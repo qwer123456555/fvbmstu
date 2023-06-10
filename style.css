@@ -1,97 +1,171 @@
 body {
   margin: 0;
   padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+}
+
+.splash-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: #000000;
 }
 
-.welcome-screen {
+.splash-content {
   text-align: center;
-  color: #ffffff;
+  color: #fff;
 }
 
-.container {
-  display: none;
-}
-
-.student-panel {
-  text-align: center;
-  background-color: #ffffff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.score-visit-wrapper {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.score-square,
-.visits-square {
-  width: 50px;
-  height: 50px;
-  border-radius: 10px;
-  margin-right: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: #ffffff;
-}
-
-.score-value,
-.visits-value {
-  font-size: 24px;
+.splash-title {
+  font-size: 48px;
   font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-.normatives-list {
-  text-align: left;
-  list-style: none;
-  padding: 0;
+.splash-subtitle {
+  font-size: 24px;
+  margin-bottom: 40px;
 }
 
-.normatives-list li {
-  margin-bottom: 5px;
-}
-
-.normative-icon {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  margin-right: 5px;
-  font-size: 18px;
-  line-height: 20px;
-}
-
-.normative-icon::before {
-  content: "✅";
-}
-
-.score-square.green {
-  background-color: #32cd32;
-}
-
-.visits-square.red {
-  background-color: #ff0000;
+input[type="text"] {
+  padding: 10px 20px;
+  font-size: 24px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
 }
 
 button {
-  background-color: #4caf50;
-  color: #ffffff;
-  border: none;
   padding: 10px 20px;
-  border-radius: 5px;
-  font-size: 16px;
+  font-size: 24px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background-color: #4caf50;
+  color: #fff;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
   background-color: #45a049;
+}
+
+.author {
+  color: #fff;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+.panel {
+  width: 500px;
+  padding: 40px;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.student-name {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.data-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.square {
+  width: 200px;
+  height: 200px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  margin: 0 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.label {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.score-value,
+.visits-value {
+  font-size: 48px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.normatives-container {
+  text-align: left;
+}
+
+.normatives-label {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.normatives-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.normative {
+  font-size: 20px;
+}
+
+/* Анимация для начального экрана */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
 }
