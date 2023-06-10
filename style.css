@@ -8,6 +8,7 @@ body {
 .logo {
   width: 100px;
   height: 100px;
+  transform: translate(-80%, -80%);
 }
 
 .splash-container {
