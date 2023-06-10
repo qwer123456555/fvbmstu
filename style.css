@@ -8,7 +8,7 @@ body {
 .logo {
   width: 100px;
   height: 100px;
-  transform: translate(-80%, -80%);
+  transform: translate(-20%);
 }
 
 .splash-container {
@@ -187,10 +187,6 @@ button:hover {
   .square {
     width: 100%;
     height: auto;
-  }
-  .logo {
-  width: 10px;
-  height: 10px;
   }
 }
 
