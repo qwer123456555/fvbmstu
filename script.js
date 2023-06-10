@@ -1,51 +1,45 @@
 document.addEventListener('DOMContentLoaded', function() {
-  const splashContainer = document.querySelector('.splash-container');
-  const fullNameInput = document.getElementById('fullName');
-  const startButton = document.getElementById('startButton');
+  const welcomeScreen = document.querySelector('.welcome-screen');
   const container = document.querySelector('.container');
-  const studentNameElement = document.getElementById('studentName');
-  const scoreElement = document.getElementById('score');
-  const visitsElement = document.getElementById('visits');
-  const swimNormativeElement = document.getElementById('swimNormative');
-  const pressNormativeElement = document.getElementById('pressNormative');
+  const nameInput = document.getElementById('nameInput');
+  const submitBtn = document.getElementById('submitBtn');
+  const studentName = document.querySelector('.student-name');
+  const scoreSquare = document.querySelector('.score-square');
+  const visitsSquare = document.querySelector('.visits-square');
+  const scoreValue = document.querySelector('.score-value');
+  const visitsValue = document.querySelector('.visits-value');
+  const normativesList = document.querySelector('.normatives-list');
 
-  startButton.addEventListener('click', function() {
-    const fullName = fullNameInput.value.trim().toLowerCase();
+  submitBtn.addEventListener('click', function() {
+    const name = nameInput.value.trim();
 
-    if (fullName === '') {
-      alert('Введите имя');
+    if (name === '') {
+      alert('Please enter a valid name.');
       return;
     }
 
-    const students = {
-      'иван иванов': {
-        score: 70,
-        visits: 25,
-        swimNormative: '✅',
-        pressNormative: '❌'
-      },
-      'петр петров': {
-        score: 40,
-        visits: 21,
-        swimNormative: '✅',
-        pressNormative: '❌'
-      }
-    };
+    welcomeScreen.style.display = 'none';
+    container.style.display = 'block';
 
-    const student = students[fullName];
+    studentName.textContent = name;
+    scoreValue.textContent = '70';
+    visitsValue.textContent = '25';
 
-    if (student) {
-      studentNameElement.textContent = fullName.toUpperCase();
-      scoreElement.textContent = student.score;
-      visitsElement.textContent = student.visits;
-      swimNormativeElement.textContent = student.swimNormative;
-      pressNormativeElement.textContent = student.pressNormative;
-
-      splashContainer.classList.add('fade-out');
-      container.classList.add('fade-in');
-      container.style.display = 'block';
+    if (parseInt(scoreValue.textContent) >= 60) {
+      scoreSquare.style.backgroundColor = '#32cd32';
     } else {
-      alert('Такого ученика нет');
+      scoreSquare.style.backgroundColor = '#ff0000';
     }
+
+    if (parseInt(visitsValue.textContent) < 23) {
+      visitsSquare.style.backgroundColor = '#ff0000';
+    } else {
+      visitsSquare.style.backgroundColor = '#32cd32';
+    }
+
+    normativesList.innerHTML = `
+      <li class="normative">Press</li>
+      <li class="normative">Swim</li>
+    `;
   });
 });
