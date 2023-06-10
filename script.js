@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+  const splashContainer = document.querySelector('.splash-container');
   const fullNameInput = document.getElementById('fullName');
   const startButton = document.getElementById('startButton');
   const container = document.querySelector('.container');
@@ -8,8 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const swimNormativeElement = document.getElementById('swimNormative');
   const pressNormativeElement = document.getElementById('pressNormative');
 
-  startButton.addEventListener('click', () => {
-    const fullName = fullNameInput.value.toLowerCase().trim();
+  startButton.addEventListener('click', function() {
+    const fullName = fullNameInput.value.trim().toLowerCase();
+
+    if (fullName === '') {
+      alert('Введите имя');
+      return;
+    }
+
     const students = {
       'иван иванов': {
         score: 70,
@@ -25,16 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    if (fullName in students) {
-      const student = students[fullName];
-      studentNameElement.textContent = fullName;
+    const student = students[fullName];
+
+    if (student) {
+      studentNameElement.textContent = fullName.toUpperCase();
       scoreElement.textContent = student.score;
       visitsElement.textContent = student.visits;
       swimNormativeElement.textContent = student.swimNormative;
       pressNormativeElement.textContent = student.pressNormative;
 
+      splashContainer.classList.add('fade-out');
+      container.classList.add('fade-in');
       container.style.display = 'block';
-      document.body.style.overflow = 'hidden'; // Disable scrolling
     } else {
       alert('Такого ученика нет');
     }
