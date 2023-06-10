@@ -13,13 +13,27 @@ document.getElementById('showDataButton').addEventListener('click', function() {
     visits = 21;
     swimNormative = true;
     pressNormative = false;
+  } else {
+    score = 0;
+    visits = 0;
+    swimNormative = false;
+    pressNormative = false;
   }
 
   var dataContainer = document.getElementById('dataContainer');
   dataContainer.innerHTML = '';
 
-  var scoreSquare = createSquare('Баллы', score, score < 60 ? 'red' : 'green');
-  var visitsSquare = createSquare('Посещения', visits, visits < 23 ? 'red' : 'green');
+  if (score < 60) {
+    var scoreSquare = createSquare('❌', score, 'red');
+  } else {
+    var scoreSquare = createSquare('✅', score, 'green');
+  }
+
+  if (visits < 23) {
+    var visitsSquare = createSquare('❌', visits, 'red');
+  } else {
+    var visitsSquare = createSquare('✅', visits, 'green');
+  }
 
   dataContainer.appendChild(scoreSquare);
   dataContainer.appendChild(visitsSquare);
@@ -32,17 +46,17 @@ document.getElementById('showDataButton').addEventListener('click', function() {
     var swimNormativeElement = document.getElementById('swimNormative');
     var pressNormativeElement = document.getElementById('pressNormative');
 
-    swimNormativeElement.textContent = 'Норматив по плаванию: ' + (swimNormative ? '+' : '-');
-    pressNormativeElement.textContent = 'Норматив по прессу: ' + (pressNormative ? '+' : '-');
+    swimNormativeElement.textContent = 'Норматив по плаванию: ' + (swimNormative ? '✅' : '❌');
+    pressNormativeElement.textContent = 'Норматив по прессу: ' + (pressNormative ? '✅' : '❌');
   } else {
     normativesContainer.style.display = 'none';
   }
 });
 
-function createSquare(label, value, colorClass) {
+function createSquare(icon, value, colorClass) {
   var square = document.createElement('div');
   square.className = 'square ' + colorClass;
-  square.innerHTML = '<span class="value">' + value + '</span><span class="label">' + label + '</span>';
+  square.innerHTML = '<div class="square-container"><span class="icon">' + icon + '</span><span class="value">' + value + '</span></div>';
 
   return square;
 }
