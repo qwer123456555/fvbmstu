@@ -70,3 +70,6 @@ function showData() {
 // Обработчик события для кнопки "Показать данные"
 var showDataButton = document.getElementById("showDataButton");
 showDataButton.addEventListener("click", showData);
+
+// Скрытие нормативов при загрузке страницы
+document.getElementById("normativesContainer").style.display = "none";
