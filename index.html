@@ -1,44 +1,48 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <title>Сайт для телефона</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body>
   <div class="splash-container">
-    <h1>Добро пожаловать!</h1>
-    <p>Введите ФИО, чтобы получить данные.</p>
-    <button id="startButton">Начать</button>
+    <div class="splash-content">
+      <h1 class="splash-title">Добро пожаловать!</h1>
+      <p class="splash-subtitle">Введите свое имя для доступа к данным:</p>
+      <input type="text" id="fullName" placeholder="Введите ваше имя">
+      <button id="startButton">Начать</button>
+      <p class="author">Автор: Голубовский Владислав</p>
+    </div>
   </div>
 
   <div class="container">
-    <h2>Введите ФИО:</h2>
-    <input type="text" id="fullName" placeholder="ФИО">
-    <button id="showDataButton">Вывести данные</button>
-
+    <h2 class="title">Сайт для телефона</h2>
     <div class="data-container">
-      <div class="square score">
-        <span id="score"></span>
-        <div class="label">баллы</div>
+      <div class="square">
+        <p class="label">Баллы</p>
+        <p id="score" class="score-value"></p>
       </div>
-      <div class="square visits">
-        <span id="visits"></span>
-        <div class="label">посещения</div>
+      <div class="square">
+        <p class="label">Посещения</p>
+        <p id="visits" class="visits-value"></p>
       </div>
-      <div class="normatives-container">
-        <div class="square normative press">
-          <span id="pressNormative"></span>
-          <div class="label">норматив пресса</div>
-        </div>
-        <div class="square normative swim">
-          <span id="swimNormative"></span>
-          <div class="label">норматив плавания</div>
-        </div>
-      </div>
+    </div>
+
+    <button id="showDataButton" class="show-data-button">Показать данные</button>
+
+    <div class="normatives-container">
+      <h3 class="normatives-label">Нормативы:</h3>
+      <ul class="normatives-list">
+        <li>Плавание: <span id="swimNormative" class="normative"></span></li>
+        <li>Пресс: <span id="pressNormative" class="normative"></span></li>
+      </ul>
     </div>
   </div>
 
   <script src="script.js"></script>
 </body>
+
 </html>
