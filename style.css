@@ -75,6 +75,7 @@ button:hover {
 }
 
 .author {
+  font-size: 15px;
   color: #000;
   position: absolute;
   bottom: 20px;
