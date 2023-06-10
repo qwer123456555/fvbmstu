@@ -47,13 +47,13 @@ document.addEventListener('DOMContentLoaded', function() {
       container.style.display = 'block';
 
       if (student.score > 59) {
-        scoreElement.parentNode.style.backgroundColor = 'green';
+        scoreElement.parentNode.style.backgroundColor = #4caf50;
       } else {
         scoreElement.parentNode.style.backgroundColor = 'red';
       }
 
       if (student.visits > 22) {
-        visitsElement.parentNode.style.backgroundColor = 'green';
+        visitsElement.parentNode.style.backgroundColor = #4caf50;
       } else {
         visitsElement.parentNode.style.backgroundColor = 'red';
       }
