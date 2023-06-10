@@ -58,4 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
       swimNormative.classList.add('red');
     }
 
-    dataContainer.style.display
+    dataContainer.style.display = 'block';
+  });
+});
