@@ -1,21 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
-  <title>Сайт для телефона</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Студент</title>
 </head>
 
 <body>
   <div class="splash-container">
     <div class="splash-content">
       <h1 class="splash-title">Добро пожаловать!</h1>
-      <p class="splash-subtitle">Введите свое имя для доступа к данным:</p>
-      <input type="text" id="fullName" placeholder="Введите ваше имя">
+      <p class="splash-subtitle">Введите ваше имя:</p>
+      <input type="text" id="fullName" placeholder="Имя Фамилия">
       <button id="startButton">Начать</button>
-      <p class="author">Автор: Голубовский Владислав</p>
     </div>
+    <p class="author">Голубовский Владислав</p>
   </div>
 
   <div class="container">
@@ -23,20 +24,19 @@
       <h2 id="studentName" class="student-name"></h2>
       <div class="data-container">
         <div class="square">
-          <p class="label">Баллы</p>
-          <p id="score" class="score-value"></p>
+          <span class="label">Баллы</span>
+          <span id="score" class="score-value"></span>
         </div>
         <div class="square">
-          <p class="label">Посещения</p>
-          <p id="visits" class="visits-value"></p>
+          <span class="label">Посещения</span>
+          <span id="visits" class="visits-value"></span>
         </div>
       </div>
-
       <div class="normatives-container">
         <h3 class="normatives-label">Нормативы:</h3>
         <ul class="normatives-list">
-          <li><span class="normative-label">Плавание:</span> <span id="swimNormative" class="normative"></span></li>
-          <li><span class="normative-label">Пресс:</span> <span id="pressNormative" class="normative"></span></li>
+          <li><span class="normative">Норматив плавания:</span> <span id="swimNormative"></span></li>
+          <li><span class="normative">Норматив пресса:</span> <span id="pressNormative"></span></li>
         </ul>
       </div>
     </div>
