@@ -39,9 +39,9 @@ input[type="text"] {
 
 button {
   display: block;
-  width: 10%;
-  padding: 8px;
-  margin-top: 14px;
+  width: fit-content;
+  margin: 16px auto;
+  padding: 8px 16px;
   background-color: #4CAF50;
   color: #fff;
   border: none;
