@@ -1,175 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Мой сайт</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+body {
+  font-family: Arial, sans-serif;
+}
 
-    .container {
-      text-align: center;
-    }
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+}
 
-    h1 {
-      font-size: 32px;
-      margin-bottom: 20px;
-    }
+h1 {
+  margin-bottom: 20px;
+}
 
-    input {
-      padding: 10px;
-      width: 250px;
-      font-size: 16px;
-    }
+input[type="text"] {
+  padding: 8px;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
 
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-    }
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+}
 
-    .square {
-      width: 100px;
-      height: 100px;
-      margin: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 24px;
-    }
+.data-container {
+  margin-top: 20px;
+  display: none;
+}
 
-    .green {
-      background-color: green;
-      color: white;
-    }
-
-    .red {
-      background-color: red;
-      color: white;
-    }
-
-    ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-      text-align: left;
-    }
-
-    ul li {
-      margin-bottom: 10px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Вводите ФИО:</h1>
-    <input type="text" id="fullNameInput">
-    <br>
-    <button id="showDataButton">Показать данные</button>
-    <br>
-    <div id="dataContainer"></div>
-    <div id="normatives"></div>
-  </div>
-
-  <script>
-    // Функция для генерации случайного норматива
-    function getRandomNorm() {
-      var norms = ["✓", "✕"];
-      var randomIndex = Math.floor(Math.random() * norms.length);
-      return norms[randomIndex];
-    }
-
-    // Функция для создания элемента списка нормативов
-    function createNormItem(label, value) {
-      var listItem = document.createElement("li");
-      listItem.textContent = label + " " + value;
-      return listItem;
-    }
-
-    // Функция для отображения данных и нормативов
-    function showData() {
-      var fullName = document.getElementById("fullNameInput").value.toLowerCase();
-      var dataContainer = document.getElementById("dataContainer");
-      var normatives = document.getElementById("normatives");
-
-      // Очищаем содержимое контейнеров данных
-      dataContainer.innerHTML = "";
-      normatives.innerHTML = "";
-
-      // Создаем элементы для отображения данных ФИО
-      var fullNameHeading = document.createElement("h2");
-      fullNameHeading.textContent = "Ваше ФИО:";
-      var fullNameData = document.createElement("p");
-      fullNameData.textContent = fullName;
-
-      // Добавляем элементы в контейнер данных
-      dataContainer.appendChild(fullNameHeading);
-      dataContainer.appendChild(fullNameData);
-
-      // Создаем квадраты для отображения баллов и посещений
-      var scoreSquare = document.createElement("div");
-      scoreSquare.classList.add("square");
-      var visitsSquare = document.createElement("div");
-      visitsSquare.classList.add("square");
-
-      // Устанавливаем значения баллов и посещений в зависимости от ФИО
-      var score, visits;
-      if (fullName === "иван иванов") {
-        score = 70;
-        visits = 25;
-        scoreSquare.classList.add("green");
-        visitsSquare.classList.add("green");
-      } else if (fullName === "петр петров") {
-        score = 40;
-        visits = 21;
-        scoreSquare.classList.add("red");
-        visitsSquare.classList.add("red");
-      } else {
-        // ФИО не соответствует заданным условиям
-        return;
-      }
-
-      // Устанавливаем значения баллов и посещений
-      scoreSquare.textContent = score;
-      visitsSquare.textContent = visits;
-
-      // Добавляем квадраты в контейнер данных
-      dataContainer.appendChild(scoreSquare);
-      dataContainer.appendChild(visitsSquare);
-
-      // Создаем список для отображения нормативов
-      var normativesList = document.createElement("ul");
-
-      // Генерируем значения нормативов в зависимости от ФИО
-      var runningNorm = getRandomNorm();
-      var absNorm = fullName.toLowerCase() === "петр петров" ? "✓" : getRandomNorm();
-      var pushupsNorm = getRandomNorm();
-      var swimmingNorm = fullName.toLowerCase() === "иван иванов" ? "✕" : getRandomNorm();
-
-      // Создаем элементы для отображения нормативов
-      var runningItem = createNormItem("Бег:", runningNorm);
-      var absItem = createNormItem("Пресс:", absNorm);
-      var pushupsItem = createNormItem("Отжимания:", pushupsNorm);
-      var swimmingItem = createNormItem("Плавание:", swimmingNorm);
-
-      // Добавляем элементы в список нормативов
-      normativesList.appendChild(runningItem);
-      normativesList.appendChild(absItem);
-      normativesList.appendChild(pushupsItem);
-      normativesList.appendChild(swimmingItem);
-
-      // Добавляем список нормативов в контейнер данных
-      normatives.appendChild(normativesList);
-    }
-
-    // Обработчик события для кнопки "Показать данные"
-    var showDataButton = document.getElementById("showDataButton");
-    showDataButton.addEventListener("click", showData);
-  </script>
-</body>
-</html>
+.square {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center
