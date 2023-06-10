@@ -1,48 +1,171 @@
-<!DOCTYPE html>
-<html lang="en">
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+}
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <title>Студент</title>
-</head>
+.splash-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
-<body>
-  <div class="splash-container">
-    <div class="splash-content">
-      <h1 class="splash-title">Добро пожаловать!</h1>
-      <p class="splash-subtitle">Введите ваше имя:</p>
-      <input type="text" id="fullName" placeholder="Имя Фамилия">
-      <button id="startButton">Начать</button>
-    </div>
-    <p class="author">Голубовский Владислав</p>
-  </div>
+.splash-content {
+  text-align: center;
+  color: #fff;
+}
 
-  <div class="container">
-    <div class="panel">
-      <h2 id="studentName" class="student-name"></h2>
-      <div class="data-container">
-        <div class="square">
-          <span class="label">Баллы</span>
-          <span id="score" class="score-value"></span>
-        </div>
-        <div class="square">
-          <span class="label">Посещения</span>
-          <span id="visits" class="visits-value"></span>
-        </div>
-      </div>
-      <div class="normatives-container">
-        <h3 class="normatives-label">Нормативы:</h3>
-        <ul class="normatives-list">
-          <li><span class="normative">Норматив плавания:</span> <span id="swimNormative"></span></li>
-          <li><span class="normative">Норматив пресса:</span> <span id="pressNormative"></span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
+.splash-title {
+  font-size: 72px;
+  font-weight: bold;
+  margin-bottom: 40px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
 
-  <script src="script.js"></script>
-</body>
+.splash-subtitle {
+  font-size: 32px;
+  margin-bottom: 60px;
+}
 
-</html>
+input[type="text"] {
+  padding: 20px;
+  font-size: 32px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+button {
+  padding: 20px;
+  font-size: 32px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background-color: #4caf50;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.author {
+  color: #fff;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+.panel {
+  width: 500px;
+  padding: 40px;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.student-name {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.data-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.square {
+  width: 200px;
+  height: 200px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  margin: 0 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.label {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.score-value,
+.visits-value {
+  font-size: 64px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.normatives-container {
+  text-align: left;
+}
+
+.normatives-label {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.normatives-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.normative {
+  font-size: 28px;
+}
+
+/* Анимация для начального экрана */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
