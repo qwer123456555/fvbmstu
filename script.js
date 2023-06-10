@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const splashContainer = document.querySelector('.splash-container');
   const fullNameInput = document.getElementById('fullName');
-  const startButton = document.querySelector('start-button');
+  const startButton = document.getElementById('startButton');
   const container = document.querySelector('.container');
   const studentNameElement = document.getElementById('studentName');
   const scoreElement = document.getElementById('score');
@@ -46,17 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
       container.classList.add('fade-in');
       container.style.display = 'block';
 
-      if (student.score > 59) {
-        scoreElement.parentNode.style.backgroundColor = '#4caf50';
-      } else {
-        scoreElement.parentNode.style.backgroundColor = 'red';
-      }
-
-      if (student.visits > 22) {
-        visitsElement.parentNode.style.backgroundColor = '#4caf50';
-      } else {
-        visitsElement.parentNode.style.backgroundColor = 'red';
-      }
+      scoreElement.parentNode.style.backgroundColor = student.score > 59 ? '#4caf50' : 'red';
+      visitsElement.parentNode.style.backgroundColor = student.visits > 22 ? '#4caf50' : 'red';
     } else {
       alert('Такого ученика нет');
     }
