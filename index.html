@@ -1,37 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <title>Student Data</title>
+  <title>Студент</title>
 </head>
+
 <body>
-  <div class="welcome-screen">
-    <h1>Welcome to the Student Data Portal</h1>
-    <p>Please enter your name:</p>
-    <input type="text" id="nameInput">
-    <button id="submitBtn">Submit</button>
+  <div class="splash-container">
+    <div class="splash-content">
+      <h1 class="splash-title">Добро пожаловать!</h1>
+      <p class="splash-subtitle">Введите ваше имя:</p>
+      <input type="text" id="fullName" placeholder="Имя Фамилия">
+      <button id="startButton">Начать</button>
+    </div>
+    <p class="author">Голубовский Владислав</p>
   </div>
 
   <div class="container">
-    <div class="student-panel">
-      <h2 class="student-name"></h2>
-      <div class="score-visit-wrapper">
-        <div class="score-square"></div>
-        <div class="score-value"></div>
+    <div class="panel">
+      <h2 id="studentName" class="student-name"></h2>
+      <div class="data-container">
+        <div class="square">
+          <span class="label">Баллы</span>
+          <span id="score" class="score-value"></span>
+        </div>
+        <div class="square">
+          <span class="label">Посещения</span>
+          <span id="visits" class="visits-value"></span>
+        </div>
       </div>
-      <div class="score-visit-wrapper">
-        <div class="visits-square"></div>
-        <div class="visits-value"></div>
+      <div class="normatives-container">
+        <h3 class="normatives-label">Нормативы:</h3>
+        <ul class="normatives-list">
+          <li><span class="normative">Норматив плавания:</span> <span id="swimNormative"></span></li>
+          <li><span class="normative">Норматив пресса:</span> <span id="pressNormative"></span></li>
+        </ul>
       </div>
-      <ul class="normatives-list">
-        <li><span class="normative-icon"></span>Press</li>
-        <li><span class="normative-icon"></span>Swim</li>
-      </ul>
     </div>
   </div>
 
   <script src="script.js"></script>
 </body>
+
 </html>
