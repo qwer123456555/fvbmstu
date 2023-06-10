@@ -3,42 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
+  <title>Student Data</title>
 </head>
 <body>
   <div class="welcome-screen">
-    <h1>Welcome to the Student Dashboard</h1>
+    <h1>Welcome to the Student Data Portal</h1>
     <p>Please enter your name:</p>
-    <input type="text" id="nameInput" placeholder="Enter your name">
+    <input type="text" id="nameInput">
     <button id="submitBtn">Submit</button>
   </div>
 
   <div class="container">
-    <div class="panel">
+    <div class="student-panel">
       <h2 class="student-name"></h2>
-      <div class="data-container">
-        <div class="square score">
-          <p class="label">Score</p>
-          <p class="score-value"></p>
-        </div>
-        <div class="square visits">
-          <p class="label">Visits</p>
-          <p class="visits-value"></p>
-        </div>
+      <div class="score-visit-wrapper">
+        <div class="score-square"></div>
+        <div class="score-value"></div>
       </div>
-      <div class="normatives-container">
-        <p class="normatives-label">Normatives:</p>
-        <ul class="normatives-list">
-          <li class="normative">Press</li>
-          <li class="normative">Swim</li>
-        </ul>
+      <div class="score-visit-wrapper">
+        <div class="visits-square"></div>
+        <div class="visits-value"></div>
       </div>
+      <ul class="normatives-list"></ul>
     </div>
-  </div>
-
-  <div class="author">
-    <p>Author: Golubovskiy Vladislav</p>
   </div>
 
   <script src="script.js"></script>
