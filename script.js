@@ -23,10 +23,8 @@ window.addEventListener('DOMContentLoaded', function() {
       swimNormative = false;
       pressNormative = true;
     } else {
-      score = 0;
-      visits = 0;
-      swimNormative = false;
-      pressNormative = false;
+      alert('Такого ученика не существует!');
+      return;
     }
 
     document.getElementById('scoreValue').textContent = score;
