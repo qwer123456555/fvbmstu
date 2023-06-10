@@ -8,31 +8,33 @@ body {
 }
 
 .container {
-  max-width: 400px;
+  max-width: 800px;
   width: 100%;
-  padding: 20px;
-  border-radius: 8px;
+  padding: 40px;
+  border-radius: 16px;
   background-color: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  font-size: 32px;
 }
 
 .input-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 }
 
 .input-container input {
   flex-grow: 1;
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+  font-size: 24px;
 }
 
 .button-container {
@@ -40,49 +42,46 @@ h1 {
 }
 
 .button-container button {
-  padding: 10px 20px;
+  padding: 20px 40px;
   background-color: #4CAF50;
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 24px;
 }
 
 .data-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 }
 
 .square {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
+  width: 160px;
+  height: 160px;
+  border-radius: 16px;
   background-color: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
-.score {
-  font-size: 24px;
+.square .value {
+  font-size: 48px;
+  font-weight: bold;
 }
 
-.visits {
+.square .label {
   font-size: 18px;
-}
-
-.label {
-  margin-top: 8px;
-  font-size: 12px;
 }
 
 .normatives-container {
   display: none;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 
 .normative-item {
@@ -92,15 +91,6 @@ h1 {
 
 .normative-item .icon {
   margin-right: 8px;
-  font-size: 16px;
-}
-
-.red {
-  background-color: #ff6b6b;
-  color: #fff;
-}
-
-.green {
-  background-color: #69c791;
-  color: #fff;
+  font-size: 24px;
+  color: #4CAF50;
 }
