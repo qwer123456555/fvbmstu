@@ -169,3 +169,18 @@ button:hover {
 .fade-in {
   animation: fadeIn 0.5s ease-in-out forwards;
 }
+@media screen and (max-width: 768px) {
+  .container {
+    width: 80%;
+  }
+
+  .panel {
+    width: 100%;
+    padding: 30px;
+  }
+
+  .square {
+    width: 120px;
+    height: 120px;
+  }
+}
