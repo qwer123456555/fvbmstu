@@ -1,15 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Страница с данными</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
+  <meta charset="UTF-8">
+  <title>Сайт для телефона</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Введите ваше ФИО:</h1>
-    <input type="text" id="fullNameInput" placeholder="ФИО">
-    <button id="showDataButton">Показать данные</button>
-    <div class="data-container" id="dataContainer"></div>
+    <h1>Сайт для телефона</h1>
+    <div class="input-container">
+      <input type="text" id="fullNameInput" placeholder="Введите ФИО">
+    </div>
+    <div class="button-container">
+      <button id="showDataButton">Показать данные</button>
+    </div>
+    <div class="data-container">
+      <div class="square score">
+        <span class="value" id="scoreValue"></span>
+        <span class="label">Баллы</span>
+      </div>
+      <div class="square visits">
+        <span class="value" id="visitsValue"></span>
+        <span class="label">Посещения</span>
+      </div>
+    </div>
+    <div class="normatives-container" id="normativesContainer">
+      <div class="normative-item">
+        <span class="icon">✅</span>
+        <span id="pressNormative">Норматив по прессу</span>
+      </div>
+      <div class="normative-item">
+        <span class="icon">✅</span>
+        <span id="swimNormative">Норматив по плаванию</span>
+      </div>
+    </div>
   </div>
 
   <script src="script.js"></script>
