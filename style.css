@@ -1,81 +1,92 @@
-html, body {
-  height: 100%;
+body {
   margin: 0;
   padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: hidden;
 }
 
 .splash-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
   background-color: #000;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  overflow: hidden;
-}
-
-.splash-content {
-  max-width: 600px;
-}
-
-.splash-title {
-  font-size: 72px;
-  margin-bottom: 40px;
-}
-
-.splash-subtitle {
-  font-size: 36px;
-  margin-bottom: 40px;
-}
-
-input[type="text"] {
-  width: 100%;
-  padding: 12px;
-  font-size: 24px;
-  margin-bottom: 40px;
-}
-
-button {
-  background-color: #007AFF;
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 36px;
-  padding: 16px 32px;
-}
-
-.author {
-  font-size: 18px;
-  margin-top: 60px;
-}
-
-.container {
-  display: none;
-  height: 100%;
-  background-color: #F8F8F8;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  overflow: hidden;
-}
-
-.panel {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
+}
+
+.splash-content {
+  text-align: center;
+  color: #fff;
+}
+
+.splash-title {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.splash-subtitle {
+  font-size: 24px;
+  margin-bottom: 40px;
+}
+
+input[type="text"] {
+  padding: 10px 20px;
+  font-size: 24px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 24px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background-color: #4caf50;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.author {
+  color: #fff;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+.panel {
+  width: 500px;
   padding: 40px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
 }
 
 .student-name {
-  font-size: 48px;
+  font-size: 32px;
   font-weight: bold;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
@@ -83,28 +94,25 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .square {
-  width: 180px;
-  height: 180px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  width: 200px;
+  height: 200px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  margin: 0 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 0 20px;
-  transform: translateZ(0);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .label {
   font-size: 24px;
-  font-weight: bold;
   margin-bottom: 10px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .score-value,
@@ -120,40 +128,44 @@ button {
 
 .normatives-label {
   font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  margin-bottom: 10px;
 }
 
 .normatives-list {
-  list-style-type: none;
+  list-style: none;
   padding: 0;
-  margin-top: 0;
-  text-align: left;
-}
-
-.normatives-list li {
-  font-size: 20px;
-  margin-bottom: 5px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  margin: 0;
 }
 
 .normative {
-  font-size: 36px;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  font-size: 20px;
 }
 
-/* Add animation to splash screen */
+/* Анимация для начального экрана */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
 
-.splash-container {
-  animation: fadeIn 1s ease-in;
+.fade-out {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
 }
