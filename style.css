@@ -1,69 +1,48 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Моя форма</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <style>
-    /* Общие стили для всего сайта */
-    body {
-      font-family: Arial, sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
-      margin: 0;
-      padding: 0;
-    }
+/* Общие стили для всего сайта */
 
-    /* Стили для мобильных устройств */
-    @media screen and (max-width: 600px) {
-      /* Установите ширину для элементов */
-      /* Установите размер шрифта */
-      /* Измените расположение блоков */
+body {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
 
-      /* Примеры */
+/* Стили для мобильных устройств */
 
-      /* Ширина 100% */
-      .container {
-        width: 100%;
-      }
+@media screen and (max-width: 600px) {
+  /* Установите ширину для элементов */
+  /* Установите размер шрифта */
+  /* Измените расположение блоков */
 
-      /* Уменьшенный размер текста */
-      h1 {
-        font-size: 24px;
-      }
+  /* Примеры */
 
-      /* Изменение расположения блоков */
-      .content {
-        display: block;
-        width: 100%;
-        margin-top: 20px;
-      }
-    }
+  /* Ширина 100% */
+  .container {
+    width: 100%;
+  }
 
-    /* Стили для планшетов */
-    @media screen and (min-width: 601px) and (max-width: 1024px) {
-      /* Добавьте стили для планшетов */
-    }
+  /* Уменьшенный размер текста */
+  h1 {
+    font-size: 24px;
+  }
 
-    /* Стили для десктопов */
-    @media screen and (min-width: 1025px) {
-      /* Добавьте стили для десктопов */
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Моя форма</h1>
-    <div class="content">
-      <form>
-        <label for="name">ФИО:</label>
-        <input type="text" id="name" name="name" placeholder="Введите ваше ФИО">
-        <br>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" placeholder="Введите ваш email">
-        <br>
-        <input type="submit" value="Отправить">
-      </form>
-    </div>
-  </div>
-</body>
-</html>
+  /* Изменение расположения блоков */
+  .content {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+  }
+}
+
+/* Стили для планшетов */
+
+@media screen and (min-width: 601px) and (max-width: 1024px) {
+  /* Добавьте стили для планшетов */
+}
+
+/* Стили для десктопов */
+
+@media screen and (min-width: 1025px) {
+  /* Добавьте стили для десктопов */
+}
