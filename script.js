@@ -1,9 +1,9 @@
-document.getElementById("myForm").addEventListener("submit", function (event) {
-    event.preventDefault(); // Предотвращаем отправку формы
+function showData() {
+    var nameInput = document.getElementById('name');
+    var name = nameInput.value;
 
-    var fullName = document.getElementById("fullName").value;
-    var result = document.getElementById("result");
+    // Здесь можно добавить код для обработки ФИО и вывода данных
 
-    // Выводим данные
-    result.innerHTML = "Ваши данные: " + fullName;
-});
+    var resultDiv = document.getElementById('result');
+    resultDiv.innerText = 'Данные для ' + name;
+}
