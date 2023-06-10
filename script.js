@@ -50,9 +50,9 @@ function showData() {
 
   // Генерируем значения нормативов в зависимости от ФИО
   var runningNorm = getRandomNorm();
-  var absNorm = fullName === "петр петров" ? "✓" : getRandomNorm();
+  var absNorm = fullName.toLowerCase() === "петр петров" ? "✓" : getRandomNorm();
   var pushupsNorm = getRandomNorm();
-  var swimmingNorm = fullName === "иван иванов" ? "✕" : getRandomNorm();
+  var swimmingNorm = fullName.toLowerCase() === "иван иванов" ? "✕" : getRandomNorm();
 
   // Создаем элементы для отображения нормативов
   var runningItem = createNormItem("Бег:", runningNorm);
