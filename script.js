@@ -32,8 +32,8 @@ document.getElementById('showDataButton').addEventListener('click', function() {
     var swimNormativeElement = document.getElementById('swimNormative');
     var pressNormativeElement = document.getElementById('pressNormative');
 
-    swimNormativeElement.textContent = 'Норматив по плаванию: ' + (swimNormative ? 'Галочка' : 'Крестик');
-    pressNormativeElement.textContent = 'Норматив по прессу: ' + (pressNormative ? 'Галочка' : 'Крестик');
+    swimNormativeElement.textContent = 'Норматив по плаванию: ' + (swimNormative ? '+' : '-');
+    pressNormativeElement.textContent = 'Норматив по прессу: ' + (pressNormative ? '+' : '-');
   } else {
     normativesContainer.style.display = 'none';
   }
