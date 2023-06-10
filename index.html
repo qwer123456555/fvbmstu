@@ -1,24 +1,101 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Сайт для ввода ФИО</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
+  <title>Страница с данными</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+
+    .data-container {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .square {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      font-size: 24px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .green {
+      background-color: #00ff00;
+    }
+
+    .red {
+      background-color: #ff0000;
+    }
+
+    .normatives-container {
+      margin-top: 20px;
+    }
+
+    .normatives-container ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .normatives-container ul li {
+      margin-bottom: 10px;
+    }
+
+    .normatives-container ul li:before {
+      content: '\2714'; /* Галочка */
+      color: #00ff00;
+      margin-right: 5px;
+    }
+
+    .normatives-container ul li.not-achieved:before {
+      content: '\2718'; /* Крестик */
+      color: #ff0000;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>Введите ваше ФИО</h1>
+    <h1>Введите ваше ФИО:</h1>
     <input type="text" id="fullNameInput" placeholder="ФИО">
-    <button onclick="showData()">Получить данные</button>
-    <div id="dataContainer"></div>
+    <button id="showDataButton">Показать данные</button>
+    <div class="data-container" id="dataContainer"></div>
+    <div class="normatives-container" id="normativesContainer">
+      <h3>Нормативы:</h3>
+      <ul>
+        <li id="swimNormative"></li>
+        <li id="pressNormative"></li>
+      </ul>
+    </div>
   </div>
-
-  <h2>Нормативы</h2>
-  <ul id="normatives">
-    <li>Бег: <span id="running"></span></li>
-    <li>Пресс: <span id="abs"></span></li>
-    <li>Отжимания: <span id="pushups"></span></li>
-    <li>Плавание: <span id="swimming"></span></li>
-  </ul>
 
   <script src="script.js"></script>
 </body>
