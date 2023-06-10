@@ -54,4 +54,14 @@ document.getElementById('showDataButton').addEventListener('click', function() {
   } else {
     normativesContainer.style.display = 'none';
   }
+  var dataContainer = document.getElementById('dataContainer');
+var normativesContainer = document.getElementById('normativesContainer');
+
+dataContainer.style.display = 'none';
+normativesContainer.style.display = 'none';
+
+document.getElementById('showDataButton').addEventListener('click', function() {
+  // Остальной код обработчика кнопки здесь
+});
+
 });
