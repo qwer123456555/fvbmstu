@@ -1,79 +1,106 @@
 body {
-  margin: 0;
-  padding: 0;
-  background-color: #f2f2f2;
-}
-
-.container {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  text-align: center;
+  font-family: Arial, sans-serif;
+  background-color: #f7f7f7;
+}
+
+.container {
+  max-width: 400px;
+  width: 100%;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 h1 {
+  text-align: center;
   margin-bottom: 20px;
-  color: #333;
 }
 
-input[type="text"] {
-  padding: 8px;
-  font-size: 16px;
-  margin-bottom: 10px;
-  border: none;
+.input-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.input-container input {
+  flex-grow: 1;
+  padding: 10px;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ccc;
 }
 
-button {
+.button-container {
+  text-align: center;
+}
+
+.button-container button {
   padding: 10px 20px;
-  font-size: 16px;
-  background-color: #00cc66;
+  background-color: #4CAF50;
   color: #fff;
   border: none;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
 }
 
 .data-container {
-  margin-top: 20px;
-  display: none;
-}
-
-.square-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .square {
-  width: 160px;
-  height: 160px;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 60px;
-  color: #fff;
-  background-color: #000;
-  border-radius: 20px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  margin-right: 20px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.score {
+  font-size: 24px;
+}
+
+.visits {
+  font-size: 18px;
 }
 
 .label {
-  font-size: 18px;
-  margin-top: 10px;
+  margin-top: 8px;
+  font-size: 12px;
 }
 
-.green {
-  background-color: #00cc66;
+.normatives-container {
+  display: none;
+  margin-top: 20px;
+}
+
+.normative-item {
+  display: flex;
+  align-items: center;
+}
+
+.normative-item .icon {
+  margin-right: 8px;
+  font-size: 16px;
 }
 
 .red {
-  background-color: #ff3b30;
+  background-color: #ff6b6b;
+  color: #fff;
+}
+
+.green {
+  background-color: #69c791;
+  color: #fff;
 }
