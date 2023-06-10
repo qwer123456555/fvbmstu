@@ -1,5 +1,6 @@
 body {
-  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 .container {
@@ -9,6 +10,7 @@ body {
   justify-content: center;
   height: 100vh;
   text-align: center;
+  background-color: #f2f2f2;
 }
 
 h1 {
@@ -28,11 +30,38 @@ button {
 
 .data-container {
   margin-top: 20px;
-  display: none;
 }
 
 .square {
   width: 100px;
   height: 100px;
   display: flex;
-  align-items: center
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  font-size: 24px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.green {
+  background-color: #00ff00;
+}
+
+.red {
+  background-color: #ff0000;
+}
+
+.normatives-container {
+  margin-top: 20px;
+  display: none;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.normatives-container ul li {
+  margin-bottom: 10px;
+}
