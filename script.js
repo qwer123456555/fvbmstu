@@ -39,12 +39,7 @@ document.getElementById('showDataButton').addEventListener('click', function() {
 function createSquare(label, value, colorClass) {
   var square = document.createElement('div');
   square.className = 'square ' + colorClass;
-  square.textContent = value;
-
-  var labelElement = document.createElement('div');
-  labelElement.textContent = label;
-
-  square.appendChild(labelElement);
+  square.innerHTML = '<span class="value">' + value + '</span><span class="label">' + label + '</span>';
 
   return square;
 }
