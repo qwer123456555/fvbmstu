@@ -5,60 +5,7 @@ body {
   overflow: hidden;
 }
 
-@media only screen and (max-width: 480px) {
-  .splash-title {
-    font-size: 48px;
-  }
-  
-  .splash-subtitle {
-    font-size: 24px;
-  }
-  
-  input[type="text"],
-  button {
-    padding: 10px;
-    font-size: 24px;
-  }
-  
-  .author {
-    font-size: 12px;
-  }
-  
-  .panel {
-    width: 90%;
-    padding: 20px;
-    font-size: 24px;
-  }
-  
-  .student-name {
-    font-size: 36px;
-  }
-  
-  .square {
-    width: 150px;
-    height: 150px;
-    margin: 0 10px;
-  }
-  
-  .label {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-  
-  .score-value,
-  .visits-value {
-    font-size: 48px;
-  }
-  
-  .normatives-label {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-  
-  .normative {
-    font-size: 20px;
-  }
-}
+
 .splash-container {
   position: absolute;
   top: 0;
@@ -222,4 +169,58 @@ button:hover {
 
 .fade-in {
   animation: fadeIn 0.5s ease-in-out forwards;
+}
+@media only screen and (max-width: 480px) {
+  .splash-title {
+    font-size: 48px;
+  }
+  
+  .splash-subtitle {
+    font-size: 24px;
+  }
+  
+  input[type="text"],
+  button {
+    padding: 10px;
+    font-size: 24px;
+  }
+  
+  .author {
+    font-size: 12px;
+  }
+  
+  .panel {
+    width: 90%;
+    padding: 20px;
+    font-size: 24px;
+  }
+  
+  .student-name {
+    font-size: 36px;
+  }
+  
+  .square {
+    width: 150px;
+    height: 150px;
+    margin: 0 10px;
+  }
+  
+  .label {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .score-value,
+  .visits-value {
+    font-size: 48px;
+  }
+  
+  .normatives-label {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .normative {
+    font-size: 20px;
+  }
 }
