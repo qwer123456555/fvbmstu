@@ -10,53 +10,60 @@ window.addEventListener('DOMContentLoaded', function() {
   document.getElementById('showDataButton').addEventListener('click', function() {
     var fullName = document.getElementById('fullNameInput').value.toLowerCase();
 
-    var score, visits, swimNormative, pressNormative;
+    var score, visits, press, swim;
+    var isExistingUser = true;
 
     if (fullName === 'иван иванов') {
       score = 70;
       visits = 25;
-      swimNormative = true;
-      pressNormative = true;
+      press = true;
+      swim = false;
     } else if (fullName === 'петр петров') {
       score = 40;
       visits = 21;
-      swimNormative = false;
-      pressNormative = true;
+      press = false;
+      swim = true;
     } else {
-      alert('Такого ученика не существует!');
-      return;
+      isExistingUser = false;
     }
 
-    document.getElementById('scoreValue').textContent = score;
-    document.getElementById('visitsValue').textContent = visits;
-
-    scoreSquare.classList.remove('green', 'red');
-    visitsSquare.classList.remove('green', 'red');
-
-    if (score < 60) {
-      scoreSquare.classList.add('red');
-    } else {
-      scoreSquare.classList.add('green');
-    }
-
-    if (visits < 23) {
-      visitsSquare.classList.add('red');
-    } else {
-      visitsSquare.classList.add('green');
-    }
-
-    if (fullName === 'иван иванов' || fullName === 'петр петров') {
+    if (isExistingUser) {
+      dataContainer.style.display = 'flex';
       normativesContainer.style.display = 'block';
 
-      var swimNormativeElement = document.getElementById('swimNormative');
-      var pressNormativeElement = document.getElementById('pressNormative');
+      scoreSquare.textContent = score;
+      visitsSquare.textContent = visits;
 
-      swimNormativeElement.textContent = 'Норматив по плаванию: ' + (swimNormative ? '✅' : '❌');
-      pressNormativeElement.textContent = 'Норматив по прессу: ' + (pressNormative ? '✅' : '❌');
+      if (visits >= 23) {
+        visitsSquare.classList.add('green');
+        visitsSquare.classList.remove('red');
+      } else {
+        visitsSquare.classList.add('red');
+        visitsSquare.classList.remove('green');
+      }
+
+      var pressElement = document.getElementById('pressNormative');
+      var swimElement = document.getElementById('swimNormative');
+
+      if (press) {
+        pressElement.innerHTML = '&#10004;'; // Галочка
+        pressElement.classList.add('green');
+      } else {
+        pressElement.innerHTML = '&#10060;'; // Крестик
+        pressElement.classList.add('red');
+      }
+
+      if (swim) {
+        swimElement.innerHTML = '&#10004;'; // Галочка
+        swimElement.classList.add('green');
+      } else {
+        swimElement.innerHTML = '&#10060;'; // Крестик
+        swimElement.classList.add('red');
+      }
     } else {
+      dataContainer.style.display = 'none';
       normativesContainer.style.display = 'none';
+      alert('Такого ученика нет');
     }
-
-    dataContainer.style.display = 'block';
   });
 });
