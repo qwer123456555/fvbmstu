@@ -11,8 +11,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       height: 100vh;
+      padding: 20px;
       text-align: center;
     }
 
@@ -42,7 +43,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 10px;
       font-size: 24px;
       color: #fff;
       text-transform: uppercase;
@@ -60,25 +60,13 @@
       margin-top: 20px;
     }
 
-    .normatives-container ul {
+    ul {
       list-style-type: none;
       padding: 0;
-      margin: 0;
     }
 
     .normatives-container ul li {
       margin-bottom: 10px;
-    }
-
-    .normatives-container ul li:before {
-      content: '\2714'; /* Галочка */
-      color: #00ff00;
-      margin-right: 5px;
-    }
-
-    .normatives-container ul li.not-achieved:before {
-      content: '\2718'; /* Крестик */
-      color: #ff0000;
     }
   </style>
 </head>
