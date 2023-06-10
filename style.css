@@ -1,48 +1,19 @@
-/* Общие стили для всего сайта */
-
-body {
-  font-family: Arial, sans-serif;
-  font-size: 50px;
-  line-height: 1.5;
-  margin: 0;
-  padding: 0;
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-/* Стили для мобильных устройств */
-
-@media screen and (max-width: 600px) {
-  /* Установите ширину для элементов */
-  /* Установите размер шрифта */
-  /* Измените расположение блоков */
-
-  /* Примеры */
-
-  /* Ширина 100% */
-  .container {
-    width: 300%;
-  }
-
-  /* Уменьшенный размер текста */
-  h1 {
-    font-size: 50px;
-  }
-
-  /* Изменение расположения блоков */
-  .content {
-    display: block;
-    width: 100%;
-    margin-top: 20px;
-  }
+h1 {
+  font-size: 24px;
 }
 
-/* Стили для планшетов */
-
-@media screen and (min-width: 601px) and (max-width: 1024px) {
-  /* Добавьте стили для планшетов */
+input[type="text"],
+input[type="submit"] {
+  margin-bottom: 10px;
 }
 
-/* Стили для десктопов */
-
-@media screen and (min-width: 1025px) {
-  /* Добавьте стили для десктопов */
+#output {
+  margin-top: 20px;
+  font-weight: bold;
 }
