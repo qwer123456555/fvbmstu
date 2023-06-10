@@ -9,12 +9,12 @@ header {
   background-color: #000;
   display: flex;
   justify-content: center;
-  padding: 20px 0;
+  padding: 10px 0;
 }
 
 .logo {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
 }
 
 .splash-container {
@@ -36,30 +36,31 @@ header {
 }
 
 .splash-title {
-  font-size: 48px;
+  font-size: 36px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .splash-subtitle {
-  font-size: 24px;
-  margin-bottom: 30px;
+  font-size: 18px;
+  margin-bottom: 20px;
 }
 
 input[type="text"] {
-  padding: 12px;
-  font-size: 24px;
+  padding: 10px;
+  font-size: 18px;
   border-radius: 8px;
   border: none;
   outline: none;
   background-color: #e0e0e0;
-  width: 300px;
-  margin-bottom: 20px;
+  width: 80%;
+  max-width: 300px;
+  margin-bottom: 15px;
 }
 
 button {
-  padding: 12px 40px;
-  font-size: 24px;
+  padding: 10px 30px;
+  font-size: 18px;
   border-radius: 8px;
   border: none;
   outline: none;
@@ -76,7 +77,7 @@ button:hover {
 .author {
   color: #000;
   position: absolute;
-  bottom: 20px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
 }
@@ -91,32 +92,33 @@ button:hover {
 }
 
 .panel {
-  width: 500px;
-  padding: 40px;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
   background-color: #f7f7f7;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
 }
 
 .student-name {
-  font-size: 36px;
+  font-size: 24px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .data-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .square {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   background-color: #e0e0e0;
   border-radius: 8px;
-  margin: 0 20px;
+  margin: 0 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -125,13 +127,13 @@ button:hover {
 }
 
 .label {
-  font-size: 24px;
-  margin-bottom: 15px;
+  font-size: 18px;
+  margin-bottom: 10px;
 }
 
 .score-value,
 .visits-value {
-  font-size: 48px;
+  font-size: 30px;
   font-weight: bold;
   color: #000;
 }
@@ -141,8 +143,8 @@ button:hover {
 }
 
 .normatives-label {
-  font-size: 24px;
-  margin-bottom: 15px;
+  font-size: 18px;
+  margin-bottom: 10px;
 }
 
 .normatives-list {
@@ -152,7 +154,7 @@ button:hover {
 }
 
 .normative {
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .back-button {
@@ -161,7 +163,7 @@ button:hover {
   left: 10px;
   transform: translateY(-50%);
   padding: 10px 20px;
-  font-size: 18px;
+  font-size: 14px;
   border-radius: 8px;
   border: none;
   outline: none;
@@ -173,70 +175,4 @@ button:hover {
 
 .back-button:hover {
   background-color: #333;
-}
-
-@media only screen and (max-width: 600px) {
-  .container {
-    width: 90%;
-    max-width: 400px;
-    padding: 20px;
-  }
-
-  .square {
-    width: 100%;
-    height: auto;
-  }
-
-  .splash-title {
-    font-size: 36px;
-    margin-bottom: 10px;
-  }
-
-  .splash-subtitle {
-    font-size: 18px;
-    margin-bottom: 20px;
-  }
-
-  input[type="text"] {
-    padding: 10px;
-    font-size: 18px;
-    width: 100%;
-    margin-bottom: 15px;
-  }
-
-  button {
-    padding: 10px 30px;
-    font-size: 18px;
-  }
-
-  .student-name {
-    font-size: 24px;
-    margin-bottom: 15px;
-  }
-
-  .label {
-    font-size: 20px;
-    margin-bottom: 10px;
-  }
-
-  .score-value,
-  .visits-value {
-    font-size: 36px;
-  }
-
-  .normatives-label {
-    font-size: 20px;
-    margin-bottom: 10px;
-  }
-
-  .normative {
-    font-size: 16px;
-  }
-
-  .back-button {
-    top: 5px;
-    left: 5px;
-    padding: 8px 16px;
-    font-size: 14px;
-  }
 }
