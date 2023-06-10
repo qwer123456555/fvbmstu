@@ -1,14 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
   const welcomeScreen = document.querySelector('.welcome-screen');
-  const container = document.querySelector('.container');
   const nameInput = document.getElementById('nameInput');
   const submitBtn = document.getElementById('submitBtn');
+  const container = document.querySelector('.container');
   const studentName = document.querySelector('.student-name');
   const scoreSquare = document.querySelector('.score-square');
   const visitsSquare = document.querySelector('.visits-square');
   const scoreValue = document.querySelector('.score-value');
   const visitsValue = document.querySelector('.visits-value');
-  const normativesList = document.querySelector('.normatives-list');
+  const normativeIcons = document.querySelectorAll('.normative-icon');
 
   submitBtn.addEventListener('click', function() {
     const name = nameInput.value.trim();
@@ -26,20 +26,19 @@ document.addEventListener('DOMContentLoaded', function() {
     visitsValue.textContent = '25';
 
     if (parseInt(scoreValue.textContent) >= 60) {
-      scoreSquare.style.backgroundColor = '#32cd32';
+      scoreSquare.classList.add('green');
     } else {
-      scoreSquare.style.backgroundColor = '#ff0000';
+      scoreSquare.classList.remove('green');
     }
 
     if (parseInt(visitsValue.textContent) < 23) {
-      visitsSquare.style.backgroundColor = '#ff0000';
+      visitsSquare.classList.add('red');
     } else {
-      visitsSquare.style.backgroundColor = '#32cd32';
+      visitsSquare.classList.remove('red');
     }
 
-    normativesList.innerHTML = `
-      <li class="normative">Press</li>
-      <li class="normative">Swim</li>
-    `;
+    normativeIcons.forEach(function(icon) {
+      icon.textContent = '✅';
+    });
   });
 });
