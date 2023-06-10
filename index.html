@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Сайт для телефона</title>
+  <title>Сайт для ввода ФИО</title>
   <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
   <div class="container">
-    <h1>Введите ФИO</h1>
-    <label for="name">ФИО:</label>
-    <input type="text" id="name" placeholder="Введите ФИО">
-    <button onclick="showData()">Вывести данные</button>
-    <div id="result"></div>
+    <h1>Введите ваше ФИО</h1>
+    <input type="text" id="fullNameInput" placeholder="ФИО">
+    <button onclick="showData()">Получить данные</button>
+    <div id="dataContainer"></div>
   </div>
 
   <script src="script.js"></script>
