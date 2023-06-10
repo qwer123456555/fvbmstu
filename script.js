@@ -1,58 +1,63 @@
 document.addEventListener('DOMContentLoaded', function() {
-  var showDataButton = document.getElementById('showDataButton');
-  var fullNameInput = document.getElementById('fullName');
-  var scoreSquare = document.getElementById('score');
-  var visitsSquare = document.getElementById('visits');
-  var pressNormative = document.getElementById('pressNormative');
-  var swimNormative = document.getElementById('swimNormative');
-  var normativesContainer = document.querySelector('.normatives-container');
-  var dataContainer = document.querySelector('.data-container');
+  const startButton = document.getElementById('startButton');
+  const showDataButton = document.getElementById('showDataButton');
+  const fullNameInput = document.getElementById('fullName');
+  const scoreElement = document.getElementById('score');
+  const visitsElement = document.getElementById('visits');
+  const pressNormative = document.getElementById('pressNormative');
+  const swimNormative = document.getElementById('swimNormative');
+  const dataContainer = document.querySelector('.data-container');
+  const normativesContainer = document.querySelector('.normatives-container');
+
+  startButton.addEventListener('click', function() {
+    document.querySelector('.splash-container').style.display = 'none';
+    document.querySelector('.container').style.display = 'block';
+  });
 
   showDataButton.addEventListener('click', function() {
-    var fullName = fullNameInput.value.toLowerCase();
-    var score = '';
-    var visits = '';
-    var press = false;
-    var swim = false;
+    const fullName = fullNameInput.value.trim().toLowerCase();
+    let score = 0;
+    let visits = 0;
+    let press = false;
+    let swim = false;
 
     if (fullName === 'иван иванов') {
-      score = '70';
-      visits = '25';
-      press = true;
-      swim = false;
-    } else if (fullName === 'петр петров') {
-      score = '40';
-      visits = '21';
+      score = 70;
+      visits = 25;
       press = false;
       swim = true;
+    } else if (fullName === 'петр петров') {
+      score = 40;
+      visits = 21;
+      press = true;
+      swim = false;
     } else {
-      dataContainer.style.display = 'none';
       alert('Такого ученика нет');
       return;
     }
 
-    scoreSquare.textContent = score;
-    visitsSquare.textContent = visits;
+    scoreElement.textContent = score;
+    visitsElement.textContent = visits;
 
     if (Number(visits) < 23) {
-      visitsSquare.classList.add('red');
+      visitsElement.parentElement.classList.add('red');
     } else {
-      visitsSquare.classList.remove('red');
+      visitsElement.parentElement.classList.remove('red');
     }
 
     if (press) {
-      pressNormative.innerHTML = '&#9989;';
+      pressNormative.textContent = '✅';
       pressNormative.classList.add('green');
     } else {
-      pressNormative.innerHTML = '&#10060;';
+      pressNormative.textContent = '❌';
       pressNormative.classList.remove('green');
     }
 
     if (swim) {
-      swimNormative.innerHTML = '&#9989;';
+      swimNormative.textContent = '✅';
       swimNormative.classList.add('green');
     } else {
-      swimNormative.innerHTML = '&#10060;';
+      swimNormative.textContent = '❌';
       swimNormative.classList.remove('green');
     }
 
