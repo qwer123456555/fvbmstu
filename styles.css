@@ -1,10 +1,11 @@
 body {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   min-height: 100vh;
   margin: 0;
   padding: 20px;
+  background-color: #f2f2f2;
 }
 
 .container {
@@ -14,6 +15,10 @@ body {
   justify-content: center;
   max-width: 600px;
   width: 100%;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
@@ -44,4 +49,33 @@ button {
 
 .data {
   margin-bottom: 8px;
+}
+
+#normatives {
+  list-style: none;
+  padding: 0;
+}
+
+#normatives li {
+  margin-bottom: 8px;
+}
+
+.square {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.red {
+  background-color: #ff4d4f;
+}
+
+.green {
+  background-color: #52c41a;
 }
