@@ -5,11 +5,12 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f8f8f8;
+  background-color: #000000;
 }
 
 .welcome-screen {
   text-align: center;
+  color: #ffffff;
 }
 
 .container {
@@ -18,8 +19,8 @@ body {
 
 .student-panel {
   text-align: center;
-  background-color: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   padding: 20px;
   border-radius: 10px;
 }
@@ -30,14 +31,22 @@ body {
   margin-bottom: 10px;
 }
 
-.score-square, .visits-square {
+.score-square,
+.visits-square {
   width: 50px;
   height: 50px;
   border-radius: 50%;
   margin-right: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #ffffff;
 }
 
-.score-value, .visits-value {
+.score-value,
+.visits-value {
   font-size: 24px;
   font-weight: bold;
 }
@@ -52,18 +61,23 @@ body {
   margin-bottom: 5px;
 }
 
-.score-square {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  line-height: 50px;
-  font-size: 24px;
-  color: #fff;
+.normative-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  font-size: 18px;
+  line-height: 20px;
 }
 
-.visits-square {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  line-height: 50px;
-  font-size: 24px;
-  color: #fff;
+.normative-icon::before {
+  content: "✅";
+}
+
+.score-square.green {
+  background-color: #32cd32;
+}
+
+.visits-square.red {
+  background-color: #ff0000;
 }
