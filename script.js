@@ -1,11 +1,10 @@
+// Функция для отображения данных
 function showData() {
   var fullName = document.getElementById("fullNameInput").value.toLowerCase();
   var dataContainer = document.getElementById("dataContainer");
-  var normatives = document.getElementById("normatives");
 
-  // Очищаем содержимое контейнеров данных
+  // Очищаем содержимое контейнера данных
   dataContainer.innerHTML = "";
-  normatives.innerHTML = "";
 
   // Создаем элементы для отображения данных ФИО
   var fullNameHeading = document.createElement("h2");
@@ -25,44 +24,49 @@ function showData() {
 
   // Устанавливаем значения баллов и посещений в зависимости от ФИО
   var score, visits;
-  if (fullName === "иван иванов") {
-    score = 70;
-    visits = 25;
-    scoreSquare.classList.add("green");
-    visitsSquare.classList.add("green");
-  } else if (fullName === "петр петров") {
-    score = 40;
-    visits = 21;
-    scoreSquare.classList.add("red");
-    visitsSquare.classList.add("red");
-  } else {
-    // ФИО не соответствует заданным условиям
-    return;
+  var normatives = {
+    "иван иванов": {
+      score: 70,
+      visits: 25,
+      swim: true,
+      press: false,
+    },
+    "петр петров": {
+      score: 40,
+      visits: 21,
+      swim: false,
+      press: true,
+    },
+  };
+
+  if (normatives.hasOwnProperty(fullName)) {
+    score = normatives[fullName].score;
+    visits = normatives[fullName].visits;
+    var swimNormative = normatives[fullName].swim ? "Галочка" : "Крестик";
+    var pressNormative = normatives[fullName].press ? "Галочка" : "Крестик";
+
+    scoreSquare.classList.add(score >= 60 ? "green" : "red");
+    visitsSquare.classList.add(visits >= 23 ? "green" : "red");
+
+    // Создаем элементы для отображения нормативов
+    var normativesHeading = document.createElement("h3");
+    normativesHeading.textContent = "Нормативы:";
+    var normativesList = document.createElement("ul");
+    var swimItem = document.createElement("li");
+    var pressItem = document.createElement("li");
+    swimItem.textContent = "Плавание: " + swimNormative;
+    pressItem.textContent = "Пресс: " + pressNormative;
+    normativesList.appendChild(swimItem);
+    normativesList.appendChild(pressItem);
+
+    // Добавляем элементы в контейнер данных
+    dataContainer.appendChild(scoreSquare);
+    dataContainer.appendChild(visitsSquare);
+    dataContainer.appendChild(normativesHeading);
+    dataContainer.appendChild(normativesList);
   }
-
-  // Устанавливаем значения баллов и посещений
-  scoreSquare.textContent = score;
-  visitsSquare.textContent = visits;
-
-  // Добавляем квадраты в контейнер данных
-  dataContainer.appendChild(scoreSquare);
-  dataContainer.appendChild(visitsSquare);
-
-  // Генерируем значения нормативов в зависимости от ФИО
-  var runningNorm = getRandomNorm();
-  var absNorm = fullName.toLowerCase() === "петр петров" ? "✓" : getRandomNorm();
-  var pushupsNorm = getRandomNorm();
-  var swimmingNorm = fullName.toLowerCase() === "иван иванов" ? "✕" : getRandomNorm();
-
-  // Создаем элементы для отображения нормативов
-  var runningItem = createNormItem("Бег:", runningNorm);
-  var absItem = createNormItem("Пресс:", absNorm);
-  var pushupsItem = createNormItem("Отжимания:", pushupsNorm);
-  var swimmingItem = createNormItem("Плавание:", swimmingNorm);
-
-  // Добавляем элементы в список нормативов
-  normatives.appendChild(runningItem);
-  normatives.appendChild(absItem);
-  normatives.appendChild(pushupsItem);
-  normatives.appendChild(swimmingItem);
 }
+
+// Обработчик события для кнопки "Показать данные"
+var showDataButton = document.getElementById("showDataButton");
+showDataButton.addEventListener("click", showData);
