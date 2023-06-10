@@ -1,44 +1,51 @@
 document.addEventListener('DOMContentLoaded', function() {
-  const welcomeScreen = document.querySelector('.welcome-screen');
-  const nameInput = document.getElementById('nameInput');
-  const submitBtn = document.getElementById('submitBtn');
+  const splashContainer = document.querySelector('.splash-container');
+  const fullNameInput = document.getElementById('fullName');
+  const startButton = document.getElementById('startButton');
   const container = document.querySelector('.container');
-  const studentName = document.querySelector('.student-name');
-  const scoreSquare = document.querySelector('.score-square');
-  const visitsSquare = document.querySelector('.visits-square');
-  const scoreValue = document.querySelector('.score-value');
-  const visitsValue = document.querySelector('.visits-value');
-  const normativeIcons = document.querySelectorAll('.normative-icon');
+  const studentNameElement = document.getElementById('studentName');
+  const scoreElement = document.getElementById('score');
+  const visitsElement = document.getElementById('visits');
+  const swimNormativeElement = document.getElementById('swimNormative');
+  const pressNormativeElement = document.getElementById('pressNormative');
 
-  submitBtn.addEventListener('click', function() {
-    const name = nameInput.value.trim();
+  startButton.addEventListener('click', function() {
+    const fullName = fullNameInput.value.trim().toLowerCase();
 
-    if (name === '') {
-      alert('Please enter a valid name.');
+    if (fullName === '') {
+      alert('Введите имя');
       return;
     }
 
-    welcomeScreen.style.display = 'none';
-    container.style.display = 'flex';
+    const students = {
+      'иван иванов': {
+        score: 70,
+        visits: 25,
+        swimNormative: '✅',
+        pressNormative: '❌'
+      },
+      'петр петров': {
+        score: 40,
+        visits: 21,
+        swimNormative: '✅',
+        pressNormative: '❌'
+      }
+    };
 
-    studentName.textContent = name;
-    scoreValue.textContent = '70';
-    visitsValue.textContent = '25';
+    const student = students[fullName];
 
-    if (parseInt(scoreValue.textContent) >= 60) {
-      scoreSquare.classList.add('green');
+    if (student) {
+      studentNameElement.textContent = fullName.toUpperCase();
+      scoreElement.textContent = student.score;
+      visitsElement.textContent = student.visits;
+      swimNormativeElement.textContent = student.swimNormative;
+      pressNormativeElement.textContent = student.pressNormative;
+
+      splashContainer.classList.add('fade-out');
+      container.classList.add('fade-in');
+      container.style.display = 'block';
     } else {
-      scoreSquare.classList.remove('green');
+      alert('Такого ученика нет');
     }
-
-    if (parseInt(visitsValue.textContent) < 23) {
-      visitsSquare.classList.add('red');
-    } else {
-      visitsSquare.classList.remove('red');
-    }
-
-    normativeIcons.forEach(function(icon) {
-      icon.innerHTML = "&#10004;";
-    });
   });
 });
