@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const splashContainer = document.querySelector('.splash-container');
   const fullNameInput = document.getElementById('fullName');
-  const startButton = document.querySelector('.start-button');
+  const startButton = document.querySelector('start-button');
   const container = document.querySelector('.container');
   const studentNameElement = document.getElementById('studentName');
   const scoreElement = document.getElementById('score');
