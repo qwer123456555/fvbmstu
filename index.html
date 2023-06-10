@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Форма ввода данных</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Сайт для телефона</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-    <h1>Введите ваше ФИооО:</h1>
-    <form id="myForm">
-        <input type="text" id="fullName" placeholder="ФИО">
-        <button type="submit">Отправить</button>
-    </form>
-    <div id="result"></div>
+    <div class="container">
+        <h1>Введите ФИО</h1>
+        <label for="name">ФИО:</label>
+        <input type="text" id="name" placeholder="Введите ФИО">
+        <button onclick="showData()">Вывести данные</button>
+        <div id="result"></div>
+    </div>
 
     <script src="script.js"></script>
 </body>
 </html>
+
