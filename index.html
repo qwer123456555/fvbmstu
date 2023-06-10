@@ -1,48 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <title>Студент</title>
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-  <div class="splash-container">
-    <div class="splash-content">
-      <h1 class="splash-title">Добро пожаловать!</h1>
-      <p class="splash-subtitle">Введите ваше имя:</p>
-      <input type="text" id="fullName" placeholder="Имя Фамилия">
-      <button id="startButton">Начать</button>
-    </div>
-    <p class="author">Голубовский Владислав</p>
+  <div class="welcome-screen">
+    <h1>Welcome to the Student Dashboard</h1>
+    <p>Please enter your name:</p>
+    <input type="text" id="nameInput" placeholder="Enter your name">
+    <button id="submitBtn">Submit</button>
   </div>
 
   <div class="container">
     <div class="panel">
-      <h2 id="studentName" class="student-name"></h2>
+      <h2 class="student-name"></h2>
       <div class="data-container">
-        <div class="square">
-          <span class="label">Баллы</span>
-          <span id="score" class="score-value"></span>
+        <div class="square score">
+          <p class="label">Score</p>
+          <p class="score-value"></p>
         </div>
-        <div class="square">
-          <span class="label">Посещения</span>
-          <span id="visits" class="visits-value"></span>
+        <div class="square visits">
+          <p class="label">Visits</p>
+          <p class="visits-value"></p>
         </div>
       </div>
       <div class="normatives-container">
-        <h3 class="normatives-label">Нормативы:</h3>
+        <p class="normatives-label">Normatives:</p>
         <ul class="normatives-list">
-          <li><span class="normative">Норматив плавания:</span> <span id="swimNormative"></span></li>
-          <li><span class="normative">Норматив пресса:</span> <span id="pressNormative"></span></li>
+          <li class="normative">Press</li>
+          <li class="normative">Swim</li>
         </ul>
       </div>
     </div>
   </div>
 
+  <div class="author">
+    <p>Author: Golubovskiy Vladislav</p>
+  </div>
+
   <script src="script.js"></script>
 </body>
-
 </html>
