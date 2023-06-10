@@ -1,5 +1,5 @@
-body, html {
-  height: 100%;
+body {
+  height: 100vh;
   margin: 0;
   padding: 0;
 }
@@ -33,4 +33,8 @@ button {
 
 #dataContainer {
   text-align: center;
+}
+
+.data {
+  margin-bottom: 8px;
 }
