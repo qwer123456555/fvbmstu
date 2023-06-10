@@ -14,7 +14,7 @@ body {
   background-color: #FFF;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 h1 {
@@ -76,7 +76,7 @@ h1 {
 .square {
   width: 150px;
   height: 150px;
-  border: 2px solid #000;
+  background-color: #FFF;
   border-radius: 10px;
   text-align: center;
   display: flex;
@@ -86,15 +86,17 @@ h1 {
   font-size: 36px;
   font-weight: bold;
   margin: 10px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   transition: background-color 0.3s;
 }
 
 .score.square {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   background-color: #FFF;
 }
 
 .visits.square {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   background-color: #FFF;
 }
 
