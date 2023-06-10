@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     welcomeScreen.style.display = 'none';
-    container.style.display = 'block';
+    container.style.display = 'flex';
 
     studentName.textContent = name;
     scoreValue.textContent = '70';
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     normativeIcons.forEach(function(icon) {
-      icon.textContent = '✅';
+      icon.innerHTML = "&#10004;";
     });
   });
 });
