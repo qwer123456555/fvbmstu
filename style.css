@@ -5,6 +5,11 @@ body {
   overflow: hidden;
 }
 
+.logo {
+  width: 100px;
+  height: 100px;
+}
+
 .splash-container {
   position: absolute;
   top: 0;
