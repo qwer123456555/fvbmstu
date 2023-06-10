@@ -1,29 +1,30 @@
 document.getElementById('showDataButton').addEventListener('click', function() {
   var fullName = document.getElementById('fullNameInput').value.toLowerCase();
 
+  var score, visits, swimNormative, pressNormative;
+
+  if (fullName === 'иван иванов') {
+    score = 70;
+    visits = 25;
+    swimNormative = false;
+    pressNormative = true;
+  } else if (fullName === 'петр петров') {
+    score = 40;
+    visits = 21;
+    swimNormative = true;
+    pressNormative = false;
+  }
+
   var dataContainer = document.getElementById('dataContainer');
   dataContainer.innerHTML = '';
 
-  var normativesContainer = document.getElementById('normativesContainer');
-  normativesContainer.style.display = 'none';
-
-  if (fullName === 'иван иванов') {
-    var score = 70;
-    var visits = 25;
-    var swimNormative = false;
-    var pressNormative = true;
-  } else if (fullName === 'петр петров') {
-    var score = 40;
-    var visits = 21;
-    var swimNormative = true;
-    var pressNormative = false;
-  }
-
   var scoreSquare = createSquare('Баллы', score, score < 60 ? 'red' : 'green');
-  var visitsSquare = createSquare('Посещения', visits, 'green');
+  var visitsSquare = createSquare('Посещения', visits, visits < 23 ? 'red' : 'green');
 
   dataContainer.appendChild(scoreSquare);
   dataContainer.appendChild(visitsSquare);
+
+  var normativesContainer = document.getElementById('normativesContainer');
 
   if (fullName === 'иван иванов' || fullName === 'петр петров') {
     normativesContainer.style.display = 'block';
@@ -33,6 +34,8 @@ document.getElementById('showDataButton').addEventListener('click', function() {
 
     swimNormativeElement.textContent = 'Норматив по плаванию: ' + (swimNormative ? 'Галочка' : 'Крестик');
     pressNormativeElement.textContent = 'Норматив по прессу: ' + (pressNormative ? 'Галочка' : 'Крестик');
+  } else {
+    normativesContainer.style.display = 'none';
   }
 });
 
