@@ -41,6 +41,18 @@ document.addEventListener('DOMContentLoaded', function() {
       swimNormativeElement.textContent = student.swimNormative;
       pressNormativeElement.textContent = student.pressNormative;
 
+      if (student.score > 59) {
+        scoreElement.style.color = 'green';
+      } else {
+        scoreElement.style.color = 'red';
+      }
+
+      if (student.visits > 22) {
+        visitsElement.style.color = 'green';
+      } else {
+        visitsElement.style.color = 'red';
+      }
+
       splashContainer.classList.add('fade-out');
       container.classList.add('fade-in');
       container.style.display = 'block';
