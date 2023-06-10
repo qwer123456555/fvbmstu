@@ -2,14 +2,21 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>МГТУ фФИЗКУЛЬТУРА</title>
+  <title>Сайт для телефона</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="splash-container">
+    <h1>Добро пожаловать!</h1>
+    <p>Введите ФИО, чтобы получить данные.</p>
+    <button id="startButton">Начать</button>
+  </div>
+
   <div class="container">
-    <h1>Введите ФИО:</h1>
+    <h2>Введите ФИО:</h2>
     <input type="text" id="fullName" placeholder="ФИО">
     <button id="showDataButton">Вывести данные</button>
+
     <div class="data-container">
       <div class="square score">
         <span id="score"></span>
@@ -20,11 +27,11 @@
         <div class="label">посещения</div>
       </div>
       <div class="normatives-container">
-        <div class="square normative">
+        <div class="square normative press">
           <span id="pressNormative"></span>
           <div class="label">норматив пресса</div>
         </div>
-        <div class="square normative">
+        <div class="square normative swim">
           <span id="swimNormative"></span>
           <div class="label">норматив плавания</div>
         </div>
