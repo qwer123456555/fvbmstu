@@ -6,13 +6,13 @@ document.getElementById('showDataButton').addEventListener('click', function() {
   if (fullName === 'иван иванов') {
     score = 70;
     visits = 25;
-    swimNormative = false;
+    swimNormative = true;
     pressNormative = true;
   } else if (fullName === 'петр петров') {
     score = 40;
     visits = 21;
-    swimNormative = true;
-    pressNormative = false;
+    swimNormative = false;
+    pressNormative = true;
   } else {
     score = 0;
     visits = 0;
@@ -20,23 +20,26 @@ document.getElementById('showDataButton').addEventListener('click', function() {
     pressNormative = false;
   }
 
-  var dataContainer = document.getElementById('dataContainer');
-  dataContainer.innerHTML = '';
+  document.getElementById('scoreValue').textContent = score;
+  document.getElementById('visitsValue').textContent = visits;
+
+  var scoreSquare = document.querySelector('.score');
+  var visitsSquare = document.querySelector('.visits');
+
+  scoreSquare.classList.remove('green', 'red');
+  visitsSquare.classList.remove('green', 'red');
 
   if (score < 60) {
-    var scoreSquare = createSquare('❌', score, 'red');
+    scoreSquare.classList.add('red');
   } else {
-    var scoreSquare = createSquare('✅', score, 'green');
+    scoreSquare.classList.add('green');
   }
 
   if (visits < 23) {
-    var visitsSquare = createSquare('❌', visits, 'red');
+    visitsSquare.classList.add('red');
   } else {
-    var visitsSquare = createSquare('✅', visits, 'green');
+    visitsSquare.classList.add('green');
   }
-
-  dataContainer.appendChild(scoreSquare);
-  dataContainer.appendChild(visitsSquare);
 
   var normativesContainer = document.getElementById('normativesContainer');
 
@@ -52,11 +55,3 @@ document.getElementById('showDataButton').addEventListener('click', function() {
     normativesContainer.style.display = 'none';
   }
 });
-
-function createSquare(icon, value, colorClass) {
-  var square = document.createElement('div');
-  square.className = 'square ' + colorClass;
-  square.innerHTML = '<div class="square-container"><span class="icon">' + icon + '</span><span class="value">' + value + '</span></div>';
-
-  return square;
-}
