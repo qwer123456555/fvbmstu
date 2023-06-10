@@ -1,26 +1,26 @@
 document.addEventListener('DOMContentLoaded', function() {
   var showDataButton = document.getElementById('showDataButton');
   var fullNameInput = document.getElementById('fullName');
-  var scoreSquare = document.querySelector('.score.square');
-  var visitsSquare = document.querySelector('.visits.square');
-  var normativesContainer = document.querySelector('.normatives-container');
-  var swimNormative = document.getElementById('swimNormative');
+  var scoreSquare = document.getElementById('score');
+  var visitsSquare = document.getElementById('visits');
   var pressNormative = document.getElementById('pressNormative');
+  var swimNormative = document.getElementById('swimNormative');
+  var normativesContainer = document.querySelector('.normatives-container');
   var dataContainer = document.querySelector('.data-container');
 
   showDataButton.addEventListener('click', function() {
-    var fullName = fullNameInput.value;
+    var fullName = fullNameInput.value.toLowerCase();
     var score = '';
     var visits = '';
     var press = false;
     var swim = false;
 
-    if (fullName.toLowerCase() === 'иван иванов') {
+    if (fullName === 'иван иванов') {
       score = '70';
       visits = '25';
       press = true;
       swim = false;
-    } else if (fullName.toLowerCase() === 'петр петров') {
+    } else if (fullName === 'петр петров') {
       score = '40';
       visits = '21';
       press = false;
@@ -34,30 +34,29 @@ document.addEventListener('DOMContentLoaded', function() {
     scoreSquare.textContent = score;
     visitsSquare.textContent = visits;
 
-    if (visits >= 23) {
-      visitsSquare.classList.add('green');
-      visitsSquare.classList.remove('red');
-    } else {
+    if (Number(visits) < 23) {
       visitsSquare.classList.add('red');
-      visitsSquare.classList.remove('green');
+    } else {
+      visitsSquare.classList.remove('red');
     }
 
     if (press) {
-      pressNormative.innerHTML = '&#10004;'; // Галочка
+      pressNormative.innerHTML = '&#9989;';
       pressNormative.classList.add('green');
     } else {
-      pressNormative.innerHTML = '&#10060;'; // Крестик
-      pressNormative.classList.add('red');
+      pressNormative.innerHTML = '&#10060;';
+      pressNormative.classList.remove('green');
     }
 
     if (swim) {
-      swimNormative.innerHTML = '&#10004;'; // Галочка
+      swimNormative.innerHTML = '&#9989;';
       swimNormative.classList.add('green');
     } else {
-      swimNormative.innerHTML = '&#10060;'; // Крестик
-      swimNormative.classList.add('red');
+      swimNormative.innerHTML = '&#10060;';
+      swimNormative.classList.remove('green');
     }
 
-    dataContainer.style.display = 'block';
+    normativesContainer.style.display = 'flex';
+    dataContainer.style.display = 'flex';
   });
 });
