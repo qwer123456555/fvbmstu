@@ -73,6 +73,7 @@ button:hover {
   left: 50%;
   transform: translate(-50%, -50%);
   display: none;
+  background-color: #fff;
 }
 
 .panel {
@@ -185,8 +186,9 @@ button:hover {
 
 .back-button {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
   padding: 10px;
   font-size: 24px;
   border-radius: 8px;
