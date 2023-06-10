@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const visitsElement = document.getElementById('visits');
   const swimNormativeElement = document.getElementById('swimNormative');
   const pressNormativeElement = document.getElementById('pressNormative');
+  const backButton = document.querySelector('.back-button');
 
   startButton.addEventListener('click', function() {
     const fullName = fullNameInput.value.trim().toLowerCase();
@@ -41,23 +42,17 @@ document.addEventListener('DOMContentLoaded', function() {
       swimNormativeElement.textContent = student.swimNormative;
       pressNormativeElement.textContent = student.pressNormative;
 
-      if (student.score > 59) {
-        scoreElement.style.color = 'green';
-      } else {
-        scoreElement.style.color = 'red';
-      }
-
-      if (student.visits > 22) {
-        visitsElement.style.color = 'green';
-      } else {
-        visitsElement.style.color = 'red';
-      }
-
       splashContainer.classList.add('fade-out');
       container.classList.add('fade-in');
       container.style.display = 'block';
     } else {
       alert('Такого ученика нет');
     }
+  });
+
+  backButton.addEventListener('click', function() {
+    splashContainer.classList.remove('fade-out');
+    container.classList.remove('fade-in');
+    container.style.display = 'none';
   });
 });
