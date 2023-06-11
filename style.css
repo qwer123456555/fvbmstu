@@ -29,11 +29,6 @@ header {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.splash-content {
-  text-align: center;
-  color: #000;
   animation: fade-in 1s ease-out forwards;
 }
 
@@ -44,6 +39,11 @@ header {
   to {
     opacity: 1;
   }
+}
+
+.splash-content {
+  text-align: center;
+  color: #000;
 }
 
 .splash-title {
@@ -88,8 +88,7 @@ button:hover {
   color: #000;
   position: absolute;
   bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 20px; /* Изменено с left на right */
 }
 
 .container {
@@ -108,6 +107,8 @@ button:hover {
   background-color: #f7f7f7;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
+  transform: translateX(-50%); /* Добавлено */
+  left: 50%; /* Добавлено */
 }
 
 .student-name {
@@ -206,9 +207,32 @@ button:hover {
     font-size: 16px;
   }
 
-  .student-name {
-    font-size: 24px;
-    margin-bottom: 10px;
+  .author {
+    right: 10px;
+    bottom: 10px;
+  }
+
+  .container {
+    width: 90%;
+  }
+
+  .panel {
+    width: 90%; /* Изменено на 90% */
+    padding: 20px;
+    transform: none; /* Изменено на none */
+    left: 50%; /* Изменено на 50% */
+    margin-left: -45%; /* Добавлено */
+  }
+
+  .data-container {
+    flex-wrap: wrap;
+    margin-bottom: 20px; /* Изменено на 20px */
+  }
+
+  .square {
+    width: 120px;
+    height: 120px;
+    margin: 0 10px 20px;
   }
 
   .label {
@@ -233,24 +257,5 @@ button:hover {
   .back-button {
     padding: 8px 16px;
     font-size: 16px;
-  }
-
-  .container {
-    width: 90%;
-  }
-
-  .panel {
-    width: 100%;
-    padding: 20px;
-  }
-
-  .data-container {
-    flex-wrap: wrap;
-  }
-
-  .square {
-    width: 120px;
-    height: 120px;
-    margin: 0 10px 20px;
   }
 }
