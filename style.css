@@ -105,8 +105,8 @@ button:hover {
   background-color: #f7f7f7;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
-  transform: translateX(-50%); /* Добавлено */
-  left: 50%; /* Добавлено */
+  left: 50%; /* Изменено */
+  transform: translateX(-50%); /* Изменено */
 }
 
 .student-name {
@@ -217,9 +217,9 @@ button:hover {
   .panel {
     width: 90%;
     padding: 40px;
-    transform: translate(-50%); /* Изменено */
-    left: 50%; /* Изменено */
-    margin-left: 0; /* Изменено */
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 0;
   }
 
   .data-container {
