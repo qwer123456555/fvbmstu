@@ -88,6 +88,8 @@ button:hover {
   color: #000;
   position: absolute;
   bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%); /* Добавлено */
 }
 
 .container {
@@ -105,8 +107,7 @@ button:hover {
   background-color: #f7f7f7;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
-  left: 50%; /* Изменено */
-  transform: translateX(-50%); /* Изменено */
+  margin: 0 auto; /* Добавлено */
 }
 
 .student-name {
@@ -208,6 +209,8 @@ button:hover {
   .author {
     right: 10px;
     bottom: 10px;
+    left: auto; /* Добавлено */
+    transform: none; /* Добавлено */
   }
 
   .container {
@@ -217,9 +220,7 @@ button:hover {
   .panel {
     width: 90%;
     padding: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-left: 0;
+    margin: 0 auto; /* Изменено */
   }
 
   .data-container {
