@@ -88,7 +88,6 @@ button:hover {
   color: #000;
   position: absolute;
   bottom: 20px;
-  right: 20px; /* Изменено с left на right */
 }
 
 .container {
@@ -98,7 +97,6 @@ button:hover {
   transform: translate(-50%, -50%);
   display: none;
   background-color: #f7f7f7;
-  animation: fade-in 1s ease-out forwards;
 }
 
 .panel {
@@ -217,16 +215,16 @@ button:hover {
   }
 
   .panel {
-    width: 90%; /* Изменено на 90% */
-    padding: 20px;
-    transform: none; /* Изменено на none */
-    left: 50%; /* Изменено на 50% */
-    margin-left: -45%; /* Добавлено */
+    width: 90%;
+    padding: 40px;
+    transform: translate(-50%); /* Изменено */
+    left: 50%; /* Изменено */
+    margin-left: 0; /* Изменено */
   }
 
   .data-container {
     flex-wrap: wrap;
-    margin-bottom: 20px; /* Изменено на 20px */
+    margin-bottom: 20px;
   }
 
   .square {
