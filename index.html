@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AutoUpgrade — Решения для авто</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -12,64 +12,57 @@
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(to right, #f8f9fb, #eef1f6);
-      color: #1a1a1a;
-      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 0.3s ease-in-out;
     }
-
-    #intro {
+    :root {
+      --bg: #f8f9fb;
+      --text: #1a1a1a;
+      --card-bg: #ffffff;
+    }
+    body.dark {
+      --bg: #1a1a1a;
+      --text: #f8f9fb;
+      --card-bg: #2c2c2c;
+    }
+    .theme-toggle {
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: #ffffff;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: 2px solid var(--text);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .theme-toggle:hover {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    #hero {
+      height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      z-index: 9999;
-      animation: fadeOutIntro 3s forwards 2s;
-    }
-    #intro h1 {
-      font-size: 48px;
-      font-weight: 700;
-      color: #1a1a1a;
-      animation: scalePulse 2s infinite;
-    }
-
-    @keyframes scalePulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.05); opacity: 0.7; }
-    }
-
-    @keyframes fadeOutIntro {
-      to {
-        opacity: 0;
-        visibility: hidden;
-      }
-    }
-
-    header {
-      max-width: 800px;
-      margin: 100px auto 30px;
-      padding: 30px;
-      background: #ffffffee;
-      border-radius: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+      justify-content: center;
       text-align: center;
-      animation: fadeIn 1s ease-out forwards;
-      transform: translateY(20px);
-      opacity: 0;
+      padding: 0 20px;
+      background: linear-gradient(135deg, #e8ebf1, #cbd2dc);
+      color: #1a1a1a;
+      animation: fadeIn 1.2s ease-out forwards;
     }
-
-    h1 {
-      font-size: 32px;
+    #hero h1 {
+      font-size: 40px;
       font-weight: 700;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
-
-    p {
-      font-size: 17px;
-      color: #555;
+    #hero p {
+      font-size: 18px;
+      color: #444;
     }
-
     .btn {
       display: inline-block;
       margin-top: 20px;
@@ -88,183 +81,181 @@
     }
 
     section {
-      max-width: 900px;
+      max-width: 1000px;
       margin: 40px auto;
       padding: 0 20px;
     }
-
     h2 {
+      font-size: 28px;
       text-align: center;
-      font-size: 24px;
-      font-weight: 600;
       margin-bottom: 24px;
     }
-
     .card {
-      background: #fff;
+      background: var(--card-bg);
       border-radius: 20px;
       padding: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       box-shadow: 0 12px 24px rgba(0,0,0,0.04);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      animation: fadeIn 1.2s ease-out;
     }
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 18px 30px rgba(0,0,0,0.08);
-    }
-
     .brand {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       font-size: 20px;
       font-weight: 600;
-      padding: 12px 16px;
-      background: #f6f8fa;
-      border-radius: 16px;
       cursor: pointer;
+      background: #f0f1f5;
+      padding: 12px 16px;
+      border-radius: 16px;
     }
-
+    .brand img {
+      width: 28px;
+      height: 28px;
+    }
     .models {
-      display: none;
       margin-top: 12px;
-      animation: slideDown 0.3s ease;
+    }
+    .model {
+      margin-bottom: 16px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+    .carousel img {
+      width: 200px;
+      height: 120px;
+      object-fit: cover;
+      margin-right: 10px;
+      border-radius: 10px;
+      scroll-snap-align: start;
     }
 
-    .model {
-      background: #f9f9f9;
-      border-radius: 14px;
-      margin-bottom: 12px;
-      padding: 12px;
+    /* Отзывы */
+    .testimonial {
+      background: #e3e8f0;
+      padding: 20px;
+      border-radius: 16px;
+      font-style: italic;
+      margin-bottom: 16px;
+    }
+
+    /* Форма */
+    form {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-
-    .model img {
-      width: 100%;
-      max-height: 200px;
-      object-fit: cover;
-      border-radius: 12px;
+    input, textarea {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
-
-    .model-details {
-      font-size: 15px;
+    button {
+      padding: 12px;
+      border: none;
+      border-radius: 20px;
+      background: #111;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     footer {
-      margin-top: 50px;
       text-align: center;
-      font-size: 14px;
-      color: #aaa;
       padding: 20px;
+      font-size: 14px;
+      color: #888;
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slideDown {
-      from { transform: translateY(-10px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    @media(max-width: 768px){
-      h1 { font-size: 26px; }
-      h2 { font-size: 22px; }
-      .btn { font-size: 15px; padding: 12px 24px; }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-<div id="intro">
-  <h1>AutoUpgrade</h1>
-</div>
-<header>
-  <h1>Решения для вашего авто</h1>
-  <p>Обновите, настройте, улучшите — быстро, просто и профессионально</p>
-  <a href="#content" class="btn">Узнать больше</a>
-</header>
 
-<div id="content">
-  <section>
-    <h2>Марки и модели</h2>
+<button class="theme-toggle" onclick="toggleTheme()">🌗 Тема</button>
 
-    <div class="card">
-      <div class="brand" onclick="toggleModels('haval')">
-        <span>Haval</span>
-      </div>
-      <div id="haval" class="models">
-        <div class="model">
-          <img src="634.png" alt="Haval Jolion" />
-          <div class="model-details"><strong>Jolion</strong> — от 3000₽<br> Устанавливается: русификация, Яндекс, Android Auto</div>
-        </div>
-        <div class="model">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/Haval_F7x_1X7A9369.jpg" alt="Haval F7x" />
-          <div class="model-details"><strong>F7x</strong> — от 3200₽<br> Устанавливается: полная прошивка, камеры 360°, YouTube</div>
+<section id="hero">
+  <div>
+    <h1>AutoUpgrade</h1>
+    <p>Модернизация китайских авто — быстро, стильно, профессионально</p>
+    <a href="#brands" class="btn">Посмотреть бренды</a>
+  </div>
+</section>
+
+<section id="brands">
+  <h2>Марки и модели</h2>
+
+  <div class="card">
+    <div class="brand" onclick="toggleModels('haval')">
+      <span>Haval</span>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Haval_Logo.png" alt="Haval">
+    </div>
+    <div id="haval" class="models">
+      <div class="model">
+        <strong>Jolion</strong> — от 3000₽
+        <div>Устанавливается: Android Auto, CarPlay, навигация</div>
+        <div class="carousel">
+          <img src="https://via.placeholder.com/200x120?text=Jolion1">
+          <img src="https://via.placeholder.com/200x120?text=Jolion2">
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="brand" onclick="toggleModels('chery')">
-        <span>Chery</span>
-      </div>
-      <div id="chery" class="models">
-        <div class="model">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Chery_Tiggo_7_PRO_1X7A9470.jpg" alt="Tiggo 7 Pro" />
-          <div class="model-details"><strong>Tiggo 7 Pro</strong> — от 2900₽<br> Устанавливается: Android Auto, камера заднего вида, CarPlay</div>
-        </div>
-        <div class="model">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Chery_Tiggo_8_PRO_1X7A9561.jpg" alt="Tiggo 8 Pro" />
-          <div class="model-details"><strong>Tiggo 8 Pro</strong> — от 3100₽<br> Устанавливается: расширенные функции мультимедиа, Яндекс.Навигатор</div>
-        </div>
-      </div>
+  <div class="card">
+    <div class="brand" onclick="toggleModels('chery')">
+      <span>Chery</span>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Chery_logo_2013.png" alt="Chery">
     </div>
-
-    <div class="card">
-      <div class="brand" onclick="toggleModels('geely')">
-        <span>Geely</span>
-      </div>
-      <div id="geely" class="models">
-        <div class="model">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/d/dc/Geely_Coolray_1X7A9844.jpg" alt="Coolray" />
-          <div class="model-details"><strong>Coolray</strong> — от 2700₽<br> Устанавливается: Google Play, голосовое управление, ТВ онлайн</div>
+    <div id="chery" class="models">
+      <div class="model">
+        <strong>Tiggo 7 Pro</strong> — от 2900₽
+        <div>Устанавливается: камеры 360, голосовое управление</div>
+        <div class="carousel">
+          <img src="https://via.placeholder.com/200x120?text=Tiggo1">
+          <img src="https://via.placeholder.com/200x120?text=Tiggo2">
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section>
-    <h2>Контакты</h2>
-    <div class="card" style="text-align:center;">
-      <p>Телефон: +7 (999) 123-45-67</p>
-      <p>Telegram / WhatsApp: @yourname</p>
-      <p>Город: ваш регион</p>
-      <a href="https://t.me/yourname" class="btn">Написать в Telegram</a>
-    </div>
-  </section>
-</div>
+<section>
+  <h2>Отзывы</h2>
+  <div class="testimonial">“Очень доволен работой! Все функции активированы, все работает отлично.” — Иван</div>
+  <div class="testimonial">“Быстро, профессионально, недорого. Рекомендую!” — Мария</div>
+</section>
 
-<footer>&copy; 2025 AutoUpgrade — Все права защищены</footer>
+<section>
+  <h2>Связаться с нами</h2>
+  <form>
+    <input type="text" placeholder="Ваше имя" required>
+    <input type="tel" placeholder="Телефон" required>
+    <textarea placeholder="Ваше сообщение"></textarea>
+    <button type="submit">Отправить</button>
+  </form>
+</section>
+
+<footer>&copy; 2025 AutoUpgrade</footer>
 
 <script>
   function toggleModels(id) {
     const el = document.getElementById(id);
-    if (el.style.display === 'block') {
-      el.style.display = 'none';
-    } else {
-      el.style.display = 'block';
-    }
+    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle('dark');
   }
 </script>
+
 </body>
 </html>
