@@ -4,268 +4,483 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AutoUpgrade — Решения для авто</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
+      background: #f4f4f4;
+      color: #1a1a1a;
       font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      transition: all 0.3s ease-in-out;
-      background: linear-gradient(135deg, var(--bg1), var(--bg2));
-      background-size: 400% 400%;
-      animation: backgroundShift 20s ease infinite;
     }
-    :root {
-      --bg: #f8f9fb;
-      --text: #1a1a1a;
-      --card-bg: #ffffff;
-      --bg1: #f8f9fb;
-      --bg2: #cbd2dc;
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
     }
-    body.dark {
-      --bg: #1a1a1a;
-      --text: #f8f9fb;
-      --card-bg: #2c2c2c;
-      --bg1: #1a1a1a;
-      --bg2: #333;
-    }
-    @keyframes backgroundShift {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-    .theme-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      background: var(--card-bg);
-      border: 2px solid var(--text);
-      border-radius: 20px;
-      padding: 8px 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s ease, color 0.3s ease;
-    }
-    .theme-toggle:hover {
-      background: var(--text);
-      color: var(--bg);
-    }
-    #hero {
-      height: 100vh;
+
+    /* Большой стартовый блок */
+    #main-section {
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      padding: 0 20px;
-      animation: fadeIn 1.2s ease-out forwards;
+      padding: 20px;
     }
-    #hero h1 {
-      font-size: 56px;
-      font-weight: 700;
+
+    .main-box {
+      background: #fff;
+      border-radius: 30px;
+      padding: 50px 30px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    #main-box h1 {
+      font-size: 52px;
       margin-bottom: 20px;
     }
-    #hero p {
+
+    #main-box p {
       font-size: 22px;
-      max-width: 600px;
-      margin: 0 auto;
+      margin-bottom: 30px;
+      color: #555;
     }
-    .btn {
-      display: inline-block;
-      margin-top: 30px;
-      padding: 16px 36px;
-      font-size: 18px;
-      font-weight: 600;
-      background: #111;
+
+    /* Кнопка */
+    .btn-primary {
+      background-color: #007aff;
       color: #fff;
-      border-radius: 32px;
+      padding: 16px 36px;
+      border-radius: 8px;
       text-decoration: none;
-      transition: all 0.3s ease;
+      font-weight: 600;
+      font-size: 18px;
+      display: inline-block;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: background-color 0.3s, transform 0.2s;
     }
-    .btn:hover {
-      background: #333;
-      transform: scale(1.05);
+    .btn-primary:hover {
+      background-color: #005bb5;
+      transform: translateY(-2px);
     }
-    section {
-      max-width: 1000px;
-      margin: 60px auto;
-      padding: 0 20px;
+
+    /* Связь + контакты */
+    section.contacts {
+      margin-top: 50px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
     }
-    h2 {
-      font-size: 32px;
+
+    section.contacts h2 {
       text-align: center;
+      font-size: 36px;
       margin-bottom: 30px;
     }
-    .card {
-      background: var(--card-bg);
+
+    .contacts-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .contact-card {
+      background: #f0f0f0;
       border-radius: 20px;
       padding: 20px;
-      margin-bottom: 24px;
-      box-shadow: 0 12px 24px rgba(0,0,0,0.04);
-      animation: fadeIn 1s ease-in-out;
+      flex: 1 1 250px;
+      min-width: 200px;
+      max-width: 350px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
-    .brand {
+
+    .contact-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+
+    .icon-phone { background-image: url('data:image/svg+xml;utf8,<svg fill="%231a1a1a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.05-.24 11.36 11.36 0 003.56.57 1 1 0 011 1v3.5a1 1 0 01-1 1A17.98 17.98 0 013 5a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.56 1 1 0 01-.24 1.05l-2.2 2.2z"/></svg>'); }
+    .icon-mail { background-image: url('data:image/svg+xml;utf8,<svg fill="%231a1a1a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>'); }
+
+    /* Блок связи через Телеграмм (над брендами) */
+    section.telegram-block {
+      margin-top: 50px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .telegram-btn {
+      background: #0088cc;
+      color: #fff;
+      padding: 16px 36px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: background 0.3s, transform 0.2s;
+    }
+    .telegram-btn:hover {
+      background: #006f99;
+      transform: translateY(-2px);
+    }
+
+    /* Блок брендов и моделей */
+    section.brands {
+      margin-top: 50px;
+      padding: 50px 20px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    }
+
+    section.brands h2 {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 40px;
+    }
+
+    /* Карточки брендов */
+    .brand-card {
+      margin-bottom: 30px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      background: #fafafa;
+    }
+
+    .brand-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 20px;
-      font-weight: 600;
+      padding: 20px;
       cursor: pointer;
-      background: #f0f1f5;
-      padding: 12px 16px;
-      border-radius: 16px;
-      transition: transform 0.3s ease;
+      transition: background 0.3s;
     }
-    .brand:hover {
-      transform: scale(1.02);
+
+    .brand-header:hover {
+      background: #f0f0f0;
     }
-    .brand img {
-      width: 28px;
-      height: 28px;
+
+    .brand-header span {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 22px;
+      font-weight: 600;
     }
+
+    .brand-header img {
+      width: 36px;
+      height: 36px;
+    }
+
     .models {
-      margin-top: 12px;
       max-height: 0;
       overflow: hidden;
+      transition: max-height 0.5s ease, opacity 0.5s ease;
       opacity: 0;
-      transition: max-height 0.6s ease, opacity 0.6s ease;
     }
+
     .models.show {
       max-height: 1000px;
       opacity: 1;
     }
+
     .model {
-      margin-bottom: 16px;
-      background: #f9f9f9;
-      border-radius: 12px;
-      padding: 12px;
+      padding: 15px 20px;
+      background: #fff;
+      border-top: 1px solid #eee;
     }
+
+    .model h3 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
     .carousel {
       display: flex;
       overflow-x: auto;
-      scroll-snap-type: x mandatory;
+      gap: 10px;
     }
     .carousel img {
       width: 200px;
       height: 120px;
-      object-fit: cover;
-      margin-right: 10px;
       border-radius: 10px;
-      scroll-snap-align: start;
+      object-fit: cover;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
     }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .carousel img:hover {
+      transform: scale(1.05);
     }
-    input, textarea {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 12px;
-      border: none;
+
+    /* Преимущества */
+    section.advantages {
+      margin-top: 50px;
+      padding: 50px 20px;
+      background: #fff;
       border-radius: 20px;
-      background: #111;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
     }
-    footer {
+
+    section.advantages h2 {
       text-align: center;
-      padding: 20px;
-      font-size: 14px;
-      color: #888;
+      font-size: 36px;
+      margin-bottom: 30px;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+
+    .advantages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .adv-item {
+      background: #f0f0f0;
+      border-radius: 20px;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 80px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: box-shadow 0.2s;
+    }
+
+    .adv-item:hover {
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    .adv-icon {
+      width: 40px;
+      height: 40px;
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+    /* Иконки преимуществ */
+    .icon-quick { background-image: url('data:image/svg+xml;utf8,<svg fill="%231a1a1a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 2v2H5.41l4.3 4.3-1.42 1.42L2 4v8h2v-4h4v-2H4V4h9.59l-4 4H16v-2h-3V2h-2z"/></svg>'); }
+    .icon-safe { background-image: url('data:image/svg+xml;utf8,<svg fill="%231a1a1a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 21c-3.87 0-7-3.13-7-7V9h14v5c0 3.87-3.13 7-7 7z"/></svg>'); }
+    .icon-guarantee { background-image: url('data:image/svg+xml;utf8,<svg fill="%231a1a1a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2L4 5v6c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V5l-8-3z"/></svg>'); }
+    .icon-expert { background-image: url('data:image/svg+xml;utf8,<svg fill="%231a1a1a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4V4h-8v4c0 2.21 1.79 4 4 4z"/><path d="M4 19v-2c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v2H4z"/></svg>'); }
+
+    /* Всплывающая ТЕЛЕГРАММ-кнопка */
+    /* для более красивого расположения связки */
+    section.telegram-contact {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .telegram-link {
+      background: #0088cc;
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: background 0.3s, transform 0.2s;
+    }
+    .telegram-link:hover {
+      background: #006f99;
+      transform: translateY(-2px);
+    }
+
+    /* Адаптация устройств */
+    @media(max-width: 768px){
+      #main-box h1 { font-size: 36px; }
+      section.advantages h2 { font-size: 28px; }
     }
   </style>
 </head>
 <body>
 
-<button class="theme-toggle" onclick="toggleTheme()">🌗 Тема</button>
+<div class="container">
 
-<section id="hero">
-  <div>
-    <h1>AutoUpgrade</h1>
-    <p>Модернизация китайских авто — быстро, стильно, профессионально</p>
-    <a href="#brands" class="btn">Посмотреть бренды</a>
-  </div>
-</section>
-
-<section id="brands">
-  <h2>Марки и модели</h2>
-  <div class="card">
-    <div class="brand" onclick="toggleModels('haval')">
-      <span>Haval</span>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Haval_Logo.png" alt="Haval">
+  <!-- Большой стартовый блок -->
+  <section id="main-section">
+    <div class="main-box" id="main-box">
+      <h1>AutoUpgrade</h1>
+      <p>Модернизация китайских авто — быстро, стильно, профессионально</p>
+      <a href="#brands" class="btn-primary">Посмотреть бренды</a>
     </div>
-    <div id="haval" class="models">
-      <div class="model">
-        <strong>Jolion</strong> — от 3000₽<br>
-        Устанавливается: Android Auto, CarPlay, навигация
-        <div class="carousel">
-          <img src="https://via.placeholder.com/200x120?text=Jolion1">
-          <img src="https://via.placeholder.com/200x120?text=Jolion2">
+  </section>
+
+  <!-- Преимущества -->
+  <section class="advantages" id="advantages" style="margin-top:50px;">
+    <h2 style="text-align:center;">Наши преимущества</h2>
+    <div class="advantages-grid">
+      <div class="adv-item">
+        <div class="adv-icon icon-quick"></div>
+        <div>15-40 минут установка</div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-icon icon-safe"></div>
+        <div>Не влияет на работу ГУ</div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-icon icon-guarantee"></div>
+        <div>Гарантированное качество</div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-icon icon-expert"></div>
+        <div>Без физического вмешательства</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Блок брендов и моделей -->
+  <section class="brands" id="brands" style="margin-top:50px;">
+    <h2 style="text-align:center;">Марки и модели</h2>
+
+    <!-- Haval -->
+    <div class="brand-card">
+      <div class="brand-header" onclick="toggleModels('haval')">
+        <span><img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Haval_Logo.png" alt="Haval"> Haval</span>
+        <span>&#9658;</span>
+      </div>
+      <div class="models" id="haval">
+        <div class="model">
+          <h3>Jolion</h3>
+          <p>От 3000₽ — Устанавливается: Android Auto, CarPlay, навигация</p>
+          <div class="carousel">
+            <img src="https://via.placeholder.com/200x120?text=Jolion1" alt="Jolion 1" />
+            <img src="https://via.placeholder.com/200x120?text=Jolion2" alt="Jolion 2" />
+          </div>
+        </div>
+        <div class="model">
+          <h3>F7</h3>
+          <p>От 3200₽ — Камеры 360°, встроенный ассистент</p>
+          <div class="carousel">
+            <img src="https://via.placeholder.com/200x120?text=F7_1" alt="F7 1" />
+            <img src="https://via.placeholder.com/200x120?text=F7_2" alt="F7 2" />
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="card">
-    <div class="brand" onclick="toggleModels('chery')">
-      <span>Chery</span>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Chery_logo_2013.png" alt="Chery">
-    </div>
-    <div id="chery" class="models">
-      <div class="model">
-        <strong>Tiggo 7 Pro</strong> — от 2900₽<br>
-        Устанавливается: камеры 360, голосовое управление
-        <div class="carousel">
-          <img src="https://via.placeholder.com/200x120?text=Tiggo1">
-          <img src="https://via.placeholder.com/200x120?text=Tiggo2">
+    <!-- Chery -->
+    <div class="brand-card">
+      <div class="brand-header" onclick="toggleModels('chery')">
+        <span><img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Chery_logo_2013.png" alt="Chery"> Chery</span>
+        <span>&#9658;</span>
+      </div>
+      <div class="models" id="chery">
+        <div class="model">
+          <h3>Tiggo 7 Pro</h3>
+          <p>От 2900₽ — Камеры 360°, голосовое управление</p>
+          <div class="carousel">
+            <img src="https://via.placeholder.com/200x120?text=Tiggo7-1" alt="Tiggo 7 Pro" />
+            <img src="https://via.placeholder.com/200x120?text=Tiggo7-2" alt="Tiggo 7 Pro" />
+          </div>
+        </div>
+        <div class="model">
+          <h3>Exeed Tiggo 8</h3>
+          <p>От 3500₽ — Расширенные функции навигации</p>
+          <div class="carousel">
+            <img src="https://via.placeholder.com/200x120?text=Exeed1" alt="Exeed Tiggo 8" />
+            <img src="https://via.placeholder.com/200x120?text=Exeed2" alt="Exeed Tiggo 8" />
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+    <!-- Geely -->
+    <div class="brand-card">
+      <div class="brand-header" onclick="toggleModels('geely')">
+        <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Geely_logo.png" alt="Geely"> Geely</span>
+        <span>&#9658;</span>
+      </div>
+      <div class="models" id="geely">
+        <div class="model">
+          <h3>Atlas</h3>
+          <p>От 3300₽ — Передовые системы ассистента водителя</p>
+          <div class="carousel">
+            <img src="https://via.placeholder.com/200x120?text=Atlas1" alt="Atlas 1"/>
+            <img src="https://via.placeholder.com/200x120?text=Atlas2" alt="Atlas 2"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- FAW -->
+    <div class="brand-card">
+      <div class="brand-header" onclick="toggleModels('faw')">
+        <span><img src="https://upload.wikimedia.org/wikipedia/commons/9/93/FAW_logo.png" alt="FAW"> FAW</span>
+        <span>&#9658;</span>
+      </div>
+      <div class="models" id="faw">
+        <div class="model">
+          <h3>Besturn X80</h3>
+          <p>От 3100₽ — Multi-link подвеска, камера заднего вида</p>
+          <div class="carousel">
+            <img src="https://via.placeholder.com/200x120?text=Besturn1" alt="Besturn X80"/>
+            <img src="https://via.placeholder.com/200x120?text=Besturn2" alt="Besturn X80"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<section>
-  <h2>Связаться с нами</h2>
-  <form action="https://formspree.io/f/your-form-id" method="POST">
-    <input type="text" name="name" placeholder="Ваше имя" required>
-    <input type="tel" name="phone" placeholder="Телефон" required>
-    <textarea name="message" placeholder="Ваше сообщение"></textarea>
-    <button type="submit">Отправить</button>
-  </form>
-  <p style="text-align:center; margin-top:10px; font-size:14px; color:gray;">
-    Или свяжитесь напрямую: <a href="https://t.me/yourtelegram" target="_blank">@yourtelegram</a>
-  </p>
-</section>
+  <!-- Блок связки с телеграммом и контактами -->
+  <section class="contacts" id="contacts">
+    <h2 style="text-align:center;">Связь и контакты</h2>
+    <div class="contacts-grid" style="margin-top:20px; justify-content: center;">
+      <div class="contact-card">
+        <div class="contact-title">Телеграмм</div>
+        <div class="contact-item" style="justify-content:center;">
+          <a href="https://t.me/yourtelegram" target="_blank" class="telegram-link">Написать в Телеграмм</a>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-title">Телефон</div>
+        <div class="contact-item">
+          <div class="icon icon-phone"></div>
+          <a href="tel:+79991234567" style="text-decoration:none; color:#1a1a1a;">+7 (999) 123-45-67</a>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-title">Почта</div>
+        <div class="contact-item">
+          <div class="icon icon-mail"></div>
+          <a href="mailto:info@autoupgrade.ru" style="text-decoration:none; color:#1a1a1a;">info@autoupgrade.ru</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<footer>&copy; 2025 AutoUpgrade</footer>
+  <!-- Подвал или еще один блок (можете убрать по желанию) -->
+  <footer style="margin-top:50px; text-align:center; padding:20px; color:#888;">
+    &copy; 2025 AutoUpgrade
+  </footer>
+
+</div>
 
 <script>
   function toggleModels(id) {
-    const el = document.getElementById(id);
-    el.classList.toggle('show');
+    document.getElementById(id).classList.toggle('show');
   }
-
-  function toggleTheme() {
-    document.body.classList.toggle('dark');
-    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-  }
-
-  window.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('dark');
-    }
-  });
 </script>
 
 </body>
 </html>
+
