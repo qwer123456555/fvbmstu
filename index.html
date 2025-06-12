@@ -1,52 +1,39 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Доход и задачи</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Календарь работ</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="income-widget">
-        <div class="income-item">
-            <span class="label">Общий доход</span>
-            <span class="value" id="total-income">₽ 0</span>
-        </div>
-        <div class="income-item">
-            <span class="label">Доход за месяц</span>
-            <span class="value" id="month-income">₽ 0</span>
-        </div>
-        <div class="income-item">
-            <span class="label">Доход за сегодня</span>
-            <span class="value" id="today-income">₽ 0</span>
-        </div>
+  <header class="income-header">
+    <div><strong>Общий доход:</strong> <span id="total-income">0 ₽</span></div>
+    <div><strong>Месяц:</strong> <span id="month-income">0 ₽</span></div>
+    <div><strong>Сегодня:</strong> <span id="today-income">0 ₽</span></div>
+  </header>
+
+  <div class="calendar-wrapper" id="calendar-wrapper">
+    <div class="calendar-container" id="calendar-container">
+      <!-- Дни подгружаются скриптом -->
     </div>
+  </div>
 
-    <div class="calendar-header">
-        <button id="prev-day">‹</button>
-        <div id="current-date">Сегодня</div>
-        <button id="next-day">›</button>
-    </div>
+  <button class="add-btn" id="add-task-btn">+</button>
 
-    <div id="task-list"></div>
+  <!-- Модальное окно -->
+  <div class="modal" id="task-modal">
+    <form id="task-form">
+      <input id="client-name" placeholder="Имя клиента" required />
+      <input id="car-model" placeholder="Машина" required />
+      <input id="task-time" type="time" required />
+      <input id="price" placeholder="Цена" required />
+      <input id="location" placeholder="Место" required />
+      <textarea id="description" placeholder="Описание"></textarea>
+      <button type="submit">Сохранить</button>
+    </form>
+  </div>
 
-    <button class="add-btn" id="add-task-btn">+</button>
-
-    <div class="modal" id="task-modal">
-        <div class="modal-content">
-            <h2>Добавить работу</h2>
-            <form id="task-form">
-                <input type="text" id="client-name" placeholder="Имя клиента" required>
-                <input type="text" id="car-model" placeholder="Автомобиль" required>
-                <input type="datetime-local" id="task-time" required>
-                <input type="text" id="price" placeholder="₽ Стоимость" required>
-                <input type="text" id="location" placeholder="Место" required>
-                <textarea id="description" placeholder="Описание (необязательно)"></textarea>
-                <button type="submit">Сохранить</button>
-            </form>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
