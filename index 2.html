@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доход и задачи</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="income-widget">
+        <div class="income-item">
+            <span class="label">Общий доход</span>
+            <span class="value" id="total-income">₽ 0</span>
+        </div>
+        <div class="income-item">
+            <span class="label">Доход за месяц</span>
+            <span class="value" id="month-income">₽ 0</span>
+        </div>
+        <div class="income-item">
+            <span class="label">Доход за сегодня</span>
+            <span class="value" id="today-income">₽ 0</span>
+        </div>
+    </div>
+
+    <div class="calendar-header">
+        <button id="prev-day">‹</button>
+        <div id="current-date">Сегодня</div>
+        <button id="next-day">›</button>
+    </div>
+
+    <div id="task-list"></div>
+
+    <button class="add-btn" id="add-task-btn">+</button>
+
+    <div class="modal" id="task-modal">
+        <div class="modal-content">
+            <h2>Добавить работу</h2>
+            <form id="task-form">
+                <input type="text" id="client-name" placeholder="Имя клиента" required>
+                <input type="text" id="car-model" placeholder="Автомобиль" required>
+                <input type="datetime-local" id="task-time" required>
+                <input type="text" id="price" placeholder="₽ Стоимость" required>
+                <input type="text" id="location" placeholder="Место" required>
+                <textarea id="description" placeholder="Описание (необязательно)"></textarea>
+                <button type="submit">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
