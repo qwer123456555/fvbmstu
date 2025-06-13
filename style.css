@@ -5,7 +5,7 @@ body, html { margin:0; padding:0; font-family:-apple-system; background:#f0f0f3;
 .day-title { font-weight:bold; }
 .tasks .task { background:#fff; margin-bottom:8px; border-radius:12px; padding:10px; position:relative; }
 .task .actions { position:absolute; right:10px; top:10px; display:flex; gap:6px; }
-.task .status { position:absolute; left:10px; top:10px; cursor:pointer; }
+.task .actions button { background:none; border:none; cursor:pointer; font-size:18px; }
 .add-btn { position:fixed; right:20px; bottom:20px; width:56px;height:56px;border:none;border-radius:50%; background:#007aff; color:#fff; font-size:28px;}
 .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); justify-content:center; align-items:center;}
 .modal-box { background:#fff; border-radius:16px; padding:16px; width:90%; max-width:360px; }
