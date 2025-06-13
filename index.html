@@ -1,38 +1,44 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Календарь работ</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="income-header">
-    <div><strong>Общий доход:</strong> <span id="total-income">0 ₽</span></div>
-    <div><strong>Месяц:</strong> <span id="month-income">0 ₽</span></div>
-    <div><strong>Сегодня:</strong> <span id="today-income">0 ₽</span></div>
+    <div>Общий: <span id="total-income">0 ₽</span></div>
+    <div>Месяц: <span id="month-income">0 ₽</span></div>
+    <div>Сегодня: <span id="today-income">0 ₽</span></div>
   </header>
 
   <div class="calendar-wrapper" id="calendar-wrapper">
-    <div class="day-box" id="day-box">
-      <h2 id="day-title">Загрузка...</h2>
-      <div class="task-list" id="task-list"></div>
+    <div class="day-view">
+      <button id="prev-btn">←</button>
+      <div class="day-title" id="day-title">…</div>
+      <button id="next-btn">→</button>
     </div>
+    <div class="tasks" id="tasks"></div>
   </div>
 
-  <button class="add-btn" id="add-task-btn">+</button>
+  <button class="add-btn" id="add-btn">+</button>
 
-  <div class="modal" id="task-modal">
-    <form id="task-form">
-      <input id="client-name" placeholder="Имя клиента" required />
-      <input id="car-model" placeholder="Машина" required />
-      <input id="task-time" type="time" required />
-      <input id="price" placeholder="Цена" required />
-      <input id="location" placeholder="Место" required />
-      <textarea id="description" placeholder="Описание"></textarea>
-      <input type="hidden" id="edit-index" />
-      <button type="submit">Сохранить</button>
-    </form>
+  <div class="modal" id="modal">
+    <div class="modal-box">
+      <h3>Добавить / редактировать</h3>
+      <form id="form">
+        <input id="client" placeholder="Клиент" required>
+        <input id="car" placeholder="Авто" required>
+        <input id="time" type="time" required>
+        <input id="price" placeholder="Цена" required>
+        <input id="place" placeholder="Место" required>
+        <textarea id="desc" placeholder="Описание"></textarea>
+        <input type="hidden" id="edit">
+        <button type="submit">Сохранить</button>
+        <button type="button" id="cancel">Отмена</button>
+      </form>
+    </div>
   </div>
 
   <script src="script.js"></script>
