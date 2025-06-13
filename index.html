@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Календарь работ</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <header class="income-header">
@@ -14,14 +14,14 @@
   </header>
 
   <div class="calendar-wrapper" id="calendar-wrapper">
-    <div class="calendar-container" id="calendar-container">
-      <!-- Дни подгружаются скриптом -->
+    <div class="day-box" id="day-box">
+      <h2 id="day-title">Загрузка...</h2>
+      <div class="task-list" id="task-list"></div>
     </div>
   </div>
 
   <button class="add-btn" id="add-task-btn">+</button>
 
-  <!-- Модальное окно -->
   <div class="modal" id="task-modal">
     <form id="task-form">
       <input id="client-name" placeholder="Имя клиента" required />
