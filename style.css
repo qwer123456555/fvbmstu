@@ -1,93 +1,31 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "San Francisco", sans-serif;
-  background: #f0f0f3;
-  color: #111;
-}
-
-.income-header {
-  padding: 12px;
-  background: #fff;
-  display: flex;
-  justify-content: space-around;
-  border-bottom: 1px solid #ccc;
-  font-size: 14px;
-}
-
-.calendar-wrapper {
-  height: calc(100vh - 80px);
-  overflow: hidden;
-  position: relative;
-}
-
-.day-box {
-  margin: 16px;
-  background: white;
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  transition: transform 0.3s ease;
-}
-
-.day-box h2 {
-  margin: 0 0 10px;
-  font-size: 16px;
-  text-align: center;
-}
-
 .task-card {
+  position: relative;
   background: #f7f7f7;
   border-radius: 16px;
-  padding: 10px;
+  padding: 10px 40px 10px 10px;
   margin-top: 8px;
   font-size: 14px;
 }
 
-.add-btn {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  background: #007aff;
-  color: white;
-  border: none;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  font-size: 28px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  z-index: 10;
+.task-status {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 20px;
+  cursor: pointer;
 }
 
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  align-items: center;
-  justify-content: center;
-}
-
-.modal form {
-  background: white;
-  border-radius: 20px;
-  padding: 20px;
-  width: 90%;
-  max-width: 400px;
+.task-actions {
   display: flex;
-  flex-direction: column;
   gap: 10px;
+  margin-top: 5px;
 }
 
-.modal input, .modal textarea {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-}
-
-.modal button {
-  background: #007aff;
-  color: white;
-  padding: 10px;
+.task-actions button {
+  font-size: 12px;
+  background: #eee;
   border: none;
-  border-radius: 10px;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
 }
