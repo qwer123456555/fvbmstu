@@ -1,93 +1,15 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "San Francisco", sans-serif;
-  background: #f0f0f3;
-  color: #111;
-}
-
-.income-header {
-  padding: 12px;
-  background: #fff;
-  display: flex;
-  justify-content: space-around;
-  border-bottom: 1px solid #ccc;
-  font-size: 14px;
-}
-
-.calendar-wrapper {
-  height: calc(100vh - 80px);
-  overflow: hidden;
-  position: relative;
-}
-
-.day-box {
-  margin: 16px;
-  background: white;
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  transition: transform 0.3s ease;
-}
-
-.day-box h2 {
-  margin: 0 0 10px;
-  font-size: 16px;
-  text-align: center;
-}
-
-.task-card {
-  background: #f7f7f7;
-  border-radius: 16px;
-  padding: 10px;
-  margin-top: 8px;
-  font-size: 14px;
-}
-
-.add-btn {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  background: #007aff;
-  color: white;
-  border: none;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  font-size: 28px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  z-index: 10;
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  align-items: center;
-  justify-content: center;
-}
-
-.modal form {
-  background: white;
-  border-radius: 20px;
-  padding: 20px;
-  width: 90%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.modal input, .modal textarea {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-}
-
-.modal button {
-  background: #007aff;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-}
+body, html { margin:0; padding:0; font-family:-apple-system; background:#f0f0f3; }
+.income-header { display:flex; justify-content:space-around; padding:12px; background:#fff; }
+.calendar-wrapper { padding:16px;}
+.day-view { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.day-title { font-weight:bold; }
+.tasks .task { background:#fff; margin-bottom:8px; border-radius:12px; padding:10px; position:relative; }
+.task .actions { position:absolute; right:10px; top:10px; display:flex; gap:6px; }
+.task .status { position:absolute; left:10px; top:10px; cursor:pointer; }
+.add-btn { position:fixed; right:20px; bottom:20px; width:56px;height:56px;border:none;border-radius:50%; background:#007aff; color:#fff; font-size:28px;}
+.modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); justify-content:center; align-items:center;}
+.modal-box { background:#fff; border-radius:16px; padding:16px; width:90%; max-width:360px; }
+.modal-box form { display:flex; flex-direction:column; gap:8px; }
+.modal-box input, .modal-box textarea { padding:8px; border:1px solid #ccc; border-radius:8px;}
+.modal-box button { padding:10px; border:none; border-radius:8px; background:#007aff; color:#fff;}
+.modal-box button#cancel { background:#ccc; }
