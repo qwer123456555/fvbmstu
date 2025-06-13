@@ -1,42 +1,39 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Календарь работ</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Календарь доходов</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="income-header">
-    <div>Общий: <span id="total-income">0 ₽</span></div>
-    <div>Месяц: <span id="month-income">0 ₽</span></div>
-    <div>Сегодня: <span id="today-income">0 ₽</span></div>
+    <div><div class="label">Всего</div><div id="total-income">0 ₽</div></div>
+    <div><div class="label">Месяц</div><div id="month-income">0 ₽</div></div>
+    <div><div class="label">Сегодня</div><div id="today-income">0 ₽</div></div>
   </header>
 
-  <div class="calendar-wrapper" id="calendar-wrapper">
-    <div class="day-view">
-      <button id="prev-btn">←</button>
-      <div class="day-title" id="day-title">…</div>
-      <button id="next-btn">→</button>
-    </div>
-    <div class="tasks" id="tasks"></div>
-  </div>
+  <main id="calendar-wrapper">
+    <div class="day-title" id="day-title"></div>
+    <div id="tasks" class="tasks"></div>
+  </main>
 
   <button class="add-btn" id="add-btn">+</button>
 
   <div class="modal" id="modal">
     <div class="modal-box">
-      <h3>Добавить / редактировать</h3>
       <form id="form">
-        <input id="client" placeholder="Клиент" required>
-        <input id="car" placeholder="Авто" required>
-        <input id="time" type="time" required>
-        <input id="price" placeholder="Цена" required>
-        <input id="place" placeholder="Место" required>
+        <input id="client" placeholder="Имя клиента" required />
+        <input id="car" placeholder="Автомобиль" required />
+        <input id="time" placeholder="Время (например, 14:00–15:30)" required />
+        <input id="price" placeholder="Стоимость (₽)" required />
+        <input id="place" placeholder="Место" required />
         <textarea id="desc" placeholder="Описание"></textarea>
-        <input type="hidden" id="edit">
-        <button type="submit">Сохранить</button>
-        <button type="button" id="cancel">Отмена</button>
+        <input type="hidden" id="edit" />
+        <div class="form-buttons">
+          <button type="submit">Сохранить</button>
+          <button type="button" id="cancel">Отмена</button>
+        </div>
       </form>
     </div>
   </div>
