@@ -1,59 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("calendar-container");
+  const tasks = JSON.parse(localStorage.getItem("tasks") || "{}");
+  const taskList = document.getElementById("task-list");
+  const dayTitle = document.getElementById("day-title");
   const modal = document.getElementById("task-modal");
   const form = document.getElementById("task-form");
   const btn = document.getElementById("add-task-btn");
 
-  const tasks = JSON.parse(localStorage.getItem("tasks") || "{}");
-  const dateList = generateDates("2025-06-12", "2027-12-31");
-
+  const dates = generateDates("2025-06-12", "2027-12-31");
   let currentIndex = 0;
 
-  // Генерация всех дней
-  dateList.forEach((dateStr, i) => {
-    const view = document.createElement("div");
-    view.className = "day-view";
+  function renderDay() {
+    const date = dates[currentIndex];
+    dayTitle.textContent = formatDate(date);
+    taskList.innerHTML = "";
 
-    const box = document.createElement("div");
-    box.className = "day-box";
-    box.innerHTML = `<h2>${formatDate(dateStr)}</h2><div class="task-list" id="tasks-${dateStr}"></div>`;
-    view.appendChild(box);
-    container.appendChild(view);
-
-    renderTasks(dateStr);
-  });
-
-  // Кнопка +
-  btn.addEventListener("click", () => {
-    modal.style.display = "flex";
-  });
-
-  // Добавление задачи
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const name = document.getElementById("client-name").value;
-    const car = document.getElementById("car-model").value;
-    const time = document.getElementById("task-time").value;
-    const price = document.getElementById("price").value;
-    const place = document.getElementById("location").value;
-    const desc = document.getElementById("description").value;
-
-    const date = dateList[currentIndex];
-    if (!tasks[date]) tasks[date] = [];
-    tasks[date].push({ name, car, time, price, place, desc });
-
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    form.reset();
-    modal.style.display = "none";
-    renderTasks(date);
-  });
-
-  function renderTasks(dateStr) {
-    const list = document.getElementById(`tasks-${dateStr}`);
-    if (!list) return;
-    list.innerHTML = "";
-
-    (tasks[dateStr] || []).forEach(t => {
+    const dayTasks = tasks[date] || [];
+    dayTasks.forEach(t => {
       const card = document.createElement("div");
       card.className = "task-card";
       card.innerHTML = `
@@ -64,13 +26,55 @@ document.addEventListener("DOMContentLoaded", () => {
         <div>📍 ${t.place}</div>
         ${t.desc ? `<div>📝 ${t.desc}</div>` : ""}
       `;
-      list.appendChild(card);
+      taskList.appendChild(card);
     });
   }
 
-  function formatDate(d) {
-    return new Date(d).toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
-  }
+  renderDay();
+
+  btn.addEventListener("click", () => {
+    modal.style.display = "flex";
+  });
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("client-name").value;
+    const car = document.getElementById("car-model").value;
+    const time = document.getElementById("task-time").value;
+    const price = document.getElementById("price").value;
+    const place = document.getElementById("location").value;
+    const desc = document.getElementById("description").value;
+
+    const date = dates[currentIndex];
+    if (!tasks[date]) tasks[date] = [];
+    tasks[date].push({ name, car, time, price, place, desc });
+
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    form.reset();
+    modal.style.display = "none";
+    renderDay();
+  });
+
+  modal.addEventListener("click", e => {
+    if (e.target === modal) modal.style.display = "none";
+  });
+
+  // Свайпы
+  let startX = 0;
+  const wrapper = document.getElementById("calendar-wrapper");
+
+  wrapper.addEventListener("touchstart", e => {
+    startX = e.touches[0].clientX;
+  });
+
+  wrapper.addEventListener("touchend", e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0 && currentIndex < dates.length - 1) currentIndex++;
+      else if (dx > 0 && currentIndex > 0) currentIndex--;
+      renderDay();
+    }
+  });
 
   function generateDates(start, end) {
     const res = [];
@@ -83,18 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return res;
   }
 
-  // Свайпы
-  let startX = 0;
-  container.addEventListener("touchstart", e => {
-    startX = e.touches[0].clientX;
-  });
-
-  container.addEventListener("touchend", e => {
-    const dx = e.changedTouches[0].clientX - startX;
-    if (Math.abs(dx) > 50) {
-      if (dx < 0 && currentIndex < dateList.length - 1) currentIndex++;
-      if (dx > 0 && currentIndex > 0) currentIndex--;
-      container.style.transform = `translateX(-${100 * currentIndex}%)`;
-    }
-  });
+  function formatDate(d) {
+    return new Date(d).toLocaleDateString("ru-RU", {
+      weekday: "long", day: "numeric", month: "long"
+    });
+  }
 });
