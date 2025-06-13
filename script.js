@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal: document.getElementById('modal'),
     form: document.getElementById('form'),
     cancel: document.getElementById('cancel'),
+    wrapper: document.getElementById('calendar-wrapper'),
     fields: ['client','car','time','price','place','desc','edit'].reduce((o,id)=> (o[id]=document.getElementById(id),o), {})
   };
   const inc = { total:0, month:0, today:0, elements: {
@@ -21,14 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function todayISO(){ return new Date().toISOString().split('T')[0]; }
 
-  el.prev.onclick = ()=>{
-    if(idx>0) idx--, draw();
-  };
-  el.next.onclick = ()=>{
-    if(idx<dates.length-1) idx++, draw();
-  };
+  el.prev.onclick = ()=>{ if(idx>0) idx--, draw(); };
+  el.next.onclick = ()=>{ if(idx<dates.length-1) idx++, draw(); };
   el.add.onclick = ()=> openModal();
-
   el.cancel.onclick = ()=> el.modal.style.display='none';
 
   el.form.onsubmit = e=>{
@@ -52,18 +48,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   el.list.onclick = e=>{
     const t = e.target;
-    if(t.classList.contains('status')){
+    if(t.dataset.i != null){
       const i = +t.dataset.i;
       const day = tasks[dates[idx]];
-      day[i].done = !day[i].done;
+      if(t.classList.contains('toggle')) {
+        day[i].done = !day[i].done;
+      } else if(t.classList.contains('del')){
+        day.splice(i,1);
+      } else if(t.classList.contains('edit')){
+        openModal(i, day[i]);
+        return;
+      }
       save(); draw();
-    } else if(t.classList.contains('del')){
-      const i = +t.dataset.i;
-      tasks[dates[idx]].splice(i,1);
-      save(); draw();
-    } else if(t.classList.contains('edit')){
-      const i = +t.dataset.i;
-      openModal(i, tasks[dates[idx]][i]);
     }
   };
 
@@ -84,9 +80,9 @@ document.addEventListener("DOMContentLoaded", () => {
     (tasks[date]||[]).forEach((t,i)=>{
       el.list.innerHTML += `
         <div class="task">
-          <div class="status" data-i="${i}">${t.done?'✅':'❌'}</div>
           <div><strong>${t.client}</strong> ${t.time} ${t.car} ${t.place} ${t.price} ₽ ${t.desc?'– '+t.desc:''}</div>
           <div class="actions">
+            <button class="toggle" data-i="${i}">${t.done?'✅':'❌'}</button>
             <button class="edit" data-i="${i}">✏️</button>
             <button class="del" data-i="${i}">🗑️</button>
           </div>
@@ -121,6 +117,19 @@ document.addEventListener("DOMContentLoaded", () => {
     while(d<=D){ a.push(d.toISOString().split('T')[0]); d.setDate(d.getDate()+1); }
     return a;
   }
+
+  // 👇 свайп между датами
+  let startX = 0;
+  el.wrapper.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+  el.wrapper.addEventListener('touchend', e => {
+    const endX = e.changedTouches[0].clientX;
+    const dx = endX - startX;
+    if(Math.abs(dx) > 30){
+      if(dx < 0 && idx < dates.length-1) idx++;
+      else if(dx > 0 && idx > 0) idx--;
+      draw();
+    }
+  });
 
   draw();
 });
