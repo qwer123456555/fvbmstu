@@ -1,15 +1,151 @@
-body, html { margin:0; padding:0; font-family:-apple-system; background:#f0f0f3; }
-.income-header { display:flex; justify-content:space-around; padding:12px; background:#fff; }
-.calendar-wrapper { padding:16px;}
-.day-view { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-.day-title { font-weight:bold; }
-.tasks .task { background:#fff; margin-bottom:8px; border-radius:12px; padding:10px; position:relative; }
-.task .actions { position:absolute; right:10px; top:10px; display:flex; gap:6px; }
-.task .actions button { background:none; border:none; cursor:pointer; font-size:18px; }
-.add-btn { position:fixed; right:20px; bottom:20px; width:56px;height:56px;border:none;border-radius:50%; background:#007aff; color:#fff; font-size:28px;}
-.modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); justify-content:center; align-items:center;}
-.modal-box { background:#fff; border-radius:16px; padding:16px; width:90%; max-width:360px; }
-.modal-box form { display:flex; flex-direction:column; gap:8px; }
-.modal-box input, .modal-box textarea { padding:8px; border:1px solid #ccc; border-radius:8px;}
-.modal-box button { padding:10px; border:none; border-radius:8px; background:#007aff; color:#fff;}
-.modal-box button#cancel { background:#ccc; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f2f2f7;
+  color: #111;
+}
+
+.income-header {
+  display: flex;
+  justify-content: space-around;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.income-header .label {
+  font-size: 12px;
+  color: #888;
+}
+
+#calendar-wrapper {
+  padding: 16px;
+  min-height: calc(100vh - 100px);
+}
+
+.day-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
+  color: #007aff;
+}
+
+.tasks .task {
+  background: #ffffffcc;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: 0.3s;
+}
+
+.task:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+}
+
+.task .info {
+  margin-bottom: 10px;
+}
+
+.task .client {
+  font-weight: bold;
+  font-size: 16px;
+  color: #111;
+}
+
+.task .details {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.task .price {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.task .actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.task .actions button {
+  border: none;
+  background: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.add-btn {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  background: #007aff;
+  color: white;
+  font-size: 28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 20px;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-box input,
+.modal-box textarea {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.form-buttons button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-weight: bold;
+}
+
+button[type="submit"] {
+  background: #007aff;
+  color: white;
+}
+
+#cancel {
+  background: #ccc;
+}
