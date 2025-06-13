@@ -1,168 +1,126 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const tasks = JSON.parse(localStorage.getItem("tasks") || "{}");
-  const taskList = document.getElementById("task-list");
-  const dayTitle = document.getElementById("day-title");
-  const modal = document.getElementById("task-modal");
-  const form = document.getElementById("task-form");
-  const btn = document.getElementById("add-task-btn");
+  const dates = genDates('2025-06-12','2027-12-31');
+  let idx = dates.indexOf(todayISO()) || 0;
+  const tasks = JSON.parse(localStorage.getItem('tasks')||'{}');
+  const el = {
+    prev: document.getElementById('prev-btn'),
+    next: document.getElementById('next-btn'),
+    title: document.getElementById('day-title'),
+    list: document.getElementById('tasks'),
+    add: document.getElementById('add-btn'),
+    modal: document.getElementById('modal'),
+    form: document.getElementById('form'),
+    cancel: document.getElementById('cancel'),
+    fields: ['client','car','time','price','place','desc','edit'].reduce((o,id)=> (o[id]=document.getElementById(id),o), {})
+  };
+  const inc = { total:0, month:0, today:0, elements: {
+    total: document.getElementById('total-income'),
+    month: document.getElementById('month-income'),
+    today: document.getElementById('today-income')
+  }};
 
-  const totalEl = document.getElementById("total-income");
-  const monthEl = document.getElementById("month-income");
-  const todayEl = document.getElementById("today-income");
+  function todayISO(){ return new Date().toISOString().split('T')[0]; }
 
-  const dates = generateDates("2025-06-12", "2027-12-31");
+  el.prev.onclick = ()=>{
+    if(idx>0) idx--, draw();
+  };
+  el.next.onclick = ()=>{
+    if(idx<dates.length-1) idx++, draw();
+  };
+  el.add.onclick = ()=> openModal();
 
-  let today = new Date().toISOString().split("T")[0];
-  let currentIndex = dates.indexOf(today);
-  if (currentIndex === -1) currentIndex = 0;
+  el.cancel.onclick = ()=> el.modal.style.display='none';
 
-  function renderDay() {
-    const date = dates[currentIndex];
-    dayTitle.textContent = formatDate(date);
-    taskList.innerHTML = "";
-
-    const dayTasks = tasks[date] || [];
-    dayTasks.forEach((t, i) => {
-      const card = document.createElement("div");
-      card.className = "task-card";
-      card.innerHTML = `
-        <div><strong>${t.name}</strong></div>
-        <div>🕒 ${t.time}</div>
-        <div>🚗 ${t.car}</div>
-        <div>💰 ${t.price}</div>
-        <div>📍 ${t.place}</div>
-        ${t.desc ? `<div>📝 ${t.desc}</div>` : ""}
-        <div class="task-status" data-index="${i}">${t.done ? "✅" : "❌"}</div>
-        <div class="task-actions">
-          <button onclick="editTask('${date}', ${i})">✏️</button>
-          <button onclick="deleteTask('${date}', ${i})">🗑️</button>
-        </div>
-      `;
-      taskList.appendChild(card);
-    });
-
-    updateIncomes();
-  }
-
-  renderDay();
-
-  btn.addEventListener("click", () => {
-    form.reset();
-    document.getElementById("edit-index").value = "";
-    modal.style.display = "flex";
-  });
-
-  form.addEventListener("submit", (e) => {
+  el.form.onsubmit = e=>{
     e.preventDefault();
-    const name = document.getElementById("client-name").value;
-    const car = document.getElementById("car-model").value;
-    const time = document.getElementById("task-time").value;
-    const price = document.getElementById("price").value;
-    const place = document.getElementById("location").value;
-    const desc = document.getElementById("description").value;
-    const editIndex = document.getElementById("edit-index").value;
-
-    const date = dates[currentIndex];
-    if (!tasks[date]) tasks[date] = [];
-
-    if (editIndex === "") {
-      tasks[date].push({ name, car, time, price, place, desc, done: false });
-    } else {
-      tasks[date][editIndex] = { ...tasks[date][editIndex], name, car, time, price, place, desc };
-    }
-
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    form.reset();
-    modal.style.display = "none";
-    renderDay();
-  });
-
-  modal.addEventListener("click", e => {
-    if (e.target === modal) modal.style.display = "none";
-  });
-
-  // Свайпы
-  let startX = 0;
-  const wrapper = document.getElementById("calendar-wrapper");
-
-  wrapper.addEventListener("touchstart", e => {
-    startX = e.touches[0].clientX;
-  });
-
-  wrapper.addEventListener("touchend", e => {
-    const dx = e.changedTouches[0].clientX - startX;
-    if (Math.abs(dx) > 50) {
-      if (dx < 0 && currentIndex < dates.length - 1) currentIndex++;
-      else if (dx > 0 && currentIndex > 0) currentIndex--;
-      renderDay();
-    }
-  });
-
-  document.addEventListener("click", e => {
-    if (e.target.classList.contains("task-status")) {
-      const i = +e.target.dataset.index;
-      const date = dates[currentIndex];
-      tasks[date][i].done = !tasks[date][i].done;
-      localStorage.setItem("tasks", JSON.stringify(tasks));
-      renderDay();
-    }
-  });
-
-  window.editTask = (date, index) => {
-    const task = tasks[date][index];
-    document.getElementById("client-name").value = task.name;
-    document.getElementById("car-model").value = task.car;
-    document.getElementById("task-time").value = task.time;
-    document.getElementById("price").value = task.price;
-    document.getElementById("location").value = task.place;
-    document.getElementById("description").value = task.desc;
-    document.getElementById("edit-index").value = index;
-    modal.style.display = "flex";
+    const date = dates[idx];
+    let day = tasks[date]||[];
+    const o = el.fields;
+    const obj = {
+      client:o.client.value,car:o.car.value,time:o.time.value,
+      price:o.price.value,place:o.place.value,desc:o.desc.value,
+      done:false
+    };
+    if(o.edit.value!==''){
+      day[+o.edit.value] = {...day[+o.edit.value], ...obj};
+    } else day.push(obj);
+    tasks[date]=day;
+    save();
+    el.modal.style.display='none';
+    draw();
   };
 
-  window.deleteTask = (date, index) => {
-    if (confirm("Удалить задачу?")) {
-      tasks[date].splice(index, 1);
-      localStorage.setItem("tasks", JSON.stringify(tasks));
-      renderDay();
+  el.list.onclick = e=>{
+    const t = e.target;
+    if(t.classList.contains('status')){
+      const i = +t.dataset.i;
+      const day = tasks[dates[idx]];
+      day[i].done = !day[i].done;
+      save(); draw();
+    } else if(t.classList.contains('del')){
+      const i = +t.dataset.i;
+      tasks[dates[idx]].splice(i,1);
+      save(); draw();
+    } else if(t.classList.contains('edit')){
+      const i = +t.dataset.i;
+      openModal(i, tasks[dates[idx]][i]);
     }
   };
 
-  function updateIncomes() {
-    let total = 0, month = 0, todaySum = 0;
-    const now = new Date();
-    const todayStr = now.toISOString().split("T")[0];
-    const thisMonth = now.toISOString().slice(0, 7);
-
-    for (let d in tasks) {
-      for (let t of tasks[d]) {
-        if (!t.done) continue;
-        const price = parseInt(t.price) || 0;
-        total += price;
-        if (d.startsWith(thisMonth)) month += price;
-        if (d === todayStr) todaySum += price;
-      }
-    }
-
-    totalEl.textContent = `${total} ₽`;
-    monthEl.textContent = `${month} ₽`;
-    todayEl.textContent = `${todaySum} ₽`;
+  function openModal(i,obj){
+    el.modal.style.display='flex';
+    const o=el.fields;
+    if(i!=null){
+      o.client.value=obj.client; o.car.value=obj.car; o.time.value=obj.time;
+      o.price.value=obj.price; o.place.value=obj.place; o.desc.value=obj.desc;
+      o.edit.value=i;
+    } else o.edit.value='';
   }
 
-  function generateDates(start, end) {
-    const res = [];
-    let d = new Date(start);
-    const stop = new Date(end);
-    while (d <= stop) {
-      res.push(d.toISOString().split("T")[0]);
-      d.setDate(d.getDate() + 1);
-    }
-    return res;
-  }
-
-  function formatDate(d) {
-    return new Date(d).toLocaleDateString("ru-RU", {
-      weekday: "long", day: "numeric", month: "long"
+  function draw(){
+    const date = dates[idx];
+    el.title.textContent = new Date(date).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+    el.list.innerHTML='';
+    (tasks[date]||[]).forEach((t,i)=>{
+      el.list.innerHTML += `
+        <div class="task">
+          <div class="status" data-i="${i}">${t.done?'✅':'❌'}</div>
+          <div><strong>${t.client}</strong> ${t.time} ${t.car} ${t.place} ${t.price} ₽ ${t.desc?'– '+t.desc:''}</div>
+          <div class="actions">
+            <button class="edit" data-i="${i}">✏️</button>
+            <button class="del" data-i="${i}">🗑️</button>
+          </div>
+        </div>`;
     });
+    updateInc();
   }
+
+  function updateInc(){
+    let tot=0,mon=0,tod=0;
+    const nowISO = todayISO(), m0 = nowISO.slice(0,7);
+    for(const d in tasks){
+      tasks[d].forEach(t=>{
+        if(t.done){
+          const p=+t.price||0; tot+=p;
+          if(d===nowISO) tod+=p;
+          if(d.slice(0,7)===m0) mon+=p;
+        }
+      });
+    }
+    inc.elements.total.textContent = tot + ' ₽';
+    inc.elements.month.textContent = mon + ' ₽';
+    inc.elements.today.textContent = tod + ' ₽';
+  }
+
+  function save(){
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }
+
+  function genDates(st,en){
+    const a=[], d=new Date(st), D=new Date(en);
+    while(d<=D){ a.push(d.toISOString().split('T')[0]); d.setDate(d.getDate()+1); }
+    return a;
+  }
+
+  draw();
 });
