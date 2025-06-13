@@ -6,8 +6,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("task-form");
   const btn = document.getElementById("add-task-btn");
 
+  const totalEl = document.getElementById("total-income");
+  const monthEl = document.getElementById("month-income");
+  const todayEl = document.getElementById("today-income");
+
   const dates = generateDates("2025-06-12", "2027-12-31");
-  let currentIndex = 0;
+
+  let today = new Date().toISOString().split("T")[0];
+  let currentIndex = dates.indexOf(today);
+  if (currentIndex === -1) currentIndex = 0;
 
   function renderDay() {
     const date = dates[currentIndex];
@@ -15,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     taskList.innerHTML = "";
 
     const dayTasks = tasks[date] || [];
-    dayTasks.forEach(t => {
+    dayTasks.forEach((t, i) => {
       const card = document.createElement("div");
       card.className = "task-card";
       card.innerHTML = `
@@ -25,14 +32,23 @@ document.addEventListener("DOMContentLoaded", () => {
         <div>💰 ${t.price}</div>
         <div>📍 ${t.place}</div>
         ${t.desc ? `<div>📝 ${t.desc}</div>` : ""}
+        <div class="task-status" data-index="${i}">${t.done ? "✅" : "❌"}</div>
+        <div class="task-actions">
+          <button onclick="editTask('${date}', ${i})">✏️</button>
+          <button onclick="deleteTask('${date}', ${i})">🗑️</button>
+        </div>
       `;
       taskList.appendChild(card);
     });
+
+    updateIncomes();
   }
 
   renderDay();
 
   btn.addEventListener("click", () => {
+    form.reset();
+    document.getElementById("edit-index").value = "";
     modal.style.display = "flex";
   });
 
@@ -44,10 +60,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const price = document.getElementById("price").value;
     const place = document.getElementById("location").value;
     const desc = document.getElementById("description").value;
+    const editIndex = document.getElementById("edit-index").value;
 
     const date = dates[currentIndex];
     if (!tasks[date]) tasks[date] = [];
-    tasks[date].push({ name, car, time, price, place, desc });
+
+    if (editIndex === "") {
+      tasks[date].push({ name, car, time, price, place, desc, done: false });
+    } else {
+      tasks[date][editIndex] = { ...tasks[date][editIndex], name, car, time, price, place, desc };
+    }
 
     localStorage.setItem("tasks", JSON.stringify(tasks));
     form.reset();
@@ -75,6 +97,57 @@ document.addEventListener("DOMContentLoaded", () => {
       renderDay();
     }
   });
+
+  document.addEventListener("click", e => {
+    if (e.target.classList.contains("task-status")) {
+      const i = +e.target.dataset.index;
+      const date = dates[currentIndex];
+      tasks[date][i].done = !tasks[date][i].done;
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+      renderDay();
+    }
+  });
+
+  window.editTask = (date, index) => {
+    const task = tasks[date][index];
+    document.getElementById("client-name").value = task.name;
+    document.getElementById("car-model").value = task.car;
+    document.getElementById("task-time").value = task.time;
+    document.getElementById("price").value = task.price;
+    document.getElementById("location").value = task.place;
+    document.getElementById("description").value = task.desc;
+    document.getElementById("edit-index").value = index;
+    modal.style.display = "flex";
+  };
+
+  window.deleteTask = (date, index) => {
+    if (confirm("Удалить задачу?")) {
+      tasks[date].splice(index, 1);
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+      renderDay();
+    }
+  };
+
+  function updateIncomes() {
+    let total = 0, month = 0, todaySum = 0;
+    const now = new Date();
+    const todayStr = now.toISOString().split("T")[0];
+    const thisMonth = now.toISOString().slice(0, 7);
+
+    for (let d in tasks) {
+      for (let t of tasks[d]) {
+        if (!t.done) continue;
+        const price = parseInt(t.price) || 0;
+        total += price;
+        if (d.startsWith(thisMonth)) month += price;
+        if (d === todayStr) todaySum += price;
+      }
+    }
+
+    totalEl.textContent = `${total} ₽`;
+    monthEl.textContent = `${month} ₽`;
+    todayEl.textContent = `${todaySum} ₽`;
+  }
 
   function generateDates(start, end) {
     const res = [];
