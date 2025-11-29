@@ -6,297 +6,1182 @@
     <title>💰 Income Master</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary: #007AFF;
+            --secondary: #5856D6;
+            --success: #34C759;
+            --danger: #FF3B30;
+            --warning: #FF9500;
+            --info: #5AC8FA;
+            --background: #0A0A0A;
+            --surface: rgba(255, 255, 255, 0.12);
+            --surface-solid: rgba(30, 30, 30, 0.95);
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --border-radius: 20px;
+            --blur-intensity: 25px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: pan-y;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text-primary);
+        }
+
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        /* Header */
+        .income-header {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px 15px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(var(--blur-intensity));
+            -webkit-backdrop-filter: blur(var(--blur-intensity));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .income-header > div {
+            text-align: center;
+        }
+
+        .income-header .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .income-header .value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow: hidden;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Calendar */
+        .calendar-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text-primary);
+            border: none;
+        }
+
+        .current-month {
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+            flex: 1;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid transparent;
+        }
+
+        .calendar-day.has-work::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+        }
+
+        .calendar-day.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        .calendar-day.today {
+            background: var(--warning);
+            color: white;
+        }
+
+        .calendar-day.other-month {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Day Title */
+        .day-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* Tasks */
+        .tasks-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .task-card {
+            background: var(--surface);
+            backdrop-filter: blur(var(--blur-intensity));
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .client-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .task-time {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .task-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+        }
+
+        .price-tag {
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 18px;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .price-tag.completed {
+            background: linear-gradient(135deg, var(--success), #30D158);
+            color: white;
+        }
+
+        .price-tag.pending {
+            background: linear-gradient(135deg, var(--danger), #FF6961);
+            color: white;
+        }
+
+        .task-description {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .task-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-primary);
+            border: none;
+        }
+
+        /* Add Button */
+        .add-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 90px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 28px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        /* Navigation */
+        .tab-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(var(--blur-intensity));
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            padding: 12px 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 16px;
+        }
+
+        .tab-btn.active {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .tab-btn i {
+            font-size: 22px;
+        }
+
+        /* Analytics */
+        .analytics-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            backdrop-filter: blur(var(--blur-intensity));
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .chart-card {
+            background: var(--surface);
+            backdrop-filter: blur(var(--blur-intensity));
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .date-range {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .date-input {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .chart-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .chart-wrapper {
+            height: 250px;
+            width: 100%;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--surface-solid);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-primary);
+            border: none;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .form-input {
+            padding: 16px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            border-radius: 15px;
+            border: none;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .task-details {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Анимированный фон -->
-    <div class="animated-bg">
-        <div class="floating-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
-            <div class="shape shape-4"></div>
-        </div>
-    </div>
-
     <div class="app-container">
-        <!-- Хедер с стеклянным эффектом -->
-        <header class="glass-header">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-chart-line"></i>
-                    <span>IncomeMaster</span>
-                </div>
-                <div class="income-stats">
-                    <div class="stat">
-                        <div class="stat-label">Всего</div>
-                        <div class="stat-value" id="total-income">0 ₽</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Месяц</div>
-                        <div class="stat-value" id="month-income">0 ₽</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Сегодня</div>
-                        <div class="stat-value" id="today-income">0 ₽</div>
-                    </div>
-                </div>
+        <header class="income-header">
+            <div>
+                <div class="label">Всего</div>
+                <div class="value" id="total-income">0 ₽</div>
+            </div>
+            <div>
+                <div class="label">Месяц</div>
+                <div class="value" id="month-income">0 ₽</div>
+            </div>
+            <div>
+                <div class="label">Сегодня</div>
+                <div class="value" id="today-income">0 ₽</div>
             </div>
         </header>
 
         <main class="main-content">
-            <!-- Вкладка календаря -->
             <div id="calendar-tab" class="tab-content active">
-                <div class="calendar-section">
-                    <!-- Навигация календаря -->
-                    <div class="calendar-nav glass-card">
-                        <button class="nav-btn prev" id="prev-month">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <div class="month-display">
-                            <div class="current-month" id="current-month">Июнь 2025</div>
-                            <div class="month-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" id="month-progress"></div>
-                                </div>
-                            </div>
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div class="calendar-nav">
+                            <button class="nav-btn" id="prev-month">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="nav-btn" id="today-btn">Сегодня</button>
                         </div>
-                        <button class="nav-btn next" id="next-month">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-
-                    <!-- Сетка календаря -->
-                    <div class="calendar-grid glass-card" id="calendar-grid">
-                        <!-- Динамически генерируется -->
-                    </div>
-
-                    <!-- Заголовок дня -->
-                    <div class="day-header glass-card">
-                        <div class="day-title" id="day-title">Сегодня</div>
-                        <div class="day-stats">
-                            <span class="tasks-count" id="tasks-count">0 записей</span>
-                            <span class="day-income" id="day-income">0 ₽</span>
+                        <div class="current-month" id="current-month">Июнь 2025</div>
+                        <div class="calendar-nav">
+                            <button class="nav-btn" id="next-month">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Список задач -->
-                    <div class="tasks-container" id="tasks">
-                        <!-- Задачи появятся здесь -->
-                    </div>
+                    <div class="calendar-grid" id="calendar-grid"></div>
+
+                    <div class="day-title" id="day-title">Сегодня</div>
+                    <div id="tasks" class="tasks-container"></div>
                 </div>
             </div>
 
-            <!-- Вкладка аналитики -->
             <div id="analytics-tab" class="tab-content">
-                <div class="analytics-section">
-                    <div class="section-title glass-card">
-                        <i class="fas fa-chart-pie"></i>
-                        <span>Аналитика доходов</span>
-                    </div>
-
-                    <!-- Статистика -->
+                <div class="analytics-container">
+                    <div class="day-title">Аналитика доходов</div>
+                    
                     <div class="stats-grid">
-                        <div class="stat-card income">
-                            <div class="stat-icon">
-                                <i class="fas fa-wallet"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-value" id="total-completed">0 ₽</div>
-                                <div class="stat-label">Выполнено работ</div>
-                            </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-completed">0 ₽</div>
+                            <div class="stat-label">Выполнено работ</div>
                         </div>
-                        <div class="stat-card avg">
-                            <div class="stat-icon">
-                                <i class="fas fa-chart-bar"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-value" id="avg-income">0 ₽</div>
-                                <div class="stat-label">Средний чек</div>
-                            </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="avg-income">0 ₽</div>
+                            <div class="stat-label">Средний чек</div>
                         </div>
-                        <div class="stat-card clients">
-                            <div class="stat-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-value" id="total-clients">0</div>
-                                <div class="stat-label">Клиентов</div>
-                            </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-clients">0</div>
+                            <div class="stat-label">Всего клиентов</div>
                         </div>
-                        <div class="stat-card rate">
-                            <div class="stat-icon">
-                                <i class="fas fa-trophy"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-value" id="completion-rate">0%</div>
-                                <div class="stat-label">Выполнено</div>
-                            </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="completion-rate">0%</div>
+                            <div class="stat-label">Выполнено</div>
                         </div>
                     </div>
 
-                    <!-- Графики -->
-                    <div class="charts-grid">
-                        <div class="chart-card glass-card">
-                            <div class="chart-header">
-                                <h3><i class="fas fa-chart-line"></i> Доходы по дням</h3>
-                                <div class="date-controls">
-                                    <input type="date" id="start-date" class="date-input">
-                                    <span class="separator">—</span>
-                                    <input type="date" id="end-date" class="date-input">
-                                    <button class="refresh-btn" id="update-chart">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="income-chart"></canvas>
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Доходы по дням</div>
+                            <div class="date-range">
+                                <input type="date" id="start-date" class="date-input">
+                                <span>-</span>
+                                <input type="date" id="end-date" class="date-input">
+                                <button class="chart-btn" id="update-chart">Обновить</button>
                             </div>
                         </div>
-
-                        <div class="chart-card glass-card">
-                            <div class="chart-header">
-                                <h3><i class="fas fa-car"></i> По маркам авто</h3>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="cars-chart"></canvas>
-                            </div>
+                        <div class="chart-wrapper">
+                            <canvas id="income-chart"></canvas>
                         </div>
                     </div>
 
-                    <!-- Быстрая статистика -->
-                    <div class="quick-stats glass-card">
-                        <h3><i class="fas fa-bolt"></i> Быстрая статистика</h3>
-                        <div class="stats-list">
-                            <div class="quick-stat">
-                                <span class="stat-name">Лучший день:</span>
-                                <span class="stat-value" id="best-day">—</span>
-                            </div>
-                            <div class="quick-stat">
-                                <span class="stat-name">Популярный авто:</span>
-                                <span class="stat-value" id="popular-car">—</span>
-                            </div>
-                            <div class="quick-stat">
-                                <span class="stat-name">Записей/месяц:</span>
-                                <span class="stat-value" id="month-tasks">0</span>
-                            </div>
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Доходы по маркам авто</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="cars-chart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
 
-        <!-- Плавающая кнопка добавления -->
-        <button class="floating-add-btn" id="add-btn">
+        <button class="add-btn" id="add-btn">
             <i class="fas fa-plus"></i>
-            <div class="pulse-ring"></div>
         </button>
 
-        <!-- Навигация -->
-        <nav class="bottom-nav">
-            <div class="nav-container">
-                <button class="nav-item active" data-tab="calendar-tab">
-                    <div class="nav-icon">
-                        <i class="fas fa-calendar"></i>
-                    </div>
-                    <span class="nav-label">Календарь</span>
-                </button>
-                <button class="nav-item" data-tab="analytics-tab">
-                    <div class="nav-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <span class="nav-label">Аналитика</span>
-                </button>
-            </div>
-        </nav>
-    </div>
-
-    <!-- Модальное окно -->
-    <div class="modal-overlay" id="modal">
-        <div class="modal-container">
-            <div class="modal-content glass-card">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="modal-title">
-                        <i class="fas fa-plus"></i>
-                        Новая запись
-                    </h2>
-                    <button class="close-btn" id="close-modal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <form id="task-form" class="task-form">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-user"></i>
-                                Клиент
-                            </label>
-                            <input type="text" id="client" class="form-input" placeholder="Имя клиента" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-car"></i>
-                                Автомобиль
-                            </label>
-                            <input type="text" id="car" class="form-input" placeholder="Марка и модель" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-clock"></i>
-                                Время
-                            </label>
-                            <input type="text" id="time" class="form-input" placeholder="14:00–15:30" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-ruble-sign"></i>
-                                Стоимость
-                            </label>
-                            <input type="number" id="price" class="form-input" placeholder="Сумма в рублях" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-map-marker-alt"></i>
-                                Место
-                            </label>
-                            <input type="text" id="place" class="form-input" placeholder="Адрес встречи" required>
-                        </div>
-                        
-                        <div class="form-group full-width">
-                            <label class="form-label">
-                                <i class="fas fa-sticky-note"></i>
-                                Описание
-                            </label>
-                            <textarea id="desc" class="form-input" rows="3" placeholder="Детали работы..."></textarea>
-                        </div>
-                    </div>
-                    
-                    <input type="hidden" id="edit-id">
-                    <input type="hidden" id="task-date">
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" id="cancel-btn">
-                            <i class="fas fa-times"></i>
-                            Отмена
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-check"></i>
-                            Сохранить
-                        </button>
-                    </div>
-                </form>
-            </div>
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="calendar-tab">
+                <i class="fas fa-calendar"></i>
+                <span>Календарь</span>
+            </button>
+            <button class="tab-btn" data-tab="analytics-tab">
+                <i class="fas fa-chart-line"></i>
+                <span>Аналитика</span>
+            </button>
         </div>
     </div>
 
-    <!-- Уведомления -->
-    <div class="notification-container" id="notifications"></div>
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Новая запись</h2>
+                <button class="close-btn" id="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="task-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Клиент</label>
+                        <input type="text" id="client" class="form-input" placeholder="Имя клиента" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Автомобиль</label>
+                        <input type="text" id="car" class="form-input" placeholder="Марка и модель" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Время</label>
+                        <input type="text" id="time" class="form-input" placeholder="14:00–15:30" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Стоимость</label>
+                        <input type="number" id="price" class="form-input" placeholder="₽" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Место</label>
+                        <input type="text" id="place" class="form-input" placeholder="Адрес" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Описание</label>
+                        <textarea id="desc" class="form-input" rows="3" placeholder="Детали работы..."></textarea>
+                    </div>
+                </div>
+                <input type="hidden" id="edit-id">
+                <input type="hidden" id="task-date">
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-btn">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const app = new IncomeCalendar();
+            window.app = app;
+        });
+
+        class IncomeCalendar {
+            constructor() {
+                this.tasks = JSON.parse(localStorage.getItem("tasks") || "{}");
+                this.currentDate = new Date().toISOString().split('T')[0];
+                this.currentMonth = new Date().getMonth();
+                this.currentYear = new Date().getFullYear();
+                this.charts = {};
+                
+                this.init();
+            }
+
+            init() {
+                this.setupElements();
+                this.setupEventListeners();
+                this.renderCalendar();
+                this.renderTasks();
+                this.updateIncome();
+                this.setupCharts();
+            }
+
+            setupElements() {
+                this.el = {};
+                const ids = [
+                    'total-income', 'month-income', 'today-income', 'calendar-grid',
+                    'current-month', 'prev-month', 'next-month', 'today-btn',
+                    'tasks', 'day-title', 'modal', 'task-form', 'modal-title',
+                    'close-modal', 'cancel-btn', 'client', 'car', 'time', 'price',
+                    'place', 'desc', 'edit-id', 'task-date', 'add-btn',
+                    'total-completed', 'avg-income', 'total-clients', 'completion-rate',
+                    'start-date', 'end-date', 'update-chart', 'income-chart',
+                    'cars-chart'
+                ];
+
+                ids.forEach(id => {
+                    this.el[id] = document.getElementById(id);
+                });
+
+                this.el.tabBtns = document.querySelectorAll('.tab-btn');
+                this.el.tabContents = document.querySelectorAll('.tab-content');
+
+                // Set default dates
+                const end = new Date();
+                const start = new Date();
+                start.setDate(start.getDate() - 30);
+                this.el.startDate.value = start.toISOString().split('T')[0];
+                this.el.endDate.value = end.toISOString().split('T')[0];
+            }
+
+            setupEventListeners() {
+                this.el.prevMonth.addEventListener('click', () => this.changeMonth(-1));
+                this.el.nextMonth.addEventListener('click', () => this.changeMonth(1));
+                this.el.todayBtn.addEventListener('click', () => this.goToToday());
+                this.el.addBtn.addEventListener('click', () => this.openModal());
+                this.el.closeModal.addEventListener('click', () => this.closeModal());
+                this.el.cancelBtn.addEventListener('click', () => this.closeModal());
+                this.el.updateChart.addEventListener('click', () => this.updateCharts());
+                
+                this.el.taskForm.addEventListener('submit', (e) => this.saveTask(e));
+                this.el.modal.addEventListener('click', (e) => {
+                    if (e.target === this.el.modal) this.closeModal();
+                });
+
+                this.el.calendarGrid.addEventListener('click', (e) => {
+                    const day = e.target.closest('.calendar-day');
+                    if (day && day.dataset.date) {
+                        this.selectDate(day.dataset.date);
+                    }
+                });
+
+                this.el.tasks.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.action-btn');
+                    const task = e.target.closest('.task-card');
+                    if (!btn || !task) return;
+
+                    const taskId = task.dataset.taskId;
+                    if (btn.classList.contains('toggle')) {
+                        this.toggleTask(taskId);
+                    } else if (btn.classList.contains('edit')) {
+                        this.editTask(taskId);
+                    } else if (btn.classList.contains('delete')) {
+                        this.deleteTask(taskId);
+                    }
+                });
+
+                this.el.tabBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const tab = btn.dataset.tab;
+                        this.switchTab(tab);
+                    });
+                });
+            }
+
+            setupCharts() {
+                // Income chart
+                this.charts.income = new Chart(this.el.incomeChart, {
+                    type: 'line',
+                    data: { labels: [], datasets: [{
+                        label: 'Доход',
+                        data: [],
+                        borderColor: '#007AFF',
+                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]},
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                ticks: { callback: value => value + ' ₽' }
+                            }
+                        }
+                    }
+                });
+
+                // Cars chart
+                this.charts.cars = new Chart(this.el.carsChart, {
+                    type: 'doughnut',
+                    data: { labels: [], datasets: [{
+                        data: [],
+                        backgroundColor: ['#007AFF', '#5856D6', '#34C759', '#FF9500', '#FF3B30']
+                    }]},
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+
+                this.updateCharts();
+            }
+
+            updateCharts() {
+                this.updateIncomeChart();
+                this.updateCarsChart();
+                this.updateStats();
+            }
+
+            updateIncomeChart() {
+                const start = new Date(this.el.startDate.value);
+                const end = new Date(this.el.endDate.value);
+                const dates = [];
+                const income = [];
+                const current = new Date(start);
+
+                while (current <= end) {
+                    const dateStr = current.toISOString().split('T')[0];
+                    dates.push(current.getDate() + '.' + (current.getMonth() + 1));
+                    
+                    let dayIncome = 0;
+                    if (this.tasks[dateStr]) {
+                        this.tasks[dateStr].forEach(task => {
+                            if (task.done) dayIncome += parseInt(task.price) || 0;
+                        });
+                    }
+                    income.push(dayIncome);
+                    current.setDate(current.getDate() + 1);
+                }
+
+                this.charts.income.data.labels = dates;
+                this.charts.income.data.datasets[0].data = income;
+                this.charts.income.update();
+            }
+
+            updateCarsChart() {
+                const carData = {};
+                Object.values(this.tasks).flat().forEach(task => {
+                    if (task.done) {
+                        const car = task.car;
+                        const price = parseInt(task.price) || 0;
+                        carData[car] = (carData[car] || 0) + price;
+                    }
+                });
+
+                const entries = Object.entries(carData).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                this.charts.cars.data.labels = entries.map(e => e[0]);
+                this.charts.cars.data.datasets[0].data = entries.map(e => e[1]);
+                this.charts.cars.update();
+            }
+
+            updateStats() {
+                let totalIncome = 0;
+                let completedCount = 0;
+                let totalCount = 0;
+                const clients = new Set();
+
+                Object.values(this.tasks).flat().forEach(task => {
+                    totalCount++;
+                    clients.add(task.client);
+                    if (task.done) {
+                        completedCount++;
+                        totalIncome += parseInt(task.price) || 0;
+                    }
+                });
+
+                const avg = completedCount ? Math.round(totalIncome / completedCount) : 0;
+                const rate = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
+
+                this.el.totalCompleted.textContent = totalIncome.toLocaleString() + ' ₽';
+                this.el.avgIncome.textContent = avg.toLocaleString() + ' ₽';
+                this.el.totalClients.textContent = clients.size;
+                this.el.completionRate.textContent = rate + '%';
+            }
+
+            renderCalendar() {
+                const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+                const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+                const startDay = firstDay.getDay();
+                const daysInMonth = lastDay.getDate();
+                const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
+                                  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+                
+                this.el.currentMonth.textContent = `${monthNames[this.currentMonth]} ${this.currentYear}`;
+
+                let html = '';
+                // Weekdays
+                ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].forEach(day => {
+                    html += `<div class="calendar-day weekday">${day}</div>`;
+                });
+
+                // Empty days
+                for (let i = 0; i < (startDay === 0 ? 6 : startDay - 1); i++) {
+                    html += '<div class="calendar-day other-month"></div>';
+                }
+
+                // Days
+                const today = new Date().toISOString().split('T')[0];
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(this.currentYear, this.currentMonth, day);
+                    const dateStr = date.toISOString().split('T')[0];
+                    const hasWork = this.tasks[dateStr] && this.tasks[dateStr].length > 0;
+                    const isToday = dateStr === today;
+                    const isSelected = dateStr === this.currentDate;
+
+                    let cls = 'calendar-day';
+                    if (isToday) cls += ' today';
+                    if (isSelected) cls += ' selected';
+                    if (hasWork) cls += ' has-work';
+
+                    html += `<div class="${cls}" data-date="${dateStr}">${day}</div>`;
+                }
+
+                this.el.calendarGrid.innerHTML = html;
+            }
+
+            renderTasks() {
+                const tasks = this.tasks[this.currentDate] || [];
+                const date = new Date(this.currentDate);
+                const today = new Date().toISOString().split('T')[0];
+                
+                let title = this.currentDate === today ? 'Сегодня' : 
+                    date.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
+                this.el.dayTitle.textContent = title;
+
+                if (tasks.length === 0) {
+                    this.el.tasks.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-plus"></i>
+                            <p>На этот день записей нет</p>
+                            <button class="btn btn-primary" onclick="app.openModal()">Добавить запись</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                this.el.tasks.innerHTML = tasks.map((task, i) => `
+                    <div class="task-card" data-task-id="${i}">
+                        <div class="task-header">
+                            <h3 class="client-name">${task.client}</h3>
+                            <div class="task-time">${task.time}</div>
+                        </div>
+                        <div class="task-details">
+                            <div class="detail-item">
+                                <i class="fas fa-car"></i>
+                                <span>${task.car}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${task.place}</span>
+                            </div>
+                        </div>
+                        <div class="price-tag ${task.done ? 'completed' : 'pending'}">
+                            ${parseInt(task.price).toLocaleString()} ₽
+                            <div style="font-size:12px;margin-top:4px">
+                                ${task.done ? '✅ Выполнено' : '❌ Не выполнено'}
+                            </div>
+                        </div>
+                        ${task.desc ? `<div class="task-description">${task.desc}</div>` : ''}
+                        <div class="task-actions">
+                            <button class="action-btn toggle ${task.done ? 'done' : ''}">
+                                <i class="fas ${task.done ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                            </button>
+                            <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            updateIncome() {
+                let total = 0, month = 0, today = 0;
+                const current = new Date().toISOString().split('T')[0];
+                const currentMonth = current.slice(0, 7);
+
+                for (const date in this.tasks) {
+                    this.tasks[date].forEach(task => {
+                        const price = parseInt(task.price) || 0;
+                        if (task.done) {
+                            total += price;
+                            if (date === current) today += price;
+                            if (date.slice(0, 7) === currentMonth) month += price;
+                        }
+                    });
+                }
+
+                this.el.totalIncome.textContent = total.toLocaleString() + ' ₽';
+                this.el.monthIncome.textContent = month.toLocaleString() + ' ₽';
+                this.el.todayIncome.textContent = today.toLocaleString() + ' ₽';
+            }
+
+            openModal(taskId = null) {
+                this.el.modal.style.display = 'flex';
+                this.el.taskDate.value = this.currentDate;
+
+                if (taskId !== null) {
+                    const task = this.tasks[this.currentDate][taskId];
+                    this.el.modalTitle.textContent = 'Редактировать запись';
+                    this.el.client.value = task.client;
+                    this.el.car.value = task.car;
+                    this.el.time.value = task.time;
+                    this.el.price.value = task.price;
+                    this.el.place.value = task.place;
+                    this.el.desc.value = task.desc || '';
+                    this.el.editId.value = taskId;
+                } else {
+                    this.el.modalTitle.textContent = 'Новая запись';
+                    this.el.taskForm.reset();
+                    this.el.editId.value = '';
+                }
+            }
+
+            closeModal() {
+                this.el.modal.style.display = 'none';
+            }
+
+            saveTask(e) {
+                e.preventDefault();
+                const taskData = {
+                    client: this.el.client.value,
+                    car: this.el.car.value,
+                    time: this.el.time.value,
+                    price: this.el.price.value,
+                    place: this.el.place.value,
+                    desc: this.el.desc.value,
+                    done: false
+                };
+
+                const date = this.el.taskDate.value;
+                const taskId = this.el.editId.value;
+
+                if (!this.tasks[date]) this.tasks[date] = [];
+
+                if (taskId) {
+                    taskData.done = this.tasks[date][taskId].done;
+                    this.tasks[date][taskId] = taskData;
+                } else {
+                    this.tasks[date].push(taskData);
+                }
+
+                this.saveToStorage();
+                this.renderTasks();
+                this.renderCalendar();
+                this.updateIncome();
+                this.updateCharts();
+                this.closeModal();
+            }
+
+            toggleTask(taskId) {
+                this.tasks[this.currentDate][taskId].done = !this.tasks[this.currentDate][taskId].done;
+                this.saveToStorage();
+                this.renderTasks();
+                this.updateIncome();
+                this.updateCharts();
+            }
+
+            editTask(taskId) {
+                this.openModal(taskId);
+            }
+
+            deleteTask(taskId) {
+                if (confirm('Удалить запись?')) {
+                    this.tasks[this.currentDate].splice(taskId, 1);
+                    if (this.tasks[this.currentDate].length === 0) {
+                        delete this.tasks[this.currentDate];
+                    }
+                    this.saveToStorage();
+                    this.renderTasks();
+                    this.renderCalendar();
+                    this.updateIncome();
+                    this.updateCharts();
+                }
+            }
+
+            changeMonth(direction) {
+                this.currentMonth += direction;
+                if (this.currentMonth < 0) {
+                    this.currentMonth = 11;
+                    this.currentYear--;
+                } else if (this.currentMonth > 11) {
+                    this.currentMonth = 0;
+                    this.currentYear++;
+                }
+                this.renderCalendar();
+            }
+
+            goToToday() {
+                const today = new Date();
+                this.currentDate = today.toISOString().split('T')[0];
+                this.currentMonth = today.getMonth();
+                this.currentYear = today.getFullYear();
+                this.renderCalendar();
+                this.renderTasks();
+            }
+
+            selectDate(date) {
+                this.currentDate = date;
+                const d = new Date(date);
+                this.currentMonth = d.getMonth();
+                this.currentYear = d.getFullYear();
+                this.renderCalendar();
+                this.renderTasks();
+            }
+
+            switchTab(tabName) {
+                this.el.tabContents.forEach(tab => tab.classList.remove('active'));
+                this.el.tabBtns.forEach(btn => btn.classList.remove('active'));
+                
+                document.getElementById(tabName).classList.add('active');
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+                if (tabName === 'analytics-tab') {
+                    setTimeout(() => this.updateCharts(), 100);
+                }
+            }
+
+            saveToStorage() {
+                localStorage.setItem("tasks", JSON.stringify(this.tasks));
+            }
+        }
+    </script>
 </body>
 </html>
