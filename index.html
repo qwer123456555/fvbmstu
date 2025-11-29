@@ -22,8 +22,19 @@
   --radius: 14px;
   --glass-blur: 14px;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+
+/* IMPORTANT: lock page scroll */
+html,body{
+  height:100%;
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden; /* <--- prevent page scrolling */
+  touch-action: pan-y; /* allow vertical gestures on allowed areas */
+}
 
 /* Background */
 .bg { position:fixed; inset:0; z-index:-2; background: linear-gradient(180deg,#05060a,#081026); }
@@ -46,8 +57,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .tab { padding:6px 10px; border-radius:999px; background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); font-weight:800; cursor:pointer; }
 .tab.active { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#07122b; box-shadow:0 12px 30px rgba(0,0,0,0.35); transform:translateY(-2px); }
 
-/* Main */
-.main { flex:1; overflow:auto; display:flex; flex-direction:column; gap:12px; padding-bottom:120px; }
+/* Main - no page scroll; internal areas manage their own scrolling */
+.main { flex:1; display:flex; flex-direction:column; gap:12px; padding-bottom:12px; overflow:hidden; } /* <--- prevent main scrolling */
+
+/* Cards */
 .card { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:16px; padding:12px; border:1px solid rgba(255,255,255,0.04); backdrop-filter: blur(8px); }
 
 /* Calendar */
@@ -57,19 +70,22 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .nav-btn { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.04); background:transparent; font-size:16px; }
 .weekdays { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; margin-bottom:8px; }
 .weekdays div { font-size:11px; color:var(--muted); text-align:center }
-.days { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; }
+
+/* Days grid: keep it fixed height so it doesn't cause page scroll */
+.days { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; max-height: calc(100vh * 0.32); overflow:hidden; } /* grid height limited */
 .day { aspect-ratio:1/1; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800; position:relative; transition: transform .15s ease; background:transparent; color:var(--text); min-height:42px; }
 .day.other { color: rgba(255,255,255,0.18); opacity:0.8; }
 .day:hover { transform: translateY(-4px); }
 .day.today { background: linear-gradient(135deg,var(--warning), #FFB86B); color:#07122b; box-shadow:0 10px 28px rgba(255,149,0,0.12); }
 .day.selected { outline:2px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
-/* If today is also selected — make it still visible and clear */
+/* If today is selected - keep visibility */
 .day.today.selected { background: linear-gradient(135deg,var(--warning), #FFD49A); color:#07122b; box-shadow:0 12px 36px rgba(255,149,0,0.18); outline:2px solid rgba(255,255,255,0.06); }
-/* dot marker (visible for days with any records) */
+/* dot marker */
 .day .dot { width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); position:absolute; bottom:6px; box-shadow:0 6px 12px rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.08); z-index:2; }
 
-/* Tasks */
-.tasks { display:flex; flex-direction:column; gap:12px; margin-top:10px; }
+/* Tasks: make only this area scrollable */
+.tasks-container { margin-top:10px; display:flex; flex-direction:column; gap:12px; }
+#tasksList { overflow:auto; -webkit-overflow-scrolling:touch; max-height: calc(100vh - 340px); padding-right:6px; } /* allow native scrolling for tasks only */
 .task-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015)); border-radius:14px; padding:12px; border:1px solid rgba(255,255,255,0.04); box-shadow: 0 12px 36px rgba(0,0,0,0.45); transition: transform .18s; }
 .task-card:hover { transform: translateY(-6px); }
 .task-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
@@ -83,15 +99,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .actions { display:flex; gap:8px; align-items:center; }
 .action-btn { width:46px; height:46px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; background:transparent; color:var(--text); font-size:16px; }
 
-/* Chart fixed size */
+/* Chart fixed size (no page scroll) */
 .chart-card { margin-top:12px; border-radius:12px; padding:10px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); height:170px; overflow:hidden; display:flex; flex-direction:column; }
 .chart-inner { flex:1; min-height:0; }
 .chart-canvas { width:100%; height:100% !important; display:block; }
 
 /* Add button and fancy modal */
-.fab { position:fixed; right:26px; bottom:96px; width:64px; height:64px; border-radius:18px; background: linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; font-size:30px; color:white; box-shadow:0 18px 48px rgba(0,0,0,0.45); pointer-events:auto; border:none; }
+.fab { position:fixed; right:26px; bottom:96px; width:64px; height:64px; border-radius:18px; background: linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; font-size:30px; color:white; box-shadow:0 18px 48px rgba(0,0,0,0.45); pointer-events:auto; border:none; z-index:55; }
 .modal-wrap { position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center; z-index:60; background: linear-gradient(rgba(0,0,0,0.36), rgba(0,0,0,0.36)); padding:12px; }
-.modal { width:100%; max-width:520px; border-radius:16px; padding:14px; background: linear-gradient(180deg, rgba(10,12,20,0.98), rgba(16,18,30,0.98)); box-shadow: 0 20px 48px rgba(2,6,23,0.8); border:1px solid rgba(255,255,255,0.04); }
+.modal { width:100%; max-width:520px; border-radius:16px; padding:14px; background: linear-gradient(180deg, rgba(10,12,20,0.98), rgba(16,18,30,0.98)); box-shadow: 0 20px 48px rgba(2,6,23,0.8); border:1px solid rgba(255,255,255,0.04); max-height: 70vh; overflow:auto; -webkit-overflow-scrolling: touch; }
 .modal .input { width:100%; padding:12px; border-radius:12px; border:0; background: rgba(255,255,255,0.02); color:var(--text); margin-top:10px; font-weight:800; }
 .modal .row { display:flex; gap:8px; }
 .btn-row { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
@@ -158,7 +174,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
           <div style="font-weight:900">Записи</div>
           <div style="color:var(--muted); font-weight:800; font-size:13px" id="selectedDateLabel">—</div>
         </div>
-        <div class="tasks" id="tasksList"><div class="center">Выберите дату в календаре, чтобы просмотреть записи</div></div>
+
+        <div class="tasks-container">
+          <div id="tasksList" aria-label="Список записей">
+            <div class="center">Выберите дату в календаре, чтобы просмотреть записи</div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -172,7 +194,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <div id="modalTitle" style="font-weight:900">Новая запись</div>
-        <!-- removed close X as requested -->
       </div>
 
       <input id="mDate" type="date" class="input" style="display:none" />
@@ -194,7 +215,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   </div>
 
 <script>
-/* Behaviour: dots fix, single toggle moved left, 7-day chart, prettier chart tabs, modal without X */
+/* Behaviour: dots fix, single toggle moved left, 7-day chart, prettier chart tabs, modal without X,
+   and page scroll locked — only #tasksList and modal are scrollable. */
 (function(){
   const $ = s => document.querySelector(s);
   const fmtMoney = n => (parseInt(n)||0).toLocaleString() + ' ₽';
@@ -205,7 +227,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   let tasks = JSON.parse(localStorage.getItem('mobile_tasks')|| '{}');
   let view = new Date();
   let selectedDate = todayISO();
-  let chartMode = '7d'; // default to 7d
+  let chartMode = '7d'; // default
   let incomeChart = null;
   let showingCalendar = true;
 
@@ -240,7 +262,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   const mPlace = $('#mPlace');
   const mDesc = $('#mDesc');
 
-  // Chart elements
   const chart7Btn = $('#chart7Btn');
   const chartDailyBtn = $('#chartDailyBtn');
   const chartMonthlyBtn = $('#chartMonthlyBtn');
@@ -290,6 +311,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     });
 
     addSwipe(daysGrid, dir=> changeMonth(dir));
+
+    // Prevent body touchmove except when inside .modal or #tasksList
+    document.addEventListener('touchmove', function(e){
+      if (e.target.closest('#tasksList') || e.target.closest('.modal')) {
+        // allow scrolling inside tasks list and modal
+        return;
+      }
+      // otherwise prevent page scroll
+      e.preventDefault();
+    }, { passive:false });
   }
 
   function setActiveChartTab(btn){
@@ -314,7 +345,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       if (ds===today) el.classList.add('today');
       if (ds===selectedDate) el.classList.add('selected');
 
-      // create content node for day number (so adding dot after won't be removed)
+      // number node (so dot appended doesn't get removed)
       const num = document.createElement('div');
       num.style.zIndex = '1';
       num.textContent = d;
@@ -447,7 +478,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       incomeChart.data.datasets[0].data = data;
       incomeChart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#007AFF';
       incomeChart.data.datasets[0].backgroundColor = createGradient(incomeChart.ctx, incomeChart.canvas.height, false);
-    } else if (chartMode==='daily'){
+    } else if (chartMode==='daily') {
       const labels=[]; const data=[];
       for (let i=29;i>=0;i--){
         const d=new Date(); d.setDate(d.getDate()-i); const ds=d.toISOString().slice(0,10);
@@ -505,11 +536,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     showingCalendar = true;
     toggleViewBtn.classList.add('active');
     toggleIcon.className = 'fas fa-calendar-day';
-    // set chart tab active
     setActiveChartTab(chart7Btn);
   })();
 
-  // expose helpers
+  // expose helpers (for debugging)
   window.mobileApp = { renderCalendar, renderTasks, updateChart, tasks, persist };
 
   // start
