@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-<title>Записи — Mobile (икон. вкладки + красивый Add)</title>
+<title>Записи — Mobile</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -37,11 +37,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .stat .value { font-weight:800; font-size:16px; margin-top:4px; }
 
 /* Single toggle button (replaces two icon buttons) */
-.toggle-wrap { display:flex; align-items:center; gap:8px; }
+.toggle-wrap { display:flex; align-items:center; gap:8px; margin-right:10px; } /* смещаем чуть левее от края */
 .toggle-btn { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text); font-size:18px; cursor:pointer; transition: transform .18s, background .18s, color .18s; }
 .toggle-btn.active { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; transform: translateY(-4px); box-shadow:0 12px 36px rgba(0,0,0,0.45); }
 .toggle-btn.flip { transform: rotateY(180deg); transition: transform .35s; }
 
+/* Chart mode tabs (pills) */
+.tab { padding:6px 10px; border-radius:999px; background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); font-weight:800; cursor:pointer; }
+.tab.active { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#07122b; box-shadow:0 12px 30px rgba(0,0,0,0.35); transform:translateY(-2px); }
+
+/* Main */
 .main { flex:1; overflow:auto; display:flex; flex-direction:column; gap:12px; padding-bottom:120px; }
 .card { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:16px; padding:12px; border:1px solid rgba(255,255,255,0.04); backdrop-filter: blur(8px); }
 
@@ -53,12 +58,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .weekdays { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; margin-bottom:8px; }
 .weekdays div { font-size:11px; color:var(--muted); text-align:center }
 .days { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; }
-.day { aspect-ratio:1/1; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800; position:relative; transition: transform .15s ease; background:transparent; color:var(--text); }
+.day { aspect-ratio:1/1; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800; position:relative; transition: transform .15s ease; background:transparent; color:var(--text); min-height:42px; }
 .day.other { color: rgba(255,255,255,0.18); opacity:0.8; }
 .day:hover { transform: translateY(-4px); }
 .day.today { background: linear-gradient(135deg,var(--warning), #FFB86B); color:#07122b; box-shadow:0 10px 28px rgba(255,149,0,0.12); }
 .day.selected { outline:2px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
-.day .dot { width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); position:absolute; bottom:6px; box-shadow:0 6px 12px rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.08); }
+/* If today is also selected — make it still visible and clear */
+.day.today.selected { background: linear-gradient(135deg,var(--warning), #FFD49A); color:#07122b; box-shadow:0 12px 36px rgba(255,149,0,0.18); outline:2px solid rgba(255,255,255,0.06); }
+/* dot marker (visible for days with any records) */
+.day .dot { width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); position:absolute; bottom:6px; box-shadow:0 6px 12px rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.08); z-index:2; }
 
 /* Tasks */
 .tasks { display:flex; flex-direction:column; gap:12px; margin-top:10px; }
@@ -71,7 +79,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .price-tag { padding:10px 14px; border-radius:12px; font-weight:900; font-size:16px; color:white; box-shadow: 0 8px 28px rgba(0,0,0,0.5); transition: all .25s; }
 .price-tag.done { background: linear-gradient(135deg, #34C759, #2EBF54); box-shadow:0 8px 28px rgba(52,199,89,0.12); color:#07122b; }
 .price-tag.pending { background: linear-gradient(135deg, #FFB86B, #FF8A3D); color:#07122b; box-shadow:0 8px 28px rgba(255,149,0,0.08); }
-.price-tag.cancelled { background: linear-gradient(135deg, #B0B0B0, #8B8B8B); color:#07122b; opacity:0.95; }
+.price-tag.cancelled { background: linear-gradient(135deg, #B0B0B0, #8B8B8A); color:#07122b; opacity:0.95; }
 .actions { display:flex; gap:8px; align-items:center; }
 .action-btn { width:46px; height:46px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; background:transparent; color:var(--text); font-size:16px; }
 
@@ -135,7 +143,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <div class="card pane" id="chartPane" style="display:none;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div style="font-weight:900">Доход — выполненные</div>
-          <div style="display:flex;gap:8px;align-items:center;color:var(--muted);font-weight:800;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button class="tab active" id="chart7Btn">7д</button>
             <button class="tab" id="chartDailyBtn">30д</button>
             <button class="tab" id="chartMonthlyBtn">12м</button>
           </div>
@@ -158,12 +167,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     <div class="bottom-nav"></div>
   </div>
 
-  <!-- Modal: redesigned with background and beautiful buttons -->
+  <!-- Modal: redesigned without close X -->
   <div class="modal-wrap" id="modalWrap">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <div id="modalTitle" style="font-weight:900">Новая запись</div>
-        <button class="icon-btn" id="closeModal"><i class="fas fa-times"></i></button>
+        <!-- removed close X as requested -->
       </div>
 
       <input id="mDate" type="date" class="input" style="display:none" />
@@ -185,7 +194,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   </div>
 
 <script>
-/* Keep core behaviour — combine icons into one toggle + day dots */
+/* Behaviour: dots fix, single toggle moved left, 7-day chart, prettier chart tabs, modal without X */
 (function(){
   const $ = s => document.querySelector(s);
   const fmtMoney = n => (parseInt(n)||0).toLocaleString() + ' ₽';
@@ -196,7 +205,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   let tasks = JSON.parse(localStorage.getItem('mobile_tasks')|| '{}');
   let view = new Date();
   let selectedDate = todayISO();
-  let chartMode = 'daily';
+  let chartMode = '7d'; // default to 7d
   let incomeChart = null;
   let showingCalendar = true;
 
@@ -220,7 +229,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   const openAdd = $('#openAdd');
 
   const modalWrap = $('#modalWrap');
-  const closeModal = $('#closeModal');
   const cancelBtn = $('#cancelBtn');
   const saveBtn = $('#saveBtn');
   const deleteBtn = $('#deleteBtn');
@@ -233,6 +241,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   const mDesc = $('#mDesc');
 
   // Chart elements
+  const chart7Btn = $('#chart7Btn');
   const chartDailyBtn = $('#chartDailyBtn');
   const chartMonthlyBtn = $('#chartMonthlyBtn');
 
@@ -264,13 +273,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     nextMonthBtn.addEventListener('click', ()=> changeMonth(1));
 
     openAdd.addEventListener('click', ()=> openModalFor(selectedDate));
-    closeModal.addEventListener('click', closeModalWrap);
     cancelBtn.addEventListener('click', closeModalWrap);
     saveBtn.addEventListener('click', saveFromModal);
     deleteBtn.addEventListener('click', deleteFromModal);
 
-    chartDailyBtn.addEventListener('click', ()=>{ chartMode='daily'; updateChart(); });
-    chartMonthlyBtn.addEventListener('click', ()=>{ chartMode='monthly'; updateChart(); });
+    chart7Btn.addEventListener('click', ()=> { chartMode='7d'; setActiveChartTab(chart7Btn); updateChart(); });
+    chartDailyBtn.addEventListener('click', ()=> { chartMode='daily'; setActiveChartTab(chartDailyBtn); updateChart(); });
+    chartMonthlyBtn.addEventListener('click', ()=> { chartMode='monthly'; setActiveChartTab(chartMonthlyBtn); updateChart(); });
 
     tasksList.addEventListener('click', (e)=>{
       const btn = e.target.closest('[data-act]'); if (!btn) return;
@@ -283,31 +292,56 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     addSwipe(daysGrid, dir=> changeMonth(dir));
   }
 
+  function setActiveChartTab(btn){
+    [chart7Btn, chartDailyBtn, chartMonthlyBtn].forEach(x=> x.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
   function renderWeekdays(){ weekdaysEl.innerHTML = weekdays.map(d=>`<div>${d}</div>`).join(''); }
 
   function renderCalendar(){
-    const y = view.getFullYear(), m = view.getMonth(); monthLabel.textContent = monthNames[m] + ' ' + y; daysGrid.innerHTML = '';
-    const first = new Date(y,m,1); const last = new Date(y,m+1,0); const pad = (first.getDay() === 0) ? 6 : first.getDay()-1;
+    const y = view.getFullYear(), m = view.getMonth();
+    monthLabel.textContent = monthNames[m] + ' ' + y;
+    daysGrid.innerHTML = '';
+    const first = new Date(y,m,1); const last = new Date(y,m+1,0);
+    const pad = (first.getDay() === 0) ? 6 : first.getDay()-1;
     for (let i=0;i<pad;i++){ const el = document.createElement('div'); el.className='day other'; daysGrid.appendChild(el); }
+
     const today = todayISO();
     for (let d=1; d<=last.getDate(); d++){
       const dateObj = new Date(y,m,d); const ds = dateObj.toISOString().slice(0,10);
       const el = document.createElement('div'); el.className='day';
       if (ds===today) el.classList.add('today');
       if (ds===selectedDate) el.classList.add('selected');
+
+      // create content node for day number (so adding dot after won't be removed)
+      const num = document.createElement('div');
+      num.style.zIndex = '1';
+      num.textContent = d;
+      el.appendChild(num);
+
       // dot if any record for the day
       if ((tasks[ds]||[]).length) {
         const dot = document.createElement('div'); dot.className='dot'; el.appendChild(dot);
       }
-      el.innerHTML = `<div style="z-index:1">${d}</div>`;
+
       el.dataset.date = ds;
-      el.addEventListener('click', ()=> { selectedDate = ds; renderCalendar(); renderTasks(); updateSelectedDateLabel(); });
+      el.addEventListener('click', ()=> {
+        selectedDate = ds; renderCalendar(); renderTasks(); updateSelectedDateLabel();
+      });
       daysGrid.appendChild(el);
     }
     updateSelectedDateLabel();
   }
 
-  function renderTasks(){ const list = tasks[selectedDate] || []; $('#selectedDateLabel').textContent = formatSelectedDate(selectedDate); if (!list.length) { tasksList.innerHTML = `<div class='center'>Нет записей на ${formatSelectedDate(selectedDate)}</div>`; return; } tasksList.innerHTML=''; list.forEach((t, idx)=>{ const card = document.createElement('div'); card.className='task-card'; card.innerHTML = `
+  function renderTasks(){
+    const list = tasks[selectedDate] || [];
+    $('#selectedDateLabel').textContent = formatSelectedDate(selectedDate);
+    if (!list.length) { tasksList.innerHTML = `<div class='center'>Нет записей на ${formatSelectedDate(selectedDate)}</div>`; return; }
+    tasksList.innerHTML='';
+    list.forEach((t, idx)=>{
+      const card = document.createElement('div'); card.className='task-card';
+      card.innerHTML = `
         <div class="task-top">
           <div>
             <div class="client">${escapeHtml(t.client||'Без имени')}</div>
@@ -325,33 +359,157 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
             <button class="action-btn" data-act="edit" data-i="${idx}" title="Редактировать"><i class="fas fa-edit"></i></button>
             <button class="action-btn" data-act="del" data-i="${idx}" title="Удалить"><i class="fas fa-trash"></i></button>
           </div>
-        </div>`; tasksList.appendChild(card); }); }
+        </div>`;
+      tasksList.appendChild(card);
+    });
+  }
 
-  function openModalFor(date, editIndex=null){ modalWrap.style.display='flex'; mDate.value = date || selectedDate; mClient.value=''; mCar.value=''; mTime.value=''; mPrice.value=''; mPlace.value=''; mDesc.value=''; modalWrap.dataset.edit=''; if (editIndex!==null){ const t = (tasks[date]||[])[editIndex]; if (t){ mClient.value=t.client||''; mCar.value=t.car||''; mTime.value=t.time||''; mPrice.value=t.price||''; mPlace.value=t.place||''; mDesc.value=t.desc||''; deleteBtn.style.display=''; modalWrap.dataset.edit=String(editIndex); } } else deleteBtn.style.display='none'; }
+  function openModalFor(date, editIndex=null){
+    modalWrap.style.display='flex';
+    mDate.value = date || selectedDate;
+    mClient.value=''; mCar.value=''; mTime.value=''; mPrice.value=''; mPlace.value=''; mDesc.value='';
+    modalWrap.dataset.edit='';
+    if (editIndex!==null){
+      const t = (tasks[date]||[])[editIndex];
+      if (t){ mClient.value=t.client||''; mCar.value=t.car||''; mTime.value=t.time||''; mPrice.value=t.price||''; mPlace.value=t.place||''; mDesc.value=t.desc||''; deleteBtn.style.display=''; modalWrap.dataset.edit=String(editIndex); }
+    } else deleteBtn.style.display='none';
+  }
   function closeModalWrap(){ modalWrap.style.display='none'; modalWrap.dataset.edit=''; }
-  function saveFromModal(){ const date = mDate.value || selectedDate; if (!tasks[date]) tasks[date]=[]; const obj = { client:mClient.value.trim(), car:mCar.value.trim(), time:mTime.value.trim(), price:mPrice.value.trim(), place:mPlace.value.trim(), desc:mDesc.value.trim(), done:false, createdAt:new Date().toISOString() }; const edit = modalWrap.dataset.edit; if (edit !== '') tasks[date][Number(edit)] = obj; else tasks[date].push(obj); persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap(); }
-  function deleteFromModal(){ const date = mDate.value || selectedDate; const edit = modalWrap.dataset.edit; if (edit==='') return; if (!confirm('Удалить запись?')) return; tasks[date].splice(Number(edit),1); if (!tasks[date].length) delete tasks[date]; persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap(); }
+  function saveFromModal(){
+    const date = mDate.value || selectedDate;
+    if (!tasks[date]) tasks[date]=[];
+    const obj = { client:mClient.value.trim(), car:mCar.value.trim(), time:mTime.value.trim(), price:mPrice.value.trim(), place:mPlace.value.trim(), desc:mDesc.value.trim(), done:false, createdAt:new Date().toISOString() };
+    const edit = modalWrap.dataset.edit;
+    if (edit !== '') tasks[date][Number(edit)] = obj; else tasks[date].push(obj);
+    persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap();
+  }
+  function deleteFromModal(){
+    const date = mDate.value || selectedDate;
+    const edit = modalWrap.dataset.edit;
+    if (edit==='') return;
+    if (!confirm('Удалить запись?')) return;
+    tasks[date].splice(Number(edit),1);
+    if (!tasks[date].length) delete tasks[date];
+    persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap();
+  }
 
-  function updateTotals(){ let all=0, month=0, todaySum=0; const today = todayISO(); const mPref = `${view.getFullYear()}-${String(view.getMonth()+1).padStart(2,'0')}`; for (const date in tasks){ for (const t of tasks[date]){ const p = Number(t.price||0); if (t.done) all+=p; if (date.slice(0,7)===mPref && t.done) month+=p; if (date===today && t.done) todaySum+=p; } } totalAllEl.textContent = fmtMoney(all); totalMonthEl.textContent = fmtMoney(month); totalTodayEl.textContent = fmtMoney(todaySum); }
+  function updateTotals(){
+    let all=0, month=0, todaySum=0;
+    const today = todayISO();
+    const mPref = `${view.getFullYear()}-${String(view.getMonth()+1).padStart(2,'0')}`;
+    for (const date in tasks){
+      for (const t of tasks[date]){
+        const p = Number(t.price||0);
+        if (t.done) all+=p;
+        if (date.slice(0,7)===mPref && t.done) month+=p;
+        if (date===today && t.done) todaySum+=p;
+      }
+    }
+    totalAllEl.textContent = fmtMoney(all);
+    totalMonthEl.textContent = fmtMoney(month);
+    totalTodayEl.textContent = fmtMoney(todaySum);
+  }
 
-  function changeMonth(delta){ view.setMonth(view.getMonth()+delta); renderCalendar(); updateTotals(); if (chartPane.style.display !== 'none') updateChart(); }
+  function changeMonth(delta){ view.setMonth(view.getMonth()+delta); renderCalendar(); updateTotals(); if (!showingCalendar) updateChart(); }
   function persist(){ localStorage.setItem('mobile_tasks', JSON.stringify(tasks)); }
   function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function formatSelectedDate(d){ if(!d) return '—'; const dt=new Date(d); const today=new Date(); if (d===todayISO()) return 'Сегодня'; return dt.toLocaleDateString('ru-RU', { weekday:'long', day:'numeric', month:'long' }); }
   function updateSelectedDateLabel(){ $('#selectedDateLabel').textContent = formatSelectedDate(selectedDate); }
 
   // Chart
-  function initChart(){ const ctx = document.getElementById('incomeChart').getContext('2d'); incomeChart = new Chart(ctx, { type:'line', data:{ labels:[], datasets:[{ label:'Доход', data:[], fill:true, tension:0.36, pointRadius:3 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{mode:'index', intersect:false}}, scales:{ x:{ ticks:{ color:'#cfd8ff' }, grid:{ display:false } }, y:{ ticks:{ color:'#cfd8ff' }, grid:{ color:'rgba(255,255,255,0.03)' } } }, layout:{ padding:6 } } }); updateChart(); }
-  function updateChart(){ if (!incomeChart) return; if (chartMode==='daily'){ const labels=[]; const data=[]; for (let i=29;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const ds=d.toISOString().slice(0,10); labels.push(d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})); let s=0; (tasks[ds]||[]).forEach(t=>{ if (t.done) s+=Number(t.price||0); }); data.push(s); } incomeChart.data.labels=labels; incomeChart.data.datasets[0].data=data; incomeChart.data.datasets[0].borderColor=getComputedStyle(document.documentElement).getPropertyValue('--primary')||'#007AFF'; incomeChart.data.datasets[0].backgroundColor=createGradient(incomeChart.ctx, incomeChart.canvas.height, false); } else { const labels=[]; const data=[]; const now=new Date(); for (let i=11;i>=0;i--){ const d=new Date(now.getFullYear(), now.getMonth()-i,1); const key=d.toISOString().slice(0,7); labels.push(d.toLocaleDateString('ru-RU',{month:'short',year:'numeric'})); let s=0; for (const date in tasks){ if (date.slice(0,7)===key) (tasks[date]||[]).forEach(t=>{ if (t.done) s+=Number(t.price||0); }); } data.push(s); } incomeChart.data.labels=labels; incomeChart.data.datasets[0].data=data; incomeChart.data.datasets[0].borderColor=getComputedStyle(document.documentElement).getPropertyValue('--secondary')||'#5856D6'; incomeChart.data.datasets[0].backgroundColor=createGradient(incomeChart.ctx, incomeChart.canvas.height, true); } incomeChart.update(); }
-  function createGradient(ctx, height, inv){ const g=ctx.createLinearGradient(0,0,0,height||160); if (!inv){ g.addColorStop(0,'rgba(0,122,255,0.32)'); g.addColorStop(1,'rgba(52,199,89,0.04)'); } else { g.addColorStop(0,'rgba(88,86,214,0.28)'); g.addColorStop(1,'rgba(88,86,214,0.04)'); } return g; }
+  function initChart(){
+    const ctx = document.getElementById('incomeChart').getContext('2d');
+    incomeChart = new Chart(ctx, {
+      type:'line',
+      data:{ labels:[], datasets:[{ label:'Доход', data:[], fill:true, tension:0.36, pointRadius:3 }] },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{display:false}, tooltip:{mode:'index', intersect:false}},
+        scales:{ x:{ ticks:{ color:'#cfd8ff' }, grid:{ display:false } }, y:{ ticks:{ color:'#cfd8ff' }, grid:{ color:'rgba(255,255,255,0.03)' } } },
+        layout:{ padding:6 }
+      }
+    });
+    updateChart();
+  }
+
+  function updateChart(){
+    if (!incomeChart) return;
+    if (chartMode === '7d'){
+      const labels=[]; const data=[];
+      for (let i=6;i>=0;i--){
+        const d = new Date(); d.setDate(d.getDate()-i); const ds = d.toISOString().slice(0,10);
+        labels.push(d.toLocaleDateString('ru-RU', { day:'numeric', month:'short' }));
+        let s=0; (tasks[ds]||[]).forEach(t => { if (t.done) s += Number(t.price||0); });
+        data.push(s);
+      }
+      incomeChart.data.labels = labels;
+      incomeChart.data.datasets[0].data = data;
+      incomeChart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#007AFF';
+      incomeChart.data.datasets[0].backgroundColor = createGradient(incomeChart.ctx, incomeChart.canvas.height, false);
+    } else if (chartMode==='daily'){
+      const labels=[]; const data=[];
+      for (let i=29;i>=0;i--){
+        const d=new Date(); d.setDate(d.getDate()-i); const ds=d.toISOString().slice(0,10);
+        labels.push(d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'}));
+        let s=0; (tasks[ds]||[]).forEach(t=>{ if (t.done) s+=Number(t.price||0); });
+        data.push(s);
+      }
+      incomeChart.data.labels = labels;
+      incomeChart.data.datasets[0].data = data;
+      incomeChart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#007AFF';
+      incomeChart.data.datasets[0].backgroundColor = createGradient(incomeChart.ctx, incomeChart.canvas.height, false);
+    } else {
+      const labels=[]; const data=[];
+      const now=new Date();
+      for (let i=11;i>=0;i--){
+        const d=new Date(now.getFullYear(), now.getMonth()-i, 1);
+        const key=d.toISOString().slice(0,7);
+        labels.push(d.toLocaleDateString('ru-RU',{month:'short',year:'numeric'}));
+        let s=0;
+        for (const date in tasks){
+          if (date.slice(0,7)===key) (tasks[date]||[]).forEach(t => { if (t.done) s += Number(t.price||0); });
+        }
+        data.push(s);
+      }
+      incomeChart.data.labels = labels;
+      incomeChart.data.datasets[0].data = data;
+      incomeChart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--secondary') || '#5856D6';
+      incomeChart.data.datasets[0].backgroundColor = createGradient(incomeChart.ctx, incomeChart.canvas.height, true);
+    }
+    incomeChart.update();
+  }
+
+  function createGradient(ctx, height, inverted){
+    const g = ctx.createLinearGradient(0,0,0,height || 160);
+    if (!inverted){
+      g.addColorStop(0, 'rgba(0,122,255,0.32)');
+      g.addColorStop(1, 'rgba(52,199,89,0.04)');
+    } else {
+      g.addColorStop(0, 'rgba(88,86,214,0.28)');
+      g.addColorStop(1, 'rgba(88,86,214,0.04)');
+    }
+    return g;
+  }
 
   // utilities
-  function addSwipe(el, cb){ let startX=null; el.addEventListener('touchstart', e=>{ startX=e.touches[0].clientX; }, {passive:true}); el.addEventListener('touchend', e=>{ if (startX===null) return; const dx=e.changedTouches[0].clientX-startX; if (Math.abs(dx)>40) cb(dx<0?1:-1); startX=null; }); }
+  function addSwipe(el, cb){
+    let startX = null;
+    el.addEventListener('touchstart', (e)=> { startX = e.touches[0].clientX; }, {passive:true});
+    el.addEventListener('touchend', (e)=> { if (startX === null) return; const dx = e.changedTouches[0].clientX - startX; if (Math.abs(dx) > 40) cb(dx < 0 ? 1 : -1); startX = null; });
+  }
 
-  // initial state: calendar shown
-  (function switchToInitial(){ calendarPane.style.display=''; chartPane.style.display='none'; showingCalendar = true; toggleViewBtn.classList.add('active'); toggleIcon.className = 'fas fa-calendar-day'; })();
+  // initial state: show calendar, but chart tab default mode is 7d
+  (function switchToInitial(){
+    calendarPane.style.display=''; chartPane.style.display='none';
+    showingCalendar = true;
+    toggleViewBtn.classList.add('active');
+    toggleIcon.className = 'fas fa-calendar-day';
+    // set chart tab active
+    setActiveChartTab(chart7Btn);
+  })();
 
-  // expose some helpers
+  // expose helpers
   window.mobileApp = { renderCalendar, renderTasks, updateChart, tasks, persist };
 
   // start
