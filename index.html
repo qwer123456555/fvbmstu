@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Income Calendar Pro</title>
+    <title>Income Calendar Pro — обновлённый</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #007AFF;
@@ -13,870 +15,299 @@
             --danger: #FF3B30;
             --warning: #FF9500;
             --background: #0A0A0A;
-            --surface: rgba(255, 255, 255, 0.12);
-            --surface-solid: rgba(30, 30, 30, 0.95);
+            --surface: rgba(255, 255, 255, 0.08);
+            --surface-solid: rgba(18, 18, 18, 0.95);
             --text-primary: #FFFFFF;
             --text-secondary: rgba(255, 255, 255, 0.7);
-            --border-radius: 20px;
-            --blur-intensity: 25px;
+            --border-radius: 18px;
+            --blur-intensity: 18px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none;
-            user-select: none;
-            touch-action: pan-y;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        html, body { width: 100%; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--background); color: var(--text-primary); }
+        body { overflow: hidden; }
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            position: fixed;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        /* Background */
+        .particles-bg { position: fixed; inset: 0; z-index: -2;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(120,119,198,0.18) 0%, transparent 45%),
+                radial-gradient(circle at 80% 20%, rgba(255,149,92,0.12) 0%, transparent 45%),
+                linear-gradient(180deg, #0f1724 0%, #07122b 100%);
         }
+        .particle { position: absolute; background: rgba(255,255,255,0.06); border-radius: 50%; filter: blur(0.5px); animation: float 18s infinite linear; }
 
-        body {
-            background: var(--background);
-            color: var(--text-primary);
-        }
+        @keyframes float { 0% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.25; } 90% { opacity: 0.25; } 100% { transform: translateY(-120px) rotate(360deg); opacity: 0; } }
 
-        /* Анимированный фон с частицами */
-        .particles-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 149, 92, 0.25) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(120, 220, 82, 0.2) 0%, transparent 50%),
-                linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            z-index: -1;
-        }
-
-        .particle {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: float 20s infinite linear;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.3; }
-            90% { opacity: 0.3; }
-            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-        }
-
-        .app-container {
-            width: 100%;
-            height: 100vh;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
-
-        /* Header */
+        /* Layout */
+        .app-container { height: 100dvh; display:flex; flex-direction:column; position:relative; }
         .income-header {
-            display: flex;
-            justify-content: space-around;
-            padding: 20px 15px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(var(--blur-intensity));
-            -webkit-backdrop-filter: blur(var(--blur-intensity));
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            z-index: 10;
+            display:flex; gap:12px; align-items:center; justify-content:space-between;
+            padding: 14px; margin: 12px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+            border-radius: 14px; backdrop-filter: blur(var(--blur-intensity)); border: 1px solid rgba(255,255,255,0.04);
         }
+        .income-header-left { display:flex; gap:12px; align-items:center; }
+        .header-stats { display:flex; gap:10px; align-items:center; }
+        .stat { padding:10px 12px; border-radius:12px; background: rgba(255,255,255,0.02); text-align:center; min-width:86px; }
+        .label { font-size:12px; color:var(--text-secondary); }
+        .value { font-weight:800; font-size:18px; color:var(--text-primary); letter-spacing:0.3px; }
 
-        .income-header > div {
-            text-align: center;
-            animation: fadeInUp 0.6s ease;
-        }
+        /* Quick controls */
+        .controls { display:flex; gap:8px; align-items:center; }
+        .icon-btn { background: transparent; border:1px solid rgba(255,255,255,0.06); padding:10px; border-radius:10px; cursor:pointer; color:var(--text-primary); display:inline-flex; align-items:center; gap:8px; }
+        .search-input { background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); padding:8px 12px; border-radius:12px; color:var(--text-primary); width:220px; }
 
-        .income-header .label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-            font-weight: 500;
-        }
+        /* Main content */
+        .main { display:flex; gap:16px; padding: 12px; flex:1; overflow:hidden; }
+        .left { width: 580px; max-width: 42%; min-width:320px; display:flex; flex-direction:column; gap:12px; overflow:hidden; }
+        .right { flex:1; display:flex; flex-direction:column; gap:12px; overflow:hidden; }
 
-        .income-header .value {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
+        /* Calendar container */
+        .calendar-container { background: var(--surface); border-radius: 16px; padding: 14px; backdrop-filter: blur(12px); border:1px solid rgba(255,255,255,0.06); overflow:hidden; display:flex; flex-direction:column; gap:12px; }
+        .calendar-header { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+        .calendar-nav { display:flex; gap:8px; }
+        .nav-btn { background: transparent; border:1px solid rgba(255,255,255,0.06); width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+        .current-month { font-weight:800; font-size:16px; text-align:center; }
 
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+        .calendar-grid { display:grid; grid-template-columns: repeat(7,1fr); gap:8px; }
+        .calendar-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:10px; font-weight:700; cursor:pointer; transition:all .25s; position:relative; user-select:none; }
+        .calendar-day.weekday { font-weight:700; color:var(--text-secondary); background:transparent; }
+        .calendar-day.other-month { color: rgba(255,255,255,0.18); }
+        .calendar-day.has-work::after { content:''; position:absolute; bottom:6px; left:50%; transform:translateX(-50%); width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); box-shadow:0 6px 18px rgba(88,86,214,0.18); }
+        .calendar-day.selected { outline: 2px solid rgba(255,255,255,0.06); box-shadow: 0 8px 30px rgba(0,0,0,0.6); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); }
+        .calendar-day.today { background: linear-gradient(135deg, var(--warning), #FFB86B); color:#07122b; box-shadow:0 8px 28px rgba(255,149,0,0.12); }
 
-        .tab-content {
-            flex: 1;
-            overflow: hidden;
-            display: none;
-        }
-
-        .tab-content.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Calendar */
-        .calendar-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 80px;
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .calendar-nav {
-            display: flex;
-            gap: 10px;
-        }
-
-        .nav-btn {
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            cursor: pointer;
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        .nav-btn:active {
-            transform: scale(0.95);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .current-month {
-            font-size: 18px;
-            font-weight: 700;
-            text-align: center;
-            flex: 1;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .calendar-day {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-weight: 600;
-            cursor: pointer;
-            position: relative;
-            background: transparent;
-            color: var(--text-primary);
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .calendar-day.has-work::after {
-            content: '';
-            position: absolute;
-            bottom: 3px;
-            width: 6px;
-            height: 6px;
-            background: var(--success);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--success);
-        }
-
-        .calendar-day.selected {
-            background: var(--primary);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 20px rgba(0, 122, 255, 0.4);
-        }
-
-        .calendar-day.today {
-            background: var(--warning);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            animation: pulse 2s infinite;
-            box-shadow: 0 4px 20px rgba(255, 149, 0, 0.4);
-        }
-
-        .calendar-day.other-month {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .calendar-day:active {
-            transform: scale(0.9);
-        }
-
-        /* Day Title */
-        .day-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-align: center;
-            color: var(--text-primary);
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            padding: 15px;
-            border-radius: var(--border-radius);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
+        .day-title { font-size:20px; font-weight:800; padding:10px 12px; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); text-align:center; }
 
         /* Tasks */
-        .tasks-container {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 20px;
-        }
+        .tasks-container { overflow:auto; padding-right:6px; display:flex; flex-direction:column; gap:12px; max-height:420px; }
+        .task-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015)); border-radius:14px; padding:12px; border:1px solid rgba(255,255,255,0.04); box-shadow: 0 10px 30px rgba(2,6,23,0.6); transition: transform .18s; }
+        .task-card:hover { transform: translateY(-6px) rotateX(4deg); }
+        .task-header { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+        .client-name { font-size:16px; font-weight:800; color:var(--text-primary); }
+        .task-time { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:white; padding:6px 12px; border-radius:12px; font-weight:700; }
 
-        .task-card {
-            background: var(--surface);
-            backdrop-filter: blur(var(--blur-intensity));
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            animation: slideInUp 0.5s ease;
-            position: relative;
-            overflow: hidden;
-        }
+        .task-details { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+        .detail-item { padding:8px 10px; border-radius:10px; background: rgba(255,255,255,0.02); color:var(--text-secondary); font-weight:600; display:flex; gap:8px; align-items:center; }
 
-        .task-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-            transition: left 0.5s ease;
-        }
+        /* Price tag - изменяется в зависимости от статуса */
+        .price-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; }
+        .price-tag { padding:10px 16px; border-radius:12px; font-weight:900; font-size:16px; color:white; box-shadow: 0 8px 28px rgba(0,0,0,0.5); transition: all .25s; }
+        .price-tag.done { background: linear-gradient(135deg, #34C759, #2EBF54); box-shadow: 0 8px 28px rgba(52,199,89,0.12); }
+        .price-tag.pending { background: linear-gradient(135deg, #FFB86B, #FF8A3D); color:#07122b; box-shadow: 0 8px 28px rgba(255,149,0,0.08); }
+        .price-tag.cancelled { background: linear-gradient(135deg, #B0B0B0, #8B8B8B); opacity:0.95; }
 
-        .task-card:active::before {
-            left: 100%;
-        }
+        .task-actions { display:flex; gap:8px; margin-top:10px; justify-content:flex-end; }
+        .action-btn { width:48px; height:48px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; background:transparent; cursor:pointer; transition: all .18s; color:var(--text-primary); }
+        .action-btn.toggle { border-color: rgba(255,255,255,0.06); }
+        .action-btn.toggle.done { background: rgba(52,199,89,0.10); color:var(--success); }
+        .action-btn.edit { background: rgba(0,122,255,0.06); color:var(--primary); }
+        .action-btn.delete { background: rgba(255,59,48,0.06); color:var(--danger); }
 
-        .task-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
+        /* Right column: analytics + controls */
+        .panel { background: var(--surface); border-radius:14px; padding:12px; border:1px solid rgba(255,255,255,0.04); backdrop-filter: blur(10px); display:flex; flex-direction:column; gap:12px; }
+        .stats-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
+        .stat-card { padding:10px; border-radius:10px; background: rgba(255,255,255,0.02); text-align:center; }
+        .chart-wrap { height:260px; position:relative; padding:6px 0; }
 
-        .client-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin: 0;
-        }
+        /* Add button */
+        .add-btn { position: fixed; right: 20px; bottom: 86px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; font-size:28px; width:70px; height:70px; border-radius:50%; border:none; cursor:pointer; z-index:1000; box-shadow:0 12px 48px rgba(0,122,255,0.22); display:flex; align-items:center; justify-content:center; }
 
-        .task-time {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
-        }
-
-        .task-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 15px;
-            color: var(--text-secondary);
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-        }
-
-        .detail-item i {
-            font-size: 16px;
-            color: var(--primary);
-        }
-
-        .price-tag {
-            background: linear-gradient(135deg, var(--success), #30D158);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 18px;
-            text-align: center;
-            margin: 15px 0;
-            animation: pulse 2s infinite;
-            box-shadow: 0 4px 20px rgba(52, 199, 89, 0.3);
-        }
-
-        .task-description {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 15px;
-            border-radius: 15px;
-            font-size: 15px;
-            line-height: 1.5;
-            margin-bottom: 16px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .task-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
-        .action-btn {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-primary);
-        }
-
-        .action-btn:active {
-            transform: scale(0.9);
-        }
-
-        .action-btn.toggle {
-            background: rgba(255, 59, 48, 0.15);
-            color: var(--danger);
-        }
-
-        .action-btn.toggle.done {
-            background: rgba(52, 199, 89, 0.15);
-            color: var(--success);
-        }
-
-        .action-btn.edit {
-            background: rgba(0, 122, 255, 0.15);
-            color: var(--primary);
-        }
-
-        .action-btn.delete {
-            background: rgba(255, 59, 48, 0.15);
-            color: var(--danger);
-        }
-
-        /* Add Button */
-        .add-btn {
-            position: fixed;
-            right: 20px;
-            bottom: 90px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            font-size: 28px;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            z-index: 1000;
-            animation: pulse 2s infinite;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 122, 255, 0.4);
-        }
-
-        .add-btn:active {
-            transform: scale(0.9) rotate(90deg);
-        }
-
-        /* Navigation */
-        .tab-navigation {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(var(--blur-intensity));
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            padding: 12px 20px;
-            z-index: 100;
-        }
-
-        .tab-btn {
-            flex: 1;
-            background: none;
-            border: none;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            border-radius: 16px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tab-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .tab-btn:active::before {
-            left: 100%;
-        }
-
-        .tab-btn.active {
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .tab-btn i {
-            font-size: 22px;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active i {
-            transform: scale(1.1);
-            color: var(--primary);
-        }
+        /* Bottom nav */
+        .tab-navigation { position: fixed; bottom: 0; left: 0; right: 0; padding:12px; display:flex; gap:8px; margin:12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); justify-content:center; }
 
         /* Modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            padding: 20px;
-            animation: fadeIn 0.3s ease;
-        }
+        .modal-overlay { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:2000; padding:16px; }
+        .modal-content { width:100%; max-width:520px; background: var(--surface-solid); border-radius:14px; padding:18px; border:1px solid rgba(255,255,255,0.06); }
+        .form-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+        .form-grid.full { grid-template-columns:1fr; }
+        .form-input, textarea { width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); color:var(--text-primary); }
+        .btn { padding:10px 12px; border-radius:10px; cursor:pointer; border:none; font-weight:700; }
+        .btn-primary { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:white; }
+        .btn-secondary { background:transparent; color:var(--text-primary); border:1px solid rgba(255,255,255,0.04); }
 
-        .modal-content {
-            background: var(--surface-solid);
-            backdrop-filter: blur(var(--blur-intensity));
-            border-radius: var(--border-radius);
-            padding: 24px;
-            width: 100%;
-            max-width: 400px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: modalSlideIn 0.3s ease;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
+        /* Notification */
+        .notification { position:fixed; top:100px; right:20px; background:var(--surface-solid); padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); z-index:3000; box-shadow:0 10px 40px rgba(0,0,0,0.6); }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 0;
-            color: var(--text-primary);
-        }
-
-        .close-btn {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        .close-btn:active {
-            transform: scale(0.9);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-label {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .form-input {
-            padding: 16px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            font-size: 16px;
-            color: var(--text-primary);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 16px 24px;
-            border-radius: 15px;
-            border: none;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9) translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-            animation: fadeIn 0.5s ease;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        .empty-state p {
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-
-        /* Notifications */
-        .notification {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: var(--surface-solid);
-            backdrop-filter: blur(20px);
-            border-radius: 15px;
-            padding: 16px 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            z-index: 3000;
-            animation: slideInRight 0.3s ease;
-            max-width: 300px;
-        }
-
-        .notification-success { border-left: 4px solid var(--success); }
-        .notification-warning { border-left: 4px solid var(--warning); }
-        .notification-info { border-left: 4px solid var(--primary); }
-
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .notification-content i {
-            font-size: 20px;
-        }
-
-        .notification-success i { color: var(--success); }
-        .notification-warning i { color: var(--warning); }
-        .notification-info i { color: var(--primary); }
-
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .task-details {
-                grid-template-columns: 1fr;
-            }
-            
-            .calendar-grid {
-                gap: 6px;
-            }
+        @media (max-width: 1000px) {
+            .main { flex-direction:column; padding:12px; }
+            .left { width:100%; max-width:100%; min-width:unset; }
+            .right { width:100%; }
+            .search-input { width:140px; }
         }
     </style>
 </head>
 <body>
     <div class="particles-bg" id="particles-bg"></div>
-    
-    <div class="app-container">
-        <header class="income-header">
-            <div>
-                <div class="label">Всего</div>
-                <div class="value" id="total-income">0 ₽</div>
-            </div>
-            <div>
-                <div class="label">Месяц</div>
-                <div class="value" id="month-income">0 ₽</div>
-            </div>
-            <div>
-                <div class="label">Сегодня</div>
-                <div class="value" id="today-income">0 ₽</div>
-            </div>
-        </header>
 
-        <main class="main-content">
-            <div id="calendar-tab" class="tab-content active">
+    <div class="app-container">
+        <!-- Header -->
+        <div class="income-header">
+            <div class="income-header-left">
+                <div class="header-stats">
+                    <div class="stat">
+                        <div class="label">Всего</div>
+                        <div class="value" id="total-income">0 ₽</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Месяц</div>
+                        <div class="value" id="month-income">0 ₽</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Сегодня</div>
+                        <div class="value" id="today-income">0 ₽</div>
+                    </div>
+                </div>
+                <div style="width:12px;"></div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input id="global-search" class="search-input" placeholder="Поиск клиентов / авто / адреса" />
+                    <button class="icon-btn" id="filter-btn" title="Фильтр">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="icon-btn" id="export-csv"><i class="fas fa-file-csv"></i> Экспорт</button>
+                <label class="icon-btn" for="import-json" style="cursor:pointer;"><i class="fas fa-file-import"></i> Импорт</label>
+                <input type="file" id="import-json" accept="application/json" style="display:none;">
+                <button class="icon-btn" id="toggle-demo">Демо данные</button>
+            </div>
+        </div>
+
+        <!-- Main -->
+        <div class="main">
+            <!-- Left: Calendar & Tasks -->
+            <div class="left">
                 <div class="calendar-container">
                     <div class="calendar-header">
                         <div class="calendar-nav">
-                            <button class="nav-btn" id="prev-month">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="nav-btn" id="today-btn">
-                                <i class="fas fa-circle"></i>
-                            </button>
+                            <button class="nav-btn" id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                            <button class="nav-btn" id="today-btn" title="Сегодня"><i class="fas fa-circle"></i></button>
                         </div>
                         <div class="current-month" id="current-month">Июнь 2025</div>
                         <div class="calendar-nav">
-                            <button class="nav-btn" id="next-month">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
+                            <button class="nav-btn" id="next-month"><i class="fas fa-chevron-right"></i></button>
                         </div>
                     </div>
 
                     <div class="calendar-grid" id="calendar-grid">
-                        <!-- Calendar will be generated here -->
+                        <!-- fill -->
                     </div>
 
                     <div class="day-title" id="day-title">Сегодня</div>
+
                     <div id="tasks" class="tasks-container">
-                        <!-- Tasks will appear here -->
+                        <!-- tasks -->
                     </div>
                 </div>
             </div>
 
-            <div id="chart-tab" class="tab-content">
-                <div class="calendar-container">
-                    <div class="day-title">Аналитика доходов</div>
-                    <div class="empty-state">
-                        <i class="fas fa-chart-line"></i>
-                        <p>График доходов скоро появится</p>
+            <!-- Right: Analytics -->
+            <div class="right">
+                <div class="panel">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="font-weight:900; font-size:16px;">Аналитика</div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="icon-btn" id="view-daily">День</button>
+                            <button class="icon-btn" id="view-monthly">Месяц</button>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid" id="mini-stats">
+                        <div class="stat-card">
+                            <div class="label">Выполнено</div>
+                            <div class="value" id="stat-done">0 ₽</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">В ожидании</div>
+                            <div class="value" id="stat-pending">0 ₽</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Средний чек</div>
+                            <div class="value" id="stat-avg">0 ₽</div>
+                        </div>
+                    </div>
+
+                    <div class="chart-wrap">
+                        <canvas id="incomeChart"></canvas>
+                    </div>
+
+                    <div style="display:flex; gap:8px; justify-content:space-between; align-items:center;">
+                        <div style="color:var(--text-secondary); font-weight:700;">Последние 30 дней</div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="icon-btn" id="export-chart-png" title="Скачать график">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="icon-btn" id="reset-filters" title="Сбросить фильтры"><i class="fas fa-eraser"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" style="flex:1; overflow:auto;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="font-weight:900;">Список последних записей</div>
+                        <div style="font-size:13px; color:var(--text-secondary);">Нажмите на чек, чтобы отметить выполнено</div>
+                    </div>
+
+                    <div id="recent-list" style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+                        <!-- recent tasks -->
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
 
-        <button class="add-btn" id="add-btn">
-            <i class="fas fa-plus"></i>
-        </button>
+        <button class="add-btn" id="add-btn"><i class="fas fa-plus"></i></button>
 
         <div class="tab-navigation">
-            <button class="tab-btn active" data-tab="calendar-tab">
-                <i class="fas fa-calendar"></i>
-                <span>Календарь</span>
-            </button>
-            <button class="tab-btn" data-tab="chart-tab">
-                <i class="fas fa-chart-line"></i>
-                <span>Аналитика</span>
-            </button>
+            <button class="icon-btn" id="open-calendar">Календарь</button>
+            <button class="icon-btn" id="open-analytics">Аналитика</button>
         </div>
     </div>
 
     <!-- Modal -->
     <div class="modal-overlay" id="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modal-title">Новая запись</h2>
-                <button class="close-btn" id="close-modal">
-                    <i class="fas fa-times"></i>
-                </button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <div style="font-size:18px; font-weight:900;" id="modal-title">Новая запись</div>
+                <button class="icon-btn" id="close-modal"><i class="fas fa-times"></i></button>
             </div>
+
             <form id="task-form">
                 <div class="form-grid">
-                    <div class="form-group">
+                    <div>
                         <label class="form-label">Клиент</label>
-                        <input type="text" id="client" class="form-input" placeholder="Имя клиента" required>
+                        <input id="client" class="form-input" placeholder="Имя клиента" required />
                     </div>
-                    
-                    <div class="form-group">
+                    <div>
                         <label class="form-label">Автомобиль</label>
-                        <input type="text" id="car" class="form-input" placeholder="Марка и модель" required>
+                        <input id="car" class="form-input" placeholder="Марка и модель" required />
                     </div>
-                    
-                    <div class="form-group">
+                    <div>
                         <label class="form-label">Время</label>
-                        <input type="text" id="time" class="form-input" placeholder="14:00–15:30" required>
+                        <input id="time" class="form-input" placeholder="14:00–15:30" required />
                     </div>
-                    
-                    <div class="form-group">
+                    <div>
                         <label class="form-label">Стоимость</label>
-                        <input type="number" id="price" class="form-input" placeholder="₽" required>
+                        <input id="price" type="number" class="form-input" placeholder="₽" required />
                     </div>
-                    
-                    <div class="form-group">
+                    <div style="grid-column: 1 / -1;">
                         <label class="form-label">Место</label>
-                        <input type="text" id="place" class="form-input" placeholder="Адрес" required>
+                        <input id="place" class="form-input" placeholder="Адрес" required />
                     </div>
-                    
-                    <div class="form-group">
+                    <div style="grid-column: 1 / -1;">
                         <label class="form-label">Описание</label>
                         <textarea id="desc" class="form-input" rows="3" placeholder="Детали работы..."></textarea>
                     </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" style="flex-direction: row; align-items: center; gap: 10px;">
-                            <input type="checkbox" id="set-reminder" style="width: 20px; height: 20px;">
-                            Напомнить за день до записи
-                        </label>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" id="set-reminder" />
+                        <label for="set-reminder">Напомнить за день</label>
                     </div>
                 </div>
-                
-                <input type="hidden" id="edit-id">
-                <input type="hidden" id="task-date">
-                
-                <div class="form-actions">
+
+                <input type="hidden" id="edit-id" />
+                <input type="hidden" id="task-date" />
+                <div style="display:flex; gap:8px; margin-top:12px; justify-content:flex-end;">
                     <button type="button" class="btn btn-secondary" id="cancel-btn">Отмена</button>
                     <button type="submit" class="btn btn-primary">Сохранить</button>
                 </div>
@@ -885,558 +316,631 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Создаем частицы для фона
-            function createParticles() {
-                const container = document.getElementById('particles-bg');
-                const particleCount = 15;
-                
-                for (let i = 0; i < particleCount; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    
-                    // Случайный размер и позиция
-                    const size = Math.random() * 4 + 2;
-                    const left = Math.random() * 100;
-                    const animationDuration = Math.random() * 20 + 15;
-                    const animationDelay = Math.random() * 5;
-                    
-                    particle.style.width = `${size}px`;
-                    particle.style.height = `${size}px`;
-                    particle.style.left = `${left}%`;
-                    particle.style.animationDuration = `${animationDuration}s`;
-                    particle.style.animationDelay = `${animationDelay}s`;
-                    
-                    container.appendChild(particle);
-                }
+        // -----------------------------------------
+        // Утилиты
+        // -----------------------------------------
+        function formatMoney(n) {
+            return (parseInt(n) || 0).toLocaleString() + ' ₽';
+        }
+
+        // Create particles background
+        (function createParticles() {
+            const container = document.getElementById('particles-bg');
+            const particleCount = 18;
+            for (let i=0;i<particleCount;i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 6 + 2;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = (Math.random()*100) + '%';
+                p.style.top = (Math.random()*100) + '%';
+                p.style.animationDuration = (Math.random()*25 + 15) + 's';
+                p.style.opacity = Math.random()*0.6;
+                container.appendChild(p);
+            }
+        })();
+
+        // -----------------------------------------
+        // Основной класс
+        // -----------------------------------------
+        class IncomeCalendar {
+            constructor() {
+                this.currentDate = new Date().toISOString().split('T')[0];
+                this.currentMonth = new Date().getMonth();
+                this.currentYear = new Date().getFullYear();
+                this.tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
+                this.chartMode = 'daily'; // daily or monthly
+                this.chart = null;
+
+                this.initElements();
+                this.bindEvents();
+                this.renderCalendar();
+                this.renderTasks();
+                this.updateIncome(true);
+                this.initChart();
+                this.renderRecent();
+                this.checkReminders();
+
+                this.searchTerm = '';
             }
 
-            class IncomeCalendar {
-                constructor() {
-                    this.dates = this.generateDates('2025-01-01', '2027-12-31');
-                    this.currentDate = new Date().toISOString().split('T')[0];
-                    this.currentMonth = new Date().getMonth();
-                    this.currentYear = new Date().getFullYear();
-                    this.tasks = JSON.parse(localStorage.getItem("tasks") || "{}");
-                    
-                    this.initializeElements();
-                    this.setupEventListeners();
-                    this.renderCalendar();
+            initElements() {
+                this.el = {
+                    totalIncome: document.getElementById('total-income'),
+                    monthIncome: document.getElementById('month-income'),
+                    todayIncome: document.getElementById('today-income'),
+                    calendarGrid: document.getElementById('calendar-grid'),
+                    currentMonth: document.getElementById('current-month'),
+                    prevMonth: document.getElementById('prev-month'),
+                    nextMonth: document.getElementById('next-month'),
+                    todayBtn: document.getElementById('today-btn'),
+                    tasksContainer: document.getElementById('tasks'),
+                    dayTitle: document.getElementById('day-title'),
+                    modal: document.getElementById('modal'),
+                    taskForm: document.getElementById('task-form'),
+                    modalTitle: document.getElementById('modal-title'),
+                    closeModal: document.getElementById('close-modal'),
+                    cancelBtn: document.getElementById('cancel-btn'),
+                    client: document.getElementById('client'),
+                    car: document.getElementById('car'),
+                    time: document.getElementById('time'),
+                    price: document.getElementById('price'),
+                    place: document.getElementById('place'),
+                    desc: document.getElementById('desc'),
+                    setReminder: document.getElementById('set-reminder'),
+                    editId: document.getElementById('edit-id'),
+                    taskDate: document.getElementById('task-date'),
+                    addBtn: document.getElementById('add-btn'),
+                    searchInput: document.getElementById('global-search'),
+                    exportCsv: document.getElementById('export-csv'),
+                    importJson: document.getElementById('import-json'),
+                    toggleDemo: document.getElementById('toggle-demo'),
+                    viewDaily: document.getElementById('view-daily'),
+                    viewMonthly: document.getElementById('view-monthly'),
+                    incomeChart: document.getElementById('incomeChart'),
+                    exportChartPng: document.getElementById('export-chart-png'),
+                    resetFilters: document.getElementById('reset-filters'),
+                    recentList: document.getElementById('recent-list')
+                };
+            }
+
+            bindEvents() {
+                this.el.prevMonth.addEventListener('click', () => this.changeMonth(-1));
+                this.el.nextMonth.addEventListener('click', () => this.changeMonth(1));
+                this.el.todayBtn.addEventListener('click', () => this.goToToday());
+                this.el.calendarGrid.addEventListener('click', (e) => {
+                    const d = e.target.closest('.calendar-day');
+                    if (d && d.dataset.date && !d.classList.contains('other-month')) {
+                        this.selectDate(d.dataset.date);
+                    }
+                });
+                this.el.tasksContainer.addEventListener('click', (e) => {
+                    const card = e.target.closest('.task-card');
+                    if (!card) return;
+                    const taskId = card.dataset.taskId;
+                    const action = e.target.closest('.action-btn');
+                    if (!action) return;
+                    const isToggle = action.classList.contains('toggle');
+                    const isEdit = action.classList.contains('edit');
+                    const isDelete = action.classList.contains('delete');
+                    if (isToggle) this.toggleTask(taskId);
+                    if (isEdit) this.editTask(taskId);
+                    if (isDelete) this.deleteTask(taskId);
+                });
+                this.el.addBtn.addEventListener('click', () => this.openModal());
+                this.el.closeModal.addEventListener('click', () => this.closeModal());
+                this.el.cancelBtn.addEventListener('click', () => this.closeModal());
+                this.el.modal.addEventListener('click', (e) => { if (e.target === this.el.modal) this.closeModal(); });
+                this.el.taskForm.addEventListener('submit', (e) => this.saveTask(e));
+                this.el.searchInput.addEventListener('input', (e) => { this.searchTerm = e.target.value.trim().toLowerCase(); this.renderTasks(); this.renderRecent(); });
+
+                this.el.exportCsv.addEventListener('click', () => this.exportCSV());
+                this.el.importJson.addEventListener('change', (e) => this.importJSON(e));
+                this.el.toggleDemo.addEventListener('click', () => { if (confirm('Добавить демонстрационные данные?')) { this.addSampleData(); } });
+
+                this.el.viewDaily.addEventListener('click', () => { this.chartMode='daily'; this.updateChart(); });
+                this.el.viewMonthly.addEventListener('click', () => { this.chartMode='monthly'; this.updateChart(); });
+
+                this.el.exportChartPng.addEventListener('click', () => {
+                    const url = this.el.incomeChart.toDataURL('image/png');
+                    const a = document.createElement('a'); a.href = url; a.download = 'income-chart.png'; a.click();
+                });
+
+                this.el.resetFilters.addEventListener('click', () => {
+                    this.searchTerm = '';
+                    this.el.searchInput.value = '';
                     this.renderTasks();
-                    this.updateIncome();
-                }
+                    this.renderRecent();
+                });
+            }
 
-                initializeElements() {
-                    this.el = {
-                        totalIncome: document.getElementById('total-income'),
-                        monthIncome: document.getElementById('month-income'),
-                        todayIncome: document.getElementById('today-income'),
-                        calendarGrid: document.getElementById('calendar-grid'),
-                        currentMonth: document.getElementById('current-month'),
-                        prevMonth: document.getElementById('prev-month'),
-                        nextMonth: document.getElementById('next-month'),
-                        todayBtn: document.getElementById('today-btn'),
-                        tasksContainer: document.getElementById('tasks'),
-                        dayTitle: document.getElementById('day-title'),
-                        modal: document.getElementById('modal'),
-                        taskForm: document.getElementById('task-form'),
-                        modalTitle: document.getElementById('modal-title'),
-                        closeModal: document.getElementById('close-modal'),
-                        cancelBtn: document.getElementById('cancel-btn'),
-                        client: document.getElementById('client'),
-                        car: document.getElementById('car'),
-                        time: document.getElementById('time'),
-                        price: document.getElementById('price'),
-                        place: document.getElementById('place'),
-                        desc: document.getElementById('desc'),
-                        setReminder: document.getElementById('set-reminder'),
-                        editId: document.getElementById('edit-id'),
-                        taskDate: document.getElementById('task-date'),
-                        tabBtns: document.querySelectorAll('.tab-btn'),
-                        tabContents: document.querySelectorAll('.tab-content'),
-                        addBtn: document.getElementById('add-btn')
-                    };
-                }
+            // generate calendar for current month
+            renderCalendar() {
+                const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+                const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+                const startDay = firstDay.getDay(); // 0-6 (Sun-Sat)
+                const daysInMonth = lastDay.getDate();
+                const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+                this.el.currentMonth.textContent = monthNames[this.currentMonth] + ' ' + this.currentYear;
 
-                setupEventListeners() {
-                    this.el.prevMonth.addEventListener('click', () => this.changeMonth(-1));
-                    this.el.nextMonth.addEventListener('click', () => this.changeMonth(1));
-                    this.el.todayBtn.addEventListener('click', () => this.goToToday());
-                    
-                    this.el.calendarGrid.addEventListener('click', (e) => {
-                        const dayElement = e.target.closest('.calendar-day');
-                        if (dayElement && !dayElement.classList.contains('other-month')) {
-                            this.selectDate(dayElement.dataset.date);
-                        }
-                    });
-                    
-                    this.el.tasksContainer.addEventListener('click', (e) => {
-                        const taskElement = e.target.closest('.task-card');
-                        if (!taskElement) return;
-                        
-                        const taskId = taskElement.dataset.taskId;
-                        const actionBtn = e.target.closest('.action-btn');
-                        
-                        if (actionBtn) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            
-                            if (actionBtn.classList.contains('toggle')) {
-                                this.toggleTask(taskId);
-                            } else if (actionBtn.classList.contains('edit')) {
-                                this.editTask(taskId);
-                            } else if (actionBtn.classList.contains('delete')) {
-                                this.deleteTask(taskId);
-                            }
-                        }
-                    });
-                    
-                    this.el.addBtn.addEventListener('click', () => this.openModal());
-                    this.el.closeModal.addEventListener('click', () => this.closeModal());
-                    this.el.cancelBtn.addEventListener('click', () => this.closeModal());
-                    this.el.modal.addEventListener('click', (e) => {
-                        if (e.target === this.el.modal) this.closeModal();
-                    });
-                    
-                    this.el.taskForm.addEventListener('submit', (e) => this.saveTask(e));
-                    
-                    this.el.tabBtns.forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            this.switchTab(btn.dataset.tab);
-                        });
-                    });
-                }
+                const weekdays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+                let html = weekdays.map(w => `<div class="calendar-day weekday">${w}</div>`).join('');
+                // Padding for first row (convert startDay from Sun=0 to Mon=0)
+                const pad = (startDay === 0) ? 6 : startDay - 1;
+                for (let i=0;i<pad;i++) html += '<div class="calendar-day other-month"></div>';
 
-                generateDates(start, end) {
-                    const dates = [];
-                    const startDate = new Date(start);
-                    const endDate = new Date(end);
-                    
-                    while (startDate <= endDate) {
-                        dates.push(startDate.toISOString().split('T')[0]);
-                        startDate.setDate(startDate.getDate() + 1);
+                const today = new Date().toISOString().split('T')[0];
+                for (let d=1; d<=daysInMonth; d++) {
+                    const date = new Date(this.currentYear, this.currentMonth, d);
+                    const ds = date.toISOString().split('T')[0];
+                    const hasWork = this.tasks[ds] && this.tasks[ds].length;
+                    const isToday = ds === today;
+                    const isSelected = ds === this.currentDate;
+                    // compute total for day for tooltip
+                    let dayTotal = 0;
+                    if (hasWork) {
+                        this.tasks[ds].forEach(t => dayTotal += parseInt(t.price || 0));
                     }
-                    
-                    return dates;
+                    const title = hasWork ? `Сумма: ${dayTotal.toLocaleString()} ₽ — нажмите для просмотра` : '';
+                    html += `<div class="calendar-day ${hasWork?'has-work':''} ${isToday?'today':''} ${isSelected?'selected':''}" data-date="${ds}" title="${title}">${d}</div>`;
                 }
+                this.el.calendarGrid.innerHTML = html;
+            }
 
-                renderCalendar() {
-                    const firstDay = new Date(this.currentYear, this.currentMonth, 1);
-                    const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
-                    const startDay = firstDay.getDay();
-                    const daysInMonth = lastDay.getDate();
-                    
-                    const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
-                                     'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-                    this.el.currentMonth.textContent = `${monthNames[this.currentMonth]} ${this.currentYear}`;
-                    
-                    const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-                    let calendarHTML = weekdays.map(day => 
-                        `<div class="calendar-day weekday">${day}</div>`
-                    ).join('');
-                    
-                    for (let i = 0; i < (startDay === 0 ? 6 : startDay - 1); i++) {
-                        calendarHTML += '<div class="calendar-day other-month"></div>';
-                    }
-                    
-                    const today = new Date().toISOString().split('T')[0];
-                    for (let day = 1; day <= daysInMonth; day++) {
-                        const date = new Date(this.currentYear, this.currentMonth, day);
-                        const dateString = date.toISOString().split('T')[0];
-                        const hasWork = this.tasks[dateString] && this.tasks[dateString].length > 0;
-                        const isToday = dateString === today;
-                        const isSelected = dateString === this.currentDate;
-                        
-                        let className = 'calendar-day';
-                        if (isToday) className += ' today';
-                        if (isSelected) className += ' selected';
-                        if (hasWork) className += ' has-work';
-                        
-                        calendarHTML += `
-                            <div class="${className}" data-date="${dateString}">
-                                ${day}
+            renderTasks() {
+                const tasks = this.tasks[this.currentDate] || [];
+                const date = new Date(this.currentDate);
+                const today = new Date().toISOString().split('T')[0];
+                let dayTitle;
+                if (this.currentDate === today) dayTitle = 'Сегодня';
+                else dayTitle = date.toLocaleDateString('ru-RU', { weekday:'long', day:'numeric', month:'long' });
+
+                this.el.dayTitle.textContent = dayTitle;
+
+                // apply search filter
+                let filtered = tasks.map((t,i)=> ({...t, __id:i})).filter(t=>{
+                    if (!this.searchTerm) return true;
+                    const s = this.searchTerm;
+                    return (t.client && t.client.toLowerCase().includes(s)) ||
+                           (t.car && t.car.toLowerCase().includes(s)) ||
+                           (t.place && t.place.toLowerCase().includes(s)) ||
+                           (t.time && t.time.toLowerCase().includes(s));
+                });
+
+                if (filtered.length === 0) {
+                    this.el.tasksContainer.innerHTML = `
+                        <div style="text-align:center; padding:30px; color:var(--text-secondary);">
+                            <i class="fas fa-calendar-plus" style="font-size:36px; opacity:0.5;"></i>
+                            <div style="margin-top:8px; font-weight:700;">Записей на этот день нет</div>
+                            <div style="margin-top:8px;">
+                                <button class="btn btn-primary" onclick="app.openModal()">Добавить запись</button>
                             </div>
-                        `;
-                    }
-                    
-                    this.el.calendarGrid.innerHTML = calendarHTML;
-                }
-
-                renderTasks() {
-                    const tasks = this.tasks[this.currentDate] || [];
-                    const date = new Date(this.currentDate);
-                    const today = new Date().toISOString().split('T')[0];
-                    
-                    let dayTitle;
-                    if (this.currentDate === today) {
-                        dayTitle = 'Сегодня';
-                    } else {
-                        const options = { weekday: 'long', day: 'numeric', month: 'long' };
-                        dayTitle = date.toLocaleDateString('ru-RU', options);
-                    }
-                    
-                    this.el.dayTitle.textContent = dayTitle;
-                    
-                    if (tasks.length === 0) {
-                        this.el.tasksContainer.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-calendar-plus"></i>
-                                <p>На этот день записей нет</p>
-                                <button class="btn btn-primary" onclick="app.openModal()" style="margin-top: 12px;">
-                                    Добавить запись
-                                </button>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    this.el.tasksContainer.innerHTML = tasks.map((task, index) => `
-                        <div class="task-card" data-task-id="${index}">
-                            <div class="task-header">
-                                <h3 class="client-name">${task.client}</h3>
-                                <div class="task-time">${task.time}</div>
-                            </div>
-                            
-                            <div class="task-details">
-                                <div class="detail-item">
-                                    <i class="fas fa-car"></i>
-                                    <span>${task.car}</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>${task.place}</span>
-                                </div>
-                            </div>
-                            
-                            <div class="price-tag">${parseInt(task.price).toLocaleString()} ₽</div>
-                            
-                            ${task.desc ? `
-                                <div class="task-description">
-                                    <i class="fas fa-sticky-note"></i> ${task.desc}
-                                </div>
-                            ` : ''}
-                            
-                            <div class="task-actions">
-                                <button class="action-btn toggle ${task.done ? 'done' : ''}" 
-                                        title="${task.done ? 'Выполнено' : 'Не выполнено'}">
-                                    <i class="fas ${task.done ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                                </button>
-                                <button class="action-btn edit" title="Редактировать">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="action-btn delete" title="Удалить">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-
-                openModal(taskId = null) {
-                    this.el.modal.style.display = 'flex';
-                    this.el.taskDate.value = this.currentDate;
-                    
-                    if (taskId !== null) {
-                        const task = this.tasks[this.currentDate][taskId];
-                        this.el.modalTitle.textContent = 'Редактировать запись';
-                        this.el.client.value = task.client;
-                        this.el.car.value = task.car;
-                        this.el.time.value = task.time;
-                        this.el.price.value = task.price;
-                        this.el.place.value = task.place;
-                        this.el.desc.value = task.desc || '';
-                        this.el.setReminder.checked = task.reminder || false;
-                        this.el.editId.value = taskId;
-                    } else {
-                        this.el.modalTitle.textContent = 'Новая запись';
-                        this.el.taskForm.reset();
-                        this.el.editId.value = '';
-                    }
-                }
-
-                closeModal() {
-                    this.el.modal.style.display = 'none';
-                }
-
-                saveTask(e) {
-                    e.preventDefault();
-                    
-                    const taskData = {
-                        client: this.el.client.value,
-                        car: this.el.car.value,
-                        time: this.el.time.value,
-                        price: this.el.price.value,
-                        place: this.el.place.value,
-                        desc: this.el.desc.value,
-                        done: false,
-                        reminder: this.el.setReminder.checked,
-                        createdAt: new Date().toISOString()
-                    };
-                    
-                    const date = this.el.taskDate.value;
-                    const taskId = this.el.editId.value;
-                    
-                    if (!this.tasks[date]) {
-                        this.tasks[date] = [];
-                    }
-                    
-                    if (taskId !== '') {
-                        this.tasks[date][taskId] = { ...this.tasks[date][taskId], ...taskData };
-                    } else {
-                        this.tasks[date].push(taskData);
-                    }
-                    
-                    if (taskData.reminder) {
-                        this.setReminder(date, taskData);
-                    }
-                    
-                    this.saveToStorage();
-                    this.renderTasks();
-                    this.renderCalendar();
-                    this.updateIncome();
-                    this.closeModal();
-                    
-                    this.showNotification('Запись сохранена!', 'success');
-                }
-
-                toggleTask(taskId) {
-                    this.tasks[this.currentDate][taskId].done = 
-                        !this.tasks[this.currentDate][taskId].done;
-                    this.saveToStorage();
-                    this.renderTasks();
-                    this.updateIncome();
-                    
-                    const status = this.tasks[this.currentDate][taskId].done ? 'выполнена' : 'не выполнена';
-                    this.showNotification(`Запись отмечена как ${status}`, 'info');
-                }
-
-                editTask(taskId) {
-                    this.openModal(taskId);
-                }
-
-                deleteTask(taskId) {
-                    if (confirm('Удалить эту запись?')) {
-                        this.tasks[this.currentDate].splice(taskId, 1);
-                        if (this.tasks[this.currentDate].length === 0) {
-                            delete this.tasks[this.currentDate];
-                        }
-                        this.saveToStorage();
-                        this.renderTasks();
-                        this.renderCalendar();
-                        this.updateIncome();
-                        this.showNotification('Запись удалена', 'warning');
-                    }
-                }
-
-                setReminder(date, task) {
-                    const reminderDate = new Date(date);
-                    reminderDate.setDate(reminderDate.getDate() - 1);
-                    
-                    const reminders = JSON.parse(localStorage.getItem("reminders") || "{}");
-                    reminders[reminderDate.toISOString().split('T')[0]] = {
-                        date: date,
-                        client: task.client,
-                        time: task.time,
-                        notified: false
-                    };
-                    
-                    localStorage.setItem("reminders", JSON.stringify(reminders));
-                    this.showNotification('Напоминание установлено!', 'success');
-                }
-
-                showNotification(message, type = 'info') {
-                    const notification = document.createElement('div');
-                    notification.className = `notification notification-${type}`;
-                    notification.innerHTML = `
-                        <div class="notification-content">
-                            <i class="fas fa-${type === 'success' ? 'check' : type === 'warning' ? 'exclamation-triangle' : 'info'}-circle"></i>
-                            <span>${message}</span>
                         </div>
                     `;
-                    
-                    document.body.appendChild(notification);
-                    
-                    setTimeout(() => {
-                        notification.style.animation = 'slideInRight 0.3s ease reverse';
-                        setTimeout(() => {
-                            if (notification.parentNode) {
-                                notification.parentNode.removeChild(notification);
-                            }
-                        }, 300);
-                    }, 3000);
+                    return;
                 }
 
-                changeMonth(direction) {
-                    this.currentMonth += direction;
-                    
-                    if (this.currentMonth < 0) {
-                        this.currentMonth = 11;
-                        this.currentYear--;
-                    } else if (this.currentMonth > 11) {
-                        this.currentMonth = 0;
-                        this.currentYear++;
-                    }
-                    
-                    this.renderCalendar();
-                }
+                const html = filtered.map(task => {
+                    const idx = task.__id;
+                    const priceClass = task.done ? 'done' : 'pending';
+                    const icon = task.done ? 'fa-check-circle' : 'fa-times-circle';
+                    const statusTitle = task.done ? 'Выполнено' : 'Не выполнено';
+                    return `
+                    <div class="task-card" data-task-id="${idx}">
+                        <div class="task-header">
+                            <div>
+                                <div class="client-name">${escapeHtml(task.client)}</div>
+                                <div style="color:var(--text-secondary); font-weight:700; margin-top:6px;">${escapeHtml(task.car)}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="task-time">${escapeHtml(task.time)}</div>
+                                <div style="font-size:12px; color:var(--text-secondary); margin-top:6px;">${escapeHtml(task.place)}</div>
+                            </div>
+                        </div>
 
-                goToToday() {
-                    const today = new Date();
-                    this.currentDate = today.toISOString().split('T')[0];
-                    this.currentMonth = today.getMonth();
-                    this.currentYear = today.getFullYear();
-                    this.renderCalendar();
-                    this.renderTasks();
-                    this.showNotification('Переход к сегодняшнему дню', 'info');
-                }
+                        <div class="task-details">
+                            ${task.desc ? `<div class="detail-item"><i class="fas fa-sticky-note"></i> ${escapeHtml(task.desc)}</div>` : ''}
+                            <div class="detail-item"><i class="fas fa-clock"></i> ${new Date(task.createdAt).toLocaleString()}</div>
+                        </div>
 
-                selectDate(date) {
-                    this.currentDate = date;
-                    const selectedDate = new Date(date);
-                    this.currentMonth = selectedDate.getMonth();
-                    this.currentYear = selectedDate.getFullYear();
-                    this.renderCalendar();
-                    this.renderTasks();
-                }
+                        <div class="price-row">
+                            <div class="price-tag ${priceClass}">${parseInt(task.price||0).toLocaleString()} ₽</div>
+                            <div class="task-actions">
+                                <button class="action-btn toggle ${task.done ? 'done' : ''}" title="${statusTitle}"><i class="fas ${task.done ? 'fa-check' : 'fa-times'}"></i></button>
+                                <button class="action-btn edit" title="Редактировать"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn delete" title="Удалить"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
 
-                updateIncome() {
-                    let total = 0, month = 0, today = 0;
-                    const currentDate = new Date().toISOString().split('T')[0];
-                    const currentMonth = currentDate.slice(0, 7);
-                    
-                    for (const date in this.tasks) {
-                        this.tasks[date].forEach(task => {
-                            const price = parseInt(task.price) || 0;
-                            if (task.done) {
-                                total += price;
-                                if (date === currentDate) today += price;
-                                if (date.slice(0, 7) === currentMonth) month += price;
-                            }
-                        });
-                    }
-                    
-                    this.el.totalIncome.textContent = `${total.toLocaleString()} ₽`;
-                    this.el.monthIncome.textContent = `${month.toLocaleString()} ₽`;
-                    this.el.todayIncome.textContent = `${today.toLocaleString()} ₽`;
-                }
+                this.el.tasksContainer.innerHTML = html;
+            }
 
-                switchTab(tabName) {
-                    this.el.tabContents.forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    this.el.tabBtns.forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    
-                    document.getElementById(tabName).classList.add('active');
-                    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-                    
-                    if (tabName === 'calendar-tab') {
-                        this.renderCalendar();
-                        this.renderTasks();
+            // Recent list on right panel
+            renderRecent() {
+                const all = [];
+                for (const date in this.tasks) {
+                    for (let i=0;i<this.tasks[date].length;i++) {
+                        const task = {...this.tasks[date][i], __date: date, __id: i};
+                        all.push(task);
                     }
                 }
+                // sort descending (most recent createdAt)
+                all.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+                // apply search
+                const filtered = all.filter(t => {
+                    if (!this.searchTerm) return true;
+                    const s = this.searchTerm;
+                    return (t.client && t.client.toLowerCase().includes(s)) ||
+                           (t.car && t.car.toLowerCase().includes(s)) ||
+                           (t.place && t.place.toLowerCase().includes(s));
+                }).slice(0, 10);
 
-                saveToStorage() {
-                    localStorage.setItem("tasks", JSON.stringify(this.tasks));
-                }
+                const html = filtered.map(t => {
+                    return `
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px; border-radius:10px; background: rgba(255,255,255,0.01);">
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <div style="width:46px; height:46px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; font-weight:900;">
+                                    ${escapeInitials(t.client)}
+                                </div>
+                                <div>
+                                    <div style="font-weight:800;">${escapeHtml(t.client)}</div>
+                                    <div style="color:var(--text-secondary); font-size:13px;">${t.car} — ${t.__date}</div>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <div style="font-weight:900;">${parseInt(t.price||0).toLocaleString()} ₽</div>
+                                <button class="icon-btn" onclick="app.openModalFor('${t.__date}', ${t.__id})" title="Редактировать"><i class="fas fa-edit"></i></button>
+                                <button class="icon-btn" onclick="app.toggleTaskGlobal('${t.__date}', ${t.__id})" title="Отметить выполнено"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
 
-                addSampleData() {
-                    const today = new Date();
-                    const tomorrow = new Date(today);
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    
-                    const sampleTasks = {
-                        [today.toISOString().split('T')[0]]: [
-                            {
-                                client: "Иван Петров",
-                                car: "BMW X5",
-                                time: "10:00-12:00",
-                                price: "5000",
-                                place: "Автосервис на Ленина",
-                                desc: "Замена масла и фильтров",
-                                done: true,
-                                reminder: false,
-                                createdAt: new Date().toISOString()
-                            },
-                            {
-                                client: "Анна Сидорова", 
-                                car: "Mercedes C-Class",
-                                time: "14:30-16:00",
-                                price: "3000",
-                                place: "Мойка Премиум",
-                                desc: "Комплексная химчистка салона",
-                                done: false,
-                                reminder: true,
-                                createdAt: new Date().toISOString()
-                            }
-                        ],
-                        [tomorrow.toISOString().split('T')[0]]: [
-                            {
-                                client: "Петр Иванов",
-                                car: "Audi A6",
-                                time: "11:00-13:30", 
-                                price: "7500",
-                                place: "Шиномонтаж Центр",
-                                desc: "Замена летней резины на зимнюю",
-                                done: false,
-                                reminder: true,
-                                createdAt: new Date().toISOString()
-                            }
-                        ]
-                    };
-                    
-                    this.tasks = { ...sampleTasks, ...this.tasks };
-                    this.saveToStorage();
-                    this.renderCalendar();
-                    this.renderTasks();
-                    this.updateIncome();
-                }
+                this.el.recentList.innerHTML = html || '<div style="color:var(--text-secondary); text-align:center; padding:18px;">Нет записей</div>';
+            }
 
-                checkReminders() {
-                    const today = new Date().toISOString().split('T')[0];
-                    const reminders = JSON.parse(localStorage.getItem("reminders") || "{}");
-                    const reminder = reminders[today];
-                    
-                    if (reminder && !reminder.notified) {
-                        this.showNotification(`Напоминание: Завтра в ${reminder.time} запись с ${reminder.client}`, 'warning');
-                        reminder.notified = true;
-                        localStorage.setItem("reminders", JSON.stringify(reminders));
-                    }
+            openModal(date = null, taskId = null) {
+                this.el.modal.style.display = 'flex';
+                if (!date) date = this.currentDate;
+                this.el.taskDate.value = date;
+                this.el.modalTitle.textContent = taskId !== null ? 'Редактировать запись' : 'Новая запись';
+
+                if (taskId !== null) {
+                    const task = this.tasks[date][taskId];
+                    this.el.client.value = task.client;
+                    this.el.car.value = task.car;
+                    this.el.time.value = task.time;
+                    this.el.price.value = task.price;
+                    this.el.place.value = task.place;
+                    this.el.desc.value = task.desc || '';
+                    this.el.setReminder.checked = task.reminder || false;
+                    this.el.editId.value = taskId;
+                } else {
+                    this.el.taskForm.reset();
+                    this.el.editId.value = '';
                 }
             }
 
-            // Создаем частицы
-            createParticles();
+            openModalFor(date, taskId) {
+                this.selectDate(date);
+                setTimeout(()=> this.openModal(date, taskId), 200);
+            }
 
+            closeModal() {
+                this.el.modal.style.display = 'none';
+            }
+
+            saveTask(e) {
+                e.preventDefault();
+                const date = this.el.taskDate.value || this.currentDate;
+                const taskData = {
+                    client: this.el.client.value.trim(),
+                    car: this.el.car.value.trim(),
+                    time: this.el.time.value.trim(),
+                    price: this.el.price.value.trim(),
+                    place: this.el.place.value.trim(),
+                    desc: this.el.desc.value.trim(),
+                    done: false,
+                    reminder: this.el.setReminder.checked,
+                    createdAt: new Date().toISOString()
+                };
+                const id = this.el.editId.value;
+                if (!this.tasks[date]) this.tasks[date] = [];
+                if (id !== '') {
+                    // update existing
+                    this.tasks[date][id] = { ...this.tasks[date][id], ...taskData };
+                } else {
+                    this.tasks[date].push(taskData);
+                }
+                if (taskData.reminder) this.setReminder(date, taskData);
+                this.saveToStorage();
+                this.renderTasks();
+                this.renderCalendar();
+                this.updateIncome();
+                this.renderRecent();
+                this.closeModal();
+                this.showNotification('Запись сохранена', 'success');
+            }
+
+            toggleTask(taskId) {
+                if (!this.tasks[this.currentDate] || !this.tasks[this.currentDate][taskId]) return;
+                this.tasks[this.currentDate][taskId].done = !this.tasks[this.currentDate][taskId].done;
+                this.saveToStorage(); this.renderTasks(); this.updateIncome(); this.renderRecent();
+                const status = this.tasks[this.currentDate][taskId].done ? 'выполнена' : 'не выполнена';
+                this.showNotification(`Запись отмечена как ${status}`, 'info');
+            }
+
+            // Global toggle for list
+            toggleTaskGlobal(date, id) {
+                if (!this.tasks[date] || !this.tasks[date][id]) return;
+                this.tasks[date][id].done = !this.tasks[date][id].done;
+                this.saveToStorage(); this.renderTasks(); this.updateIncome(); this.renderRecent();
+            }
+
+            editTask(taskId) { this.openModal(this.currentDate, taskId); }
+
+            deleteTask(taskId) {
+                if (!confirm('Удалить эту запись?')) return;
+                this.tasks[this.currentDate].splice(taskId,1);
+                if (this.tasks[this.currentDate].length === 0) delete this.tasks[this.currentDate];
+                this.saveToStorage(); this.renderTasks(); this.renderCalendar(); this.updateIncome(); this.renderRecent();
+                this.showNotification('Запись удалена', 'warning');
+            }
+
+            setReminder(date, task) {
+                const reminders = JSON.parse(localStorage.getItem('reminders') || '{}');
+                const reminderDate = new Date(date); reminderDate.setDate(reminderDate.getDate()-1);
+                reminders[reminderDate.toISOString().split('T')[0]] = { date, client: task.client, time: task.time, notified:false };
+                localStorage.setItem('reminders', JSON.stringify(reminders));
+                this.showNotification('Напоминание установлено', 'success');
+            }
+
+            showNotification(text, type='info') {
+                const n = document.createElement('div');
+                n.className = 'notification';
+                n.innerHTML = `<div style="display:flex; gap:8px; align-items:center;"><i class="fas ${type==='success'?'fa-check-circle': type==='warning'?'fa-exclamation-triangle':'fa-info-circle'}"></i><div style="font-weight:700;margin-left:6px;">${text}</div></div>`;
+                document.body.appendChild(n);
+                setTimeout(()=> n.style.opacity = 0, 3000);
+                setTimeout(()=> n.remove(), 3400);
+            }
+
+            changeMonth(dir) {
+                this.currentMonth += dir;
+                if (this.currentMonth < 0) { this.currentMonth = 11; this.currentYear--; }
+                if (this.currentMonth > 11) { this.currentMonth = 0; this.currentYear++; }
+                this.renderCalendar();
+            }
+
+            goToToday() {
+                const t = new Date();
+                this.currentDate = t.toISOString().split('T')[0];
+                this.currentMonth = t.getMonth(); this.currentYear = t.getFullYear();
+                this.renderCalendar(); this.renderTasks();
+                this.showNotification('Переход к сегодняшнему дню', 'info');
+            }
+
+            selectDate(date) {
+                this.currentDate = date;
+                const s = new Date(date);
+                this.currentMonth = s.getMonth(); this.currentYear = s.getFullYear();
+                this.renderCalendar(); this.renderTasks();
+            }
+
+            updateIncome(init=false) {
+                let total=0, month=0, today=0, doneSum=0, pendingSum=0, count=0;
+                const currentDate = new Date().toISOString().split('T')[0];
+                const currentMonth = currentDate.slice(0,7);
+                for (const date in this.tasks) {
+                    for (const t of this.tasks[date]) {
+                        const p = parseInt(t.price) || 0;
+                        if (t.done) { total += p; doneSum += p; }
+                        else pendingSum += p;
+                        if (date === currentDate && t.done) today += p;
+                        if (date.slice(0,7) === currentMonth && t.done) month += p;
+                        count++;
+                    }
+                }
+                const avg = count ? Math.round((doneSum + pendingSum) / count) : 0;
+
+                // animate numbers (simple)
+                animateNumber(this.el.totalIncome, total);
+                animateNumber(this.el.monthIncome, month);
+                animateNumber(this.el.todayIncome, today);
+
+                document.getElementById('stat-done').textContent = doneSum.toLocaleString() + ' ₽';
+                document.getElementById('stat-pending').textContent = pendingSum.toLocaleString() + ' ₽';
+                document.getElementById('stat-avg').textContent = avg.toLocaleString() + ' ₽';
+
+                if (!init) this.updateChart();
+            }
+
+            // Chart
+            initChart() {
+                const ctx = this.el.incomeChart.getContext('2d');
+                this.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: [], datasets: [{ label: 'Доход', data: [], fill:true, tension:0.35, pointRadius:4 }] },
+                    options: {
+                        responsive:true,
+                        maintainAspectRatio:false,
+                        plugins: { legend:{ display:false }, tooltip:{ mode:'index', intersect:false } },
+                        scales: {
+                            x:{ display:true, grid:{ display:false }, ticks: { color: 'rgba(255,255,255,0.8)' } },
+                            y:{ display:true, grid:{ color:'rgba(255,255,255,0.03)' }, ticks:{ color:'rgba(255,255,255,0.8)' } }
+                        }
+                    }
+                });
+                this.updateChart();
+            }
+
+            updateChart() {
+                if (!this.chart) return;
+                if (this.chartMode === 'daily') {
+                    // last 30 days
+                    const labels = [];
+                    const data = [];
+                    for (let i=29;i>=0;i--) {
+                        const d = new Date();
+                        d.setDate(d.getDate() - i);
+                        const ds = d.toISOString().split('T')[0];
+                        labels.push(d.toLocaleDateString('ru-RU', { day:'numeric', month:'numeric' }));
+                        let sum = 0;
+                        (this.tasks[ds]||[]).forEach(t => { if (t.done) sum += parseInt(t.price||0); });
+                        data.push(sum);
+                    }
+                    this.chart.data.labels = labels;
+                    this.chart.data.datasets[0].data = data;
+                    this.chart.data.datasets[0].backgroundColor = createGradient(this.chart, '#007AFF80', '#34C75930');
+                    this.chart.data.datasets[0].borderColor = '#007AFF';
+                } else {
+                    // monthly: last 12 months
+                    const labels = [];
+                    const data = [];
+                    const now = new Date();
+                    for (let i=11;i>=0;i--) {
+                        const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+                        const key = d.toISOString().slice(0,7);
+                        labels.push(d.toLocaleDateString('ru-RU', { month:'short', year:'numeric' }));
+                        let sum = 0;
+                        for (const date in this.tasks) {
+                            if (date.slice(0,7) === key) {
+                                (this.tasks[date]||[]).forEach(t => { if (t.done) sum += parseInt(t.price||0); });
+                            }
+                        }
+                        data.push(sum);
+                    }
+                    this.chart.data.labels = labels;
+                    this.chart.data.datasets[0].data = data;
+                    this.chart.data.datasets[0].backgroundColor = createGradient(this.chart, '#34C75980', '#5856D630');
+                    this.chart.data.datasets[0].borderColor = '#34C759';
+                }
+                this.chart.update();
+            }
+
+            // storage
+            saveToStorage() { localStorage.setItem('tasks', JSON.stringify(this.tasks)); }
+
+            addSampleData() {
+                const today = new Date();
+                const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+                const sample = {
+                    [today.toISOString().split('T')[0]]: [
+                        { client:'Иван Петров', car:'BMW X5', time:'10:00-12:00', price:'5000', place:'Автосервис на Ленина', desc:'Замена масла', done:true, reminder:false, createdAt: new Date().toISOString() },
+                        { client:'Анна Сидорова', car:'Mercedes C-Class', time:'14:30-16:00', price:'3000', place:'Мойка Премиум', desc:'Химчистка салона', done:false, reminder:true, createdAt: new Date().toISOString() }
+                    ],
+                    [tomorrow.toISOString().split('T')[0]]: [
+                        { client:'Петр Иванов', car:'Audi A6', time:'11:00-13:30', price:'7500', place:'Шиномонтаж', desc:'Шины', done:false, reminder:true, createdAt: new Date().toISOString() }
+                    ]
+                };
+                this.tasks = {...sample, ...this.tasks};
+                this.saveToStorage();
+                this.renderCalendar(); this.renderTasks(); this.updateIncome(); this.renderRecent();
+            }
+
+            // reminders daily
+            checkReminders() {
+                const today = new Date().toISOString().split('T')[0];
+                const reminders = JSON.parse(localStorage.getItem('reminders') || '{}');
+                const r = reminders[today];
+                if (r && !r.notified) {
+                    this.showNotification(`Напоминание: Завтра в ${r.time} запись с ${r.client}`, 'warning');
+                    r.notified = true;
+                    localStorage.setItem('reminders', JSON.stringify(reminders));
+                }
+            }
+
+            // Export CSV: all tasks to CSV
+            exportCSV() {
+                const rows = [['date','client','car','time','price','place','desc','done','createdAt']];
+                for (const date in this.tasks) {
+                    this.tasks[date].forEach(t => rows.push([date, t.client, t.car, t.time, t.price, t.place, (t.desc||'').replace(/\n/g,' '), t.done ? '1' : '0', t.createdAt]));
+                }
+                const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+                const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = 'tasks_export.csv'; a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            importJSON(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const data = JSON.parse(ev.target.result);
+                        if (typeof data === 'object') {
+                            this.tasks = {...this.tasks, ...data};
+                            this.saveToStorage();
+                            this.renderCalendar(); this.renderTasks(); this.updateIncome(); this.renderRecent();
+                            this.showNotification('Импорт успешно завершён', 'success');
+                        } else {
+                            throw new Error('Неверный формат');
+                        }
+                    } catch (err) {
+                        alert('Не удалось импортировать: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Helpers
+        function animateNumber(el, target) {
+            const start = parseInt((el.textContent||'0').replace(/\D/g,'')) || 0;
+            const duration = 500;
+            const startTime = performance.now();
+            function step(now){
+                const t = Math.min(1, (now-startTime)/duration);
+                const v = Math.round(start + (target-start)*easeOutCubic(t));
+                el.textContent = v.toLocaleString() + ' ₽';
+                if (t < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+        function easeOutCubic(t){ return (--t)*t*t+1; }
+
+        function createGradient(chart, c1, c2) {
+            const ctx = chart.ctx;
+            const gradient = ctx.createLinearGradient(0,0,0,chart.height);
+            gradient.addColorStop(0, c1);
+            gradient.addColorStop(1, c2);
+            return gradient;
+        }
+
+        // safe escaping
+        function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
+        function escapeInitials(name){
+            if(!name) return '';
+            const parts = name.trim().split(' ');
+            if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+            return (parts[0][0] + (parts[1][0]||'')).toUpperCase();
+        }
+
+        // expose app methods that are used directly
+        window.app = null;
+
+        document.addEventListener('DOMContentLoaded', function(){
             const app = new IncomeCalendar();
             window.app = app;
 
-            app.checkReminders();
+            // For compatibility with older actions in HTML (buttons)
+            window.app.openModalFor = (date, id)=> app.openModalFor(date, id);
+            window.app.toggleTaskGlobal = (date, id)=> app.toggleTaskGlobal(date, id);
 
+            // If no tasks — propose demo
             if (Object.keys(app.tasks).length === 0) {
-                setTimeout(() => {
+                setTimeout(()=> {
                     if (confirm('Хотите добавить демонстрационные данные для ознакомления с приложением?')) {
                         app.addSampleData();
                     }
-                }, 1000);
+                }, 900);
             }
         });
-
-        // Запрет масштабирования
-        document.addEventListener('touchmove', function (event) {
-            if (event.scale !== 1) { event.preventDefault(); }
-        }, { passive: false });
-
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (event) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
     </script>
 </body>
 </html>
