@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Income Calendar Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #007AFF;
@@ -58,6 +57,20 @@
                 radial-gradient(circle at 40% 40%, rgba(120, 220, 82, 0.2) 0%, transparent 50%),
                 linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
         }
 
         .app-container {
@@ -321,8 +334,9 @@
             color: var(--primary);
         }
 
-        /* Цена с разными цветами в зависимости от статуса */
         .price-tag {
+            background: linear-gradient(135deg, var(--success), #30D158);
+            color: white;
             padding: 12px 20px;
             border-radius: 20px;
             font-weight: 700;
@@ -331,18 +345,6 @@
             margin: 15px 0;
             animation: pulse 2s infinite;
             box-shadow: 0 4px 20px rgba(52, 199, 89, 0.3);
-        }
-
-        .price-tag.completed {
-            background: linear-gradient(135deg, var(--success), #30D158);
-            color: white;
-            box-shadow: 0 4px 20px rgba(52, 199, 89, 0.3);
-        }
-
-        .price-tag.pending {
-            background: linear-gradient(135deg, var(--danger), #FF6961);
-            color: white;
-            box-shadow: 0 4px 20px rgba(255, 59, 48, 0.3);
         }
 
         .task-description {
@@ -487,89 +489,6 @@
         .tab-btn.active i {
             transform: scale(1.1);
             color: var(--primary);
-        }
-
-        /* Analytics */
-        .analytics-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 80px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            backdrop-filter: blur(var(--blur-intensity));
-            border-radius: var(--border-radius);
-            padding: 20px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .chart-card {
-            background: var(--surface);
-            backdrop-filter: blur(var(--blur-intensity));
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .chart-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: var(--text-primary);
-            text-align: center;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 250px;
-            width: 100%;
-        }
-
-        .period-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            justify-content: center;
-        }
-
-        .period-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-secondary);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .period-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
         }
 
         /* Modal */
@@ -825,10 +744,6 @@
             .calendar-grid {
                 gap: 6px;
             }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -852,7 +767,6 @@
         </header>
 
         <main class="main-content">
-            <!-- Вкладка календаря -->
             <div id="calendar-tab" class="tab-content active">
                 <div class="calendar-container">
                     <div class="calendar-header">
@@ -883,58 +797,12 @@
                 </div>
             </div>
 
-            <!-- Вкладка аналитики -->
-            <div id="analytics-tab" class="tab-content">
-                <div class="analytics-container">
+            <div id="chart-tab" class="tab-content">
+                <div class="calendar-container">
                     <div class="day-title">Аналитика доходов</div>
-                    
-                    <!-- Статистика -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="total-orders">0</div>
-                            <div class="stat-label">Всего заказов</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="completed-orders">0</div>
-                            <div class="stat-label">Выполнено</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="completion-rate">0%</div>
-                            <div class="stat-label">Процент выполнения</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="avg-income">0 ₽</div>
-                            <div class="stat-label">Средний чек</div>
-                        </div>
-                    </div>
-
-                    <!-- График доходов по дням -->
-                    <div class="chart-card">
-                        <div class="chart-title">Доходы по дням</div>
-                        <div class="period-selector">
-                            <button class="period-btn active" data-period="7">Неделя</button>
-                            <button class="period-btn" data-period="30">Месяц</button>
-                            <button class="period-btn" data-period="90">3 месяца</button>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="income-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- График выполнения заказов -->
-                    <div class="chart-card">
-                        <div class="chart-title">Статистика выполнения</div>
-                        <div class="chart-container">
-                            <canvas id="completion-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Топ клиентов -->
-                    <div class="chart-card">
-                        <div class="chart-title">Топ клиентов</div>
-                        <div class="chart-container">
-                            <canvas id="clients-chart"></canvas>
-                        </div>
+                    <div class="empty-state">
+                        <i class="fas fa-chart-line"></i>
+                        <p>График доходов скоро появится</p>
                     </div>
                 </div>
             </div>
@@ -949,7 +817,7 @@
                 <i class="fas fa-calendar"></i>
                 <span>Календарь</span>
             </button>
-            <button class="tab-btn" data-tab="analytics-tab">
+            <button class="tab-btn" data-tab="chart-tab">
                 <i class="fas fa-chart-line"></i>
                 <span>Аналитика</span>
             </button>
@@ -1018,6 +886,31 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Создаем частицы для фона
+            function createParticles() {
+                const container = document.getElementById('particles-bg');
+                const particleCount = 15;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    // Случайный размер и позиция
+                    const size = Math.random() * 4 + 2;
+                    const left = Math.random() * 100;
+                    const animationDuration = Math.random() * 20 + 15;
+                    const animationDelay = Math.random() * 5;
+                    
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${left}%`;
+                    particle.style.animationDuration = `${animationDuration}s`;
+                    particle.style.animationDelay = `${animationDelay}s`;
+                    
+                    container.appendChild(particle);
+                }
+            }
+
             class IncomeCalendar {
                 constructor() {
                     this.dates = this.generateDates('2025-01-01', '2027-12-31');
@@ -1025,15 +918,12 @@
                     this.currentMonth = new Date().getMonth();
                     this.currentYear = new Date().getFullYear();
                     this.tasks = JSON.parse(localStorage.getItem("tasks") || "{}");
-                    this.charts = {};
-                    this.analyticsPeriod = 7; // дней по умолчанию
                     
                     this.initializeElements();
                     this.setupEventListeners();
                     this.renderCalendar();
                     this.renderTasks();
                     this.updateIncome();
-                    this.setupCharts();
                 }
 
                 initializeElements() {
@@ -1064,13 +954,7 @@
                         taskDate: document.getElementById('task-date'),
                         tabBtns: document.querySelectorAll('.tab-btn'),
                         tabContents: document.querySelectorAll('.tab-content'),
-                        addBtn: document.getElementById('add-btn'),
-                        // Analytics elements
-                        totalOrders: document.getElementById('total-orders'),
-                        completedOrders: document.getElementById('completed-orders'),
-                        completionRate: document.getElementById('completion-rate'),
-                        avgIncome: document.getElementById('avg-income'),
-                        periodBtns: document.querySelectorAll('.period-btn')
+                        addBtn: document.getElementById('add-btn')
                     };
                 }
 
@@ -1120,295 +1004,161 @@
                         btn.addEventListener('click', (e) => {
                             e.preventDefault();
                             this.switchTab(btn.dataset.tab);
-                            if (btn.dataset.tab === 'analytics-tab') {
-                                setTimeout(() => this.updateAnalytics(), 100);
-                            }
-                        });
-                    });
-
-                    // Периоды для аналитики
-                    this.el.periodBtns.forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            this.el.periodBtns.forEach(b => b.classList.remove('active'));
-                            btn.classList.add('active');
-                            this.analyticsPeriod = parseInt(btn.dataset.period);
-                            this.updateAnalytics();
                         });
                     });
                 }
 
-                // ... (остальные методы остаются такими же: generateDates, renderCalendar, renderTasks, openModal, closeModal, saveTask, toggleTask, editTask, deleteTask, showNotification, changeMonth, goToToday, selectDate, updateIncome, switchTab, saveToStorage)
-
-                // АНАЛИТИКА И ГРАФИКИ
-                setupCharts() {
-                    // График доходов по дням
-                    this.charts.income = new Chart(document.getElementById('income-chart'), {
-                        type: 'line',
-                        data: {
-                            labels: [],
-                            datasets: [{
-                                label: 'Доходы',
-                                data: [],
-                                borderColor: '#007AFF',
-                                backgroundColor: 'rgba(0, 122, 255, 0.1)',
-                                borderWidth: 3,
-                                tension: 0.4,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: false
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    grid: {
-                                        color: 'rgba(255, 255, 255, 0.1)'
-                                    },
-                                    ticks: {
-                                        color: 'rgba(255, 255, 255, 0.7)',
-                                        callback: function(value) {
-                                            return value + ' ₽';
-                                        }
-                                    }
-                                },
-                                x: {
-                                    grid: {
-                                        color: 'rgba(255, 255, 255, 0.1)'
-                                    },
-                                    ticks: {
-                                        color: 'rgba(255, 255, 255, 0.7)'
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    // График выполнения заказов
-                    this.charts.completion = new Chart(document.getElementById('completion-chart'), {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Выполнено', 'Не выполнено'],
-                            datasets: [{
-                                data: [0, 0],
-                                backgroundColor: ['#34C759', '#FF3B30'],
-                                borderWidth: 0
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'bottom',
-                                    labels: {
-                                        color: 'rgba(255, 255, 255, 0.7)',
-                                        font: {
-                                            size: 12
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    // График топ клиентов
-                    this.charts.clients = new Chart(document.getElementById('clients-chart'), {
-                        type: 'bar',
-                        data: {
-                            labels: [],
-                            datasets: [{
-                                label: 'Сумма заказов',
-                                data: [],
-                                backgroundColor: '#5856D6',
-                                borderWidth: 0
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: false
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    grid: {
-                                        color: 'rgba(255, 255, 255, 0.1)'
-                                    },
-                                    ticks: {
-                                        color: 'rgba(255, 255, 255, 0.7)',
-                                        callback: function(value) {
-                                            return value + ' ₽';
-                                        }
-                                    }
-                                },
-                                x: {
-                                    grid: {
-                                        color: 'rgba(255, 255, 255, 0.1)'
-                                    },
-                                    ticks: {
-                                        color: 'rgba(255, 255, 255, 0.7)'
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-
-                updateAnalytics() {
-                    this.calculateStats();
-                    this.updateIncomeChart();
-                    this.updateCompletionChart();
-                    this.updateClientsChart();
-                }
-
-                calculateStats() {
-                    let totalOrders = 0;
-                    let completedOrders = 0;
-                    let totalIncome = 0;
-                    let completedIncome = 0;
-
-                    // Собираем статистику за выбранный период
-                    const endDate = new Date();
-                    const startDate = new Date();
-                    startDate.setDate(startDate.getDate() - this.analyticsPeriod);
-
-                    for (const date in this.tasks) {
-                        const taskDate = new Date(date);
-                        if (taskDate >= startDate && taskDate <= endDate) {
-                            this.tasks[date].forEach(task => {
-                                totalOrders++;
-                                const price = parseInt(task.price) || 0;
-                                totalIncome += price;
-                                
-                                if (task.done) {
-                                    completedOrders++;
-                                    completedIncome += price;
-                                }
-                            });
-                        }
-                    }
-
-                    // Обновляем статистику
-                    this.el.totalOrders.textContent = totalOrders;
-                    this.el.completedOrders.textContent = completedOrders;
-                    
-                    const completionRate = totalOrders > 0 ? Math.round((completedOrders / totalOrders) * 100) : 0;
-                    this.el.completionRate.textContent = completionRate + '%';
-                    
-                    const avgIncome = completedOrders > 0 ? Math.round(completedIncome / completedOrders) : 0;
-                    this.el.avgIncome.textContent = avgIncome.toLocaleString() + ' ₽';
-                }
-
-                updateIncomeChart() {
-                    const endDate = new Date();
-                    const startDate = new Date();
-                    startDate.setDate(startDate.getDate() - this.analyticsPeriod);
-
+                generateDates(start, end) {
                     const dates = [];
-                    const incomeData = [];
-                    const currentDate = new Date(startDate);
+                    const startDate = new Date(start);
+                    const endDate = new Date(end);
+                    
+                    while (startDate <= endDate) {
+                        dates.push(startDate.toISOString().split('T')[0]);
+                        startDate.setDate(startDate.getDate() + 1);
+                    }
+                    
+                    return dates;
+                }
 
-                    // Собираем данные по дням
-                    while (currentDate <= endDate) {
-                        const dateString = currentDate.toISOString().split('T')[0];
-                        const label = currentDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
-                        dates.push(label);
+                renderCalendar() {
+                    const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+                    const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+                    const startDay = firstDay.getDay();
+                    const daysInMonth = lastDay.getDate();
+                    
+                    const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
+                                     'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+                    this.el.currentMonth.textContent = `${monthNames[this.currentMonth]} ${this.currentYear}`;
+                    
+                    const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+                    let calendarHTML = weekdays.map(day => 
+                        `<div class="calendar-day weekday">${day}</div>`
+                    ).join('');
+                    
+                    for (let i = 0; i < (startDay === 0 ? 6 : startDay - 1); i++) {
+                        calendarHTML += '<div class="calendar-day other-month"></div>';
+                    }
+                    
+                    const today = new Date().toISOString().split('T')[0];
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const date = new Date(this.currentYear, this.currentMonth, day);
+                        const dateString = date.toISOString().split('T')[0];
+                        const hasWork = this.tasks[dateString] && this.tasks[dateString].length > 0;
+                        const isToday = dateString === today;
+                        const isSelected = dateString === this.currentDate;
                         
-                        let dayIncome = 0;
-                        if (this.tasks[dateString]) {
-                            this.tasks[dateString].forEach(task => {
-                                if (task.done) {
-                                    dayIncome += parseInt(task.price) || 0;
-                                }
-                            });
-                        }
+                        let className = 'calendar-day';
+                        if (isToday) className += ' today';
+                        if (isSelected) className += ' selected';
+                        if (hasWork) className += ' has-work';
                         
-                        incomeData.push(dayIncome);
-                        currentDate.setDate(currentDate.getDate() + 1);
+                        calendarHTML += `
+                            <div class="${className}" data-date="${dateString}">
+                                ${day}
+                            </div>
+                        `;
                     }
-
-                    // Обновляем график
-                    this.charts.income.data.labels = dates;
-                    this.charts.income.data.datasets[0].data = incomeData;
-                    this.charts.income.update();
+                    
+                    this.el.calendarGrid.innerHTML = calendarHTML;
                 }
 
-                updateCompletionChart() {
-                    let completed = 0;
-                    let pending = 0;
-
-                    const endDate = new Date();
-                    const startDate = new Date();
-                    startDate.setDate(startDate.getDate() - this.analyticsPeriod);
-
-                    for (const date in this.tasks) {
-                        const taskDate = new Date(date);
-                        if (taskDate >= startDate && taskDate <= endDate) {
-                            this.tasks[date].forEach(task => {
-                                if (task.done) {
-                                    completed++;
-                                } else {
-                                    pending++;
-                                }
-                            });
-                        }
+                renderTasks() {
+                    const tasks = this.tasks[this.currentDate] || [];
+                    const date = new Date(this.currentDate);
+                    const today = new Date().toISOString().split('T')[0];
+                    
+                    let dayTitle;
+                    if (this.currentDate === today) {
+                        dayTitle = 'Сегодня';
+                    } else {
+                        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+                        dayTitle = date.toLocaleDateString('ru-RU', options);
                     }
-
-                    this.charts.completion.data.datasets[0].data = [completed, pending];
-                    this.charts.completion.update();
+                    
+                    this.el.dayTitle.textContent = dayTitle;
+                    
+                    if (tasks.length === 0) {
+                        this.el.tasksContainer.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-plus"></i>
+                                <p>На этот день записей нет</p>
+                                <button class="btn btn-primary" onclick="app.openModal()" style="margin-top: 12px;">
+                                    Добавить запись
+                                </button>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    this.el.tasksContainer.innerHTML = tasks.map((task, index) => `
+                        <div class="task-card" data-task-id="${index}">
+                            <div class="task-header">
+                                <h3 class="client-name">${task.client}</h3>
+                                <div class="task-time">${task.time}</div>
+                            </div>
+                            
+                            <div class="task-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-car"></i>
+                                    <span>${task.car}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${task.place}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="price-tag">${parseInt(task.price).toLocaleString()} ₽</div>
+                            
+                            ${task.desc ? `
+                                <div class="task-description">
+                                    <i class="fas fa-sticky-note"></i> ${task.desc}
+                                </div>
+                            ` : ''}
+                            
+                            <div class="task-actions">
+                                <button class="action-btn toggle ${task.done ? 'done' : ''}" 
+                                        title="${task.done ? 'Выполнено' : 'Не выполнено'}">
+                                    <i class="fas ${task.done ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                                </button>
+                                <button class="action-btn edit" title="Редактировать">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete" title="Удалить">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
                 }
 
-                updateClientsChart() {
-                    const clientStats = {};
-                    const endDate = new Date();
-                    const startDate = new Date();
-                    startDate.setDate(startDate.getDate() - this.analyticsPeriod);
-
-                    // Собираем статистику по клиентам
-                    for (const date in this.tasks) {
-                        const taskDate = new Date(date);
-                        if (taskDate >= startDate && taskDate <= endDate) {
-                            this.tasks[date].forEach(task => {
-                                if (task.done) {
-                                    const price = parseInt(task.price) || 0;
-                                    if (!clientStats[task.client]) {
-                                        clientStats[task.client] = 0;
-                                    }
-                                    clientStats[task.client] += price;
-                                }
-                            });
-                        }
+                openModal(taskId = null) {
+                    this.el.modal.style.display = 'flex';
+                    this.el.taskDate.value = this.currentDate;
+                    
+                    if (taskId !== null) {
+                        const task = this.tasks[this.currentDate][taskId];
+                        this.el.modalTitle.textContent = 'Редактировать запись';
+                        this.el.client.value = task.client;
+                        this.el.car.value = task.car;
+                        this.el.time.value = task.time;
+                        this.el.price.value = task.price;
+                        this.el.place.value = task.place;
+                        this.el.desc.value = task.desc || '';
+                        this.el.setReminder.checked = task.reminder || false;
+                        this.el.editId.value = taskId;
+                    } else {
+                        this.el.modalTitle.textContent = 'Новая запись';
+                        this.el.taskForm.reset();
+                        this.el.editId.value = '';
                     }
-
-                    // Сортируем по убыванию и берем топ-5
-                    const topClients = Object.entries(clientStats)
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, 5);
-
-                    const clientNames = topClients.map(item => {
-                        // Сокращаем длинные имена
-                        const name = item[0];
-                        return name.length > 10 ? name.substring(0, 10) + '...' : name;
-                    });
-                    const clientIncomes = topClients.map(item => item[1]);
-
-                    this.charts.clients.data.labels = clientNames;
-                    this.charts.clients.data.datasets[0].data = clientIncomes;
-                    this.charts.clients.update();
                 }
 
-                // ... (остальные методы остаются без изменений)
+                closeModal() {
+                    this.el.modal.style.display = 'none';
+                }
 
-                // При сохранении задачи обновляем аналитику
                 saveTask(e) {
                     e.preventDefault();
                     
@@ -1432,7 +1182,6 @@
                     }
                     
                     if (taskId !== '') {
-                        taskData.done = this.tasks[date][taskId].done;
                         this.tasks[date][taskId] = { ...this.tasks[date][taskId], ...taskData };
                     } else {
                         this.tasks[date].push(taskData);
@@ -1446,37 +1195,248 @@
                     this.renderTasks();
                     this.renderCalendar();
                     this.updateIncome();
-                    this.updateAnalytics(); // ОБНОВЛЯЕМ АНАЛИТИКУ
                     this.closeModal();
                     
                     this.showNotification('Запись сохранена!', 'success');
                 }
 
-                // При изменении статуса тоже обновляем аналитику
                 toggleTask(taskId) {
                     this.tasks[this.currentDate][taskId].done = 
                         !this.tasks[this.currentDate][taskId].done;
                     this.saveToStorage();
                     this.renderTasks();
                     this.updateIncome();
-                    this.updateAnalytics(); // ОБНОВЛЯЕМ АНАЛИТИКУ
                     
                     const status = this.tasks[this.currentDate][taskId].done ? 'выполнена' : 'не выполнена';
-                    const client = this.tasks[this.currentDate][taskId].client;
-                    this.showNotification(`Запись с ${client} отмечена как ${status}`, 'info');
+                    this.showNotification(`Запись отмечена как ${status}`, 'info');
                 }
 
-                // ... (остальные методы)
+                editTask(taskId) {
+                    this.openModal(taskId);
+                }
+
+                deleteTask(taskId) {
+                    if (confirm('Удалить эту запись?')) {
+                        this.tasks[this.currentDate].splice(taskId, 1);
+                        if (this.tasks[this.currentDate].length === 0) {
+                            delete this.tasks[this.currentDate];
+                        }
+                        this.saveToStorage();
+                        this.renderTasks();
+                        this.renderCalendar();
+                        this.updateIncome();
+                        this.showNotification('Запись удалена', 'warning');
+                    }
+                }
+
+                setReminder(date, task) {
+                    const reminderDate = new Date(date);
+                    reminderDate.setDate(reminderDate.getDate() - 1);
+                    
+                    const reminders = JSON.parse(localStorage.getItem("reminders") || "{}");
+                    reminders[reminderDate.toISOString().split('T')[0]] = {
+                        date: date,
+                        client: task.client,
+                        time: task.time,
+                        notified: false
+                    };
+                    
+                    localStorage.setItem("reminders", JSON.stringify(reminders));
+                    this.showNotification('Напоминание установлено!', 'success');
+                }
+
+                showNotification(message, type = 'info') {
+                    const notification = document.createElement('div');
+                    notification.className = `notification notification-${type}`;
+                    notification.innerHTML = `
+                        <div class="notification-content">
+                            <i class="fas fa-${type === 'success' ? 'check' : type === 'warning' ? 'exclamation-triangle' : 'info'}-circle"></i>
+                            <span>${message}</span>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.style.animation = 'slideInRight 0.3s ease reverse';
+                        setTimeout(() => {
+                            if (notification.parentNode) {
+                                notification.parentNode.removeChild(notification);
+                            }
+                        }, 300);
+                    }, 3000);
+                }
+
+                changeMonth(direction) {
+                    this.currentMonth += direction;
+                    
+                    if (this.currentMonth < 0) {
+                        this.currentMonth = 11;
+                        this.currentYear--;
+                    } else if (this.currentMonth > 11) {
+                        this.currentMonth = 0;
+                        this.currentYear++;
+                    }
+                    
+                    this.renderCalendar();
+                }
+
+                goToToday() {
+                    const today = new Date();
+                    this.currentDate = today.toISOString().split('T')[0];
+                    this.currentMonth = today.getMonth();
+                    this.currentYear = today.getFullYear();
+                    this.renderCalendar();
+                    this.renderTasks();
+                    this.showNotification('Переход к сегодняшнему дню', 'info');
+                }
+
+                selectDate(date) {
+                    this.currentDate = date;
+                    const selectedDate = new Date(date);
+                    this.currentMonth = selectedDate.getMonth();
+                    this.currentYear = selectedDate.getFullYear();
+                    this.renderCalendar();
+                    this.renderTasks();
+                }
+
+                updateIncome() {
+                    let total = 0, month = 0, today = 0;
+                    const currentDate = new Date().toISOString().split('T')[0];
+                    const currentMonth = currentDate.slice(0, 7);
+                    
+                    for (const date in this.tasks) {
+                        this.tasks[date].forEach(task => {
+                            const price = parseInt(task.price) || 0;
+                            if (task.done) {
+                                total += price;
+                                if (date === currentDate) today += price;
+                                if (date.slice(0, 7) === currentMonth) month += price;
+                            }
+                        });
+                    }
+                    
+                    this.el.totalIncome.textContent = `${total.toLocaleString()} ₽`;
+                    this.el.monthIncome.textContent = `${month.toLocaleString()} ₽`;
+                    this.el.todayIncome.textContent = `${today.toLocaleString()} ₽`;
+                }
+
+                switchTab(tabName) {
+                    this.el.tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    this.el.tabBtns.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    document.getElementById(tabName).classList.add('active');
+                    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                    
+                    if (tabName === 'calendar-tab') {
+                        this.renderCalendar();
+                        this.renderTasks();
+                    }
+                }
+
+                saveToStorage() {
+                    localStorage.setItem("tasks", JSON.stringify(this.tasks));
+                }
+
+                addSampleData() {
+                    const today = new Date();
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    
+                    const sampleTasks = {
+                        [today.toISOString().split('T')[0]]: [
+                            {
+                                client: "Иван Петров",
+                                car: "BMW X5",
+                                time: "10:00-12:00",
+                                price: "5000",
+                                place: "Автосервис на Ленина",
+                                desc: "Замена масла и фильтров",
+                                done: true,
+                                reminder: false,
+                                createdAt: new Date().toISOString()
+                            },
+                            {
+                                client: "Анна Сидорова", 
+                                car: "Mercedes C-Class",
+                                time: "14:30-16:00",
+                                price: "3000",
+                                place: "Мойка Премиум",
+                                desc: "Комплексная химчистка салона",
+                                done: false,
+                                reminder: true,
+                                createdAt: new Date().toISOString()
+                            }
+                        ],
+                        [tomorrow.toISOString().split('T')[0]]: [
+                            {
+                                client: "Петр Иванов",
+                                car: "Audi A6",
+                                time: "11:00-13:30", 
+                                price: "7500",
+                                place: "Шиномонтаж Центр",
+                                desc: "Замена летней резины на зимнюю",
+                                done: false,
+                                reminder: true,
+                                createdAt: new Date().toISOString()
+                            }
+                        ]
+                    };
+                    
+                    this.tasks = { ...sampleTasks, ...this.tasks };
+                    this.saveToStorage();
+                    this.renderCalendar();
+                    this.renderTasks();
+                    this.updateIncome();
+                }
+
+                checkReminders() {
+                    const today = new Date().toISOString().split('T')[0];
+                    const reminders = JSON.parse(localStorage.getItem("reminders") || "{}");
+                    const reminder = reminders[today];
+                    
+                    if (reminder && !reminder.notified) {
+                        this.showNotification(`Напоминание: Завтра в ${reminder.time} запись с ${reminder.client}`, 'warning');
+                        reminder.notified = true;
+                        localStorage.setItem("reminders", JSON.stringify(reminders));
+                    }
+                }
             }
+
+            // Создаем частицы
+            createParticles();
 
             const app = new IncomeCalendar();
             window.app = app;
 
-            // Запрет масштабирования
-            document.addEventListener('touchmove', function (event) {
-                if (event.scale !== 1) { event.preventDefault(); }
-            }, { passive: false });
+            app.checkReminders();
+
+            if (Object.keys(app.tasks).length === 0) {
+                setTimeout(() => {
+                    if (confirm('Хотите добавить демонстрационные данные для ознакомления с приложением?')) {
+                        app.addSampleData();
+                    }
+                }, 1000);
+            }
         });
+
+        // Запрет масштабирования
+        document.addEventListener('touchmove', function (event) {
+            if (event.scale !== 1) { event.preventDefault(); }
+        }, { passive: false });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 </body>
 </html>
