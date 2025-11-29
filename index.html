@@ -3,718 +3,427 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>💰 Income Master</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Календарь доходов</title>
     <style>
-        :root {
-            --primary: #007AFF;
-            --secondary: #5856D6;
-            --success: #34C759;
-            --danger: #FF3B30;
-            --warning: #FF9500;
-            --info: #5AC8FA;
-            --background: #0A0A0A;
-            --surface: rgba(255, 255, 255, 0.12);
-            --surface-solid: rgba(30, 30, 30, 0.95);
-            --text-primary: #FFFFFF;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --border-radius: 20px;
-            --blur-intensity: 25px;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none;
-            user-select: none;
             touch-action: pan-y;
         }
-
-        html, body {
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: white;
+            overflow: hidden;
+            position: fixed;
             width: 100%;
             height: 100%;
-            overflow: hidden;
-            position: fixed;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
-
-        body {
-            background: var(--background);
-            color: var(--text-primary);
-        }
-
-        .app-container {
+        
+        .app {
             width: 100%;
             height: 100vh;
-            height: 100dvh;
             display: flex;
             flex-direction: column;
-            position: fixed;
-            top: 0;
-            left: 0;
         }
-
+        
         /* Header */
-        .income-header {
+        .header {
             display: flex;
             justify-content: space-around;
-            padding: 20px 15px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(var(--blur-intensity));
-            -webkit-backdrop-filter: blur(var(--blur-intensity));
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
         }
-
-        .income-header > div {
+        
+        .stat {
             text-align: center;
         }
-
-        .income-header .label {
+        
+        .stat .label {
             font-size: 12px;
-            color: var(--text-secondary);
+            color: #888;
             margin-bottom: 4px;
         }
-
-        .income-header .value {
-            font-size: 18px;
-            font-weight: 700;
+        
+        .stat .value {
+            font-size: 16px;
+            font-weight: bold;
         }
-
-        /* Main Content */
-        .main-content {
+        
+        /* Main content */
+        .main {
             flex: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            overflow: auto;
+            padding: 15px;
+            padding-bottom: 70px;
         }
-
-        .tab-content {
-            flex: 1;
-            overflow: hidden;
-            display: none;
-        }
-
-        .tab-content.active {
-            display: flex;
-            flex-direction: column;
-        }
-
+        
         /* Calendar */
-        .calendar-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 80px;
-        }
-
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-
-        .calendar-nav {
-            display: flex;
-            gap: 10px;
-        }
-
+        
         .nav-btn {
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            cursor: pointer;
-            color: var(--text-primary);
             border: none;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
         }
-
+        
         .current-month {
-            font-size: 18px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: bold;
             text-align: center;
             flex: 1;
         }
-
+        
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
+            gap: 5px;
             margin-bottom: 20px;
         }
-
-        .calendar-day {
+        
+        .day {
             aspect-ratio: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             position: relative;
-            background: transparent;
-            color: var(--text-primary);
-            border: 2px solid transparent;
         }
-
-        .calendar-day.has-work::after {
+        
+        .day.has-work::after {
             content: '';
             position: absolute;
             bottom: 3px;
-            width: 6px;
-            height: 6px;
-            background: var(--success);
+            width: 4px;
+            height: 4px;
+            background: #34c759;
             border-radius: 50%;
         }
-
-        .calendar-day.selected {
-            background: var(--primary);
+        
+        .day.selected {
+            background: #007aff;
             color: white;
         }
-
-        .calendar-day.today {
-            background: var(--warning);
+        
+        .day.today {
+            background: #ff9500;
             color: white;
         }
-
-        .calendar-day.other-month {
-            color: rgba(255, 255, 255, 0.3);
+        
+        .day.other {
+            color: #666;
         }
-
-        /* Day Title */
-        .day-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-align: center;
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            padding: 15px;
-            border-radius: var(--border-radius);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
+        
         /* Tasks */
-        .tasks-container {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 20px;
+        .day-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
         }
-
-        .task-card {
-            background: var(--surface);
-            backdrop-filter: blur(var(--blur-intensity));
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+        
+        .task {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
         }
-
+        
         .task-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
+            align-items: start;
+            margin-bottom: 10px;
         }
-
-        .client-name {
-            font-size: 20px;
-            font-weight: 700;
-            margin: 0;
+        
+        .client {
+            font-weight: bold;
+            font-size: 16px;
         }
-
-        .task-time {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        
+        .time {
+            background: #007aff;
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
         }
-
-        .task-details {
+        
+        .details {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
-
-        .detail-item {
+        
+        .detail {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 15px;
-            color: var(--text-secondary);
+            gap: 6px;
+            font-size: 14px;
+            color: #ccc;
+        }
+        
+        .price {
+            background: #34c759;
+            color: white;
             padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.08);
             border-radius: 12px;
-        }
-
-        .price-tag {
-            padding: 12px 20px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 18px;
+            font-weight: bold;
             text-align: center;
-            margin: 15px 0;
+            margin: 10px 0;
         }
-
-        .price-tag.completed {
-            background: linear-gradient(135deg, var(--success), #30D158);
-            color: white;
+        
+        .price.pending {
+            background: #ff3b30;
         }
-
-        .price-tag.pending {
-            background: linear-gradient(135deg, var(--danger), #FF6961);
-            color: white;
+        
+        .desc {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
-
-        .task-description {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 15px;
-            border-radius: 15px;
-            font-size: 15px;
-            line-height: 1.5;
-            margin-bottom: 16px;
-        }
-
-        .task-actions {
+        
+        .actions {
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
+            gap: 8px;
         }
-
+        
         .action-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--text-primary);
             border: none;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
         }
-
-        /* Add Button */
+        
+        /* Add button */
         .add-btn {
             position: fixed;
-            right: 20px;
-            bottom: 90px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            font-size: 28px;
-            width: 70px;
-            height: 70px;
+            right: 15px;
+            bottom: 70px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             border: none;
+            background: #007aff;
+            color: white;
+            font-size: 24px;
             cursor: pointer;
-            z-index: 1000;
         }
-
+        
         /* Navigation */
-        .tab-navigation {
+        .nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(var(--blur-intensity));
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.1);
             display: flex;
-            padding: 12px 20px;
+            padding: 10px;
         }
-
-        .tab-btn {
+        
+        .nav-btn-tab {
             flex: 1;
             background: none;
             border: none;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: var(--text-secondary);
+            padding: 10px;
+            color: #888;
             cursor: pointer;
-            border-radius: 16px;
+            border-radius: 8px;
         }
-
-        .tab-btn.active {
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .tab-btn i {
-            font-size: 22px;
-        }
-
-        /* Analytics */
-        .analytics-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 80px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            backdrop-filter: blur(var(--blur-intensity));
-            border-radius: var(--border-radius);
-            padding: 20px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .chart-card {
-            background: var(--surface);
-            backdrop-filter: blur(var(--blur-intensity));
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .chart-title {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .date-range {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .date-input {
-            padding: 8px 12px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            font-size: 14px;
-        }
-
-        .chart-btn {
-            background: var(--primary);
+        
+        .nav-btn-tab.active {
             color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
+            background: rgba(255,255,255,0.2);
         }
-
-        .chart-wrapper {
-            height: 250px;
-            width: 100%;
-        }
-
+        
         /* Modal */
-        .modal-overlay {
+        .modal {
             position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 2000;
             padding: 20px;
+            z-index: 1000;
         }
-
+        
         .modal-content {
-            background: var(--surface-solid);
-            border-radius: var(--border-radius);
-            padding: 24px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
             width: 100%;
             max-width: 400px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
+        
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-
+        
         .modal-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
         }
-
+        
         .close-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            width: 44px;
-            height: 44px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--text-primary);
             border: none;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            cursor: pointer;
         }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-
-        .form-group {
+        
+        .form {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
         }
-
-        .form-label {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .form-input {
-            padding: 16px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
+        
+        .input {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: rgba(255,255,255,0.1);
+            color: white;
             font-size: 16px;
-            color: var(--text-primary);
         }
-
+        
         .form-actions {
             display: flex;
-            gap: 12px;
-            margin-top: 24px;
+            gap: 10px;
+            margin-top: 15px;
         }
-
+        
         .btn {
             flex: 1;
-            padding: 16px 24px;
-            border-radius: 15px;
+            padding: 12px;
+            border-radius: 8px;
             border: none;
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
         }
-
+        
         .btn-primary {
-            background: var(--primary);
+            background: #007aff;
             color: white;
         }
-
+        
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
+            background: rgba(255,255,255,0.1);
+            color: white;
         }
-
-        /* Empty State */
-        .empty-state {
+        
+        /* Empty state */
+        .empty {
             text-align: center;
             padding: 40px 20px;
-            color: var(--text-secondary);
+            color: #666;
         }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 16px;
-            opacity: 0.5;
+        
+        .tab-content {
+            display: none;
         }
-
-        @media (max-width: 768px) {
-            .task-details {
-                grid-template-columns: 1fr;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+        
+        .tab-content.active {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <header class="income-header">
-            <div>
+    <div class="app">
+        <header class="header">
+            <div class="stat">
                 <div class="label">Всего</div>
                 <div class="value" id="total-income">0 ₽</div>
             </div>
-            <div>
+            <div class="stat">
                 <div class="label">Месяц</div>
                 <div class="value" id="month-income">0 ₽</div>
             </div>
-            <div>
+            <div class="stat">
                 <div class="label">Сегодня</div>
                 <div class="value" id="today-income">0 ₽</div>
             </div>
         </header>
 
-        <main class="main-content">
+        <main class="main">
+            <!-- Календарь -->
             <div id="calendar-tab" class="tab-content active">
-                <div class="calendar-container">
-                    <div class="calendar-header">
-                        <div class="calendar-nav">
-                            <button class="nav-btn" id="prev-month">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="nav-btn" id="today-btn">Сегодня</button>
-                        </div>
-                        <div class="current-month" id="current-month">Июнь 2025</div>
-                        <div class="calendar-nav">
-                            <button class="nav-btn" id="next-month">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="calendar-grid" id="calendar-grid"></div>
-
-                    <div class="day-title" id="day-title">Сегодня</div>
-                    <div id="tasks" class="tasks-container"></div>
+                <div class="calendar-header">
+                    <button class="nav-btn" id="prev-month">←</button>
+                    <div class="current-month" id="current-month">Июнь 2025</div>
+                    <button class="nav-btn" id="next-month">→</button>
                 </div>
+
+                <div class="calendar-grid" id="calendar-grid"></div>
+
+                <div class="day-title" id="day-title">Сегодня</div>
+                <div id="tasks-container"></div>
             </div>
 
+            <!-- Аналитика -->
             <div id="analytics-tab" class="tab-content">
-                <div class="analytics-container">
-                    <div class="day-title">Аналитика доходов</div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="total-completed">0 ₽</div>
-                            <div class="stat-label">Выполнено работ</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="avg-income">0 ₽</div>
-                            <div class="stat-label">Средний чек</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="total-clients">0</div>
-                            <div class="stat-label">Всего клиентов</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="completion-rate">0%</div>
-                            <div class="stat-label">Выполнено</div>
-                        </div>
-                    </div>
-
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <div class="chart-title">Доходы по дням</div>
-                            <div class="date-range">
-                                <input type="date" id="start-date" class="date-input">
-                                <span>-</span>
-                                <input type="date" id="end-date" class="date-input">
-                                <button class="chart-btn" id="update-chart">Обновить</button>
-                            </div>
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="income-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <div class="chart-title">Доходы по маркам авто</div>
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="cars-chart"></canvas>
-                        </div>
-                    </div>
+                <div class="day-title">Аналитика</div>
+                <div class="empty">
+                    <p>Статистика будет здесь</p>
                 </div>
             </div>
         </main>
 
-        <button class="add-btn" id="add-btn">
-            <i class="fas fa-plus"></i>
-        </button>
+        <button class="add-btn" id="add-btn">+</button>
 
-        <div class="tab-navigation">
-            <button class="tab-btn active" data-tab="calendar-tab">
-                <i class="fas fa-calendar"></i>
-                <span>Календарь</span>
-            </button>
-            <button class="tab-btn" data-tab="analytics-tab">
-                <i class="fas fa-chart-line"></i>
-                <span>Аналитика</span>
-            </button>
-        </div>
+        <nav class="nav">
+            <button class="nav-btn-tab active" data-tab="calendar-tab">Календарь</button>
+            <button class="nav-btn-tab" data-tab="analytics-tab">Аналитика</button>
+        </nav>
     </div>
 
-    <div class="modal-overlay" id="modal">
+    <!-- Модальное окно -->
+    <div class="modal" id="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title" id="modal-title">Новая запись</h2>
-                <button class="close-btn" id="close-modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="close-btn" id="close-modal">×</button>
             </div>
-            <form id="task-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Клиент</label>
-                        <input type="text" id="client" class="form-input" placeholder="Имя клиента" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Автомобиль</label>
-                        <input type="text" id="car" class="form-input" placeholder="Марка и модель" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Время</label>
-                        <input type="text" id="time" class="form-input" placeholder="14:00–15:30" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Стоимость</label>
-                        <input type="number" id="price" class="form-input" placeholder="₽" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Место</label>
-                        <input type="text" id="place" class="form-input" placeholder="Адрес" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Описание</label>
-                        <textarea id="desc" class="form-input" rows="3" placeholder="Детали работы..."></textarea>
-                    </div>
-                </div>
+            <form class="form" id="task-form">
+                <input type="text" class="input" id="client" placeholder="Клиент" required>
+                <input type="text" class="input" id="car" placeholder="Автомобиль" required>
+                <input type="text" class="input" id="time" placeholder="Время (14:00-15:30)" required>
+                <input type="number" class="input" id="price" placeholder="Стоимость (₽)" required>
+                <input type="text" class="input" id="place" placeholder="Место" required>
+                <textarea class="input" id="desc" placeholder="Описание" rows="3"></textarea>
                 <input type="hidden" id="edit-id">
                 <input type="hidden" id="task-date">
                 <div class="form-actions">
@@ -726,19 +435,12 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const app = new IncomeCalendar();
-            window.app = app;
-        });
-
         class IncomeCalendar {
             constructor() {
                 this.tasks = JSON.parse(localStorage.getItem("tasks") || "{}");
                 this.currentDate = new Date().toISOString().split('T')[0];
                 this.currentMonth = new Date().getMonth();
                 this.currentYear = new Date().getFullYear();
-                this.charts = {};
-                
                 this.init();
             }
 
@@ -748,64 +450,60 @@
                 this.renderCalendar();
                 this.renderTasks();
                 this.updateIncome();
-                this.setupCharts();
             }
 
             setupElements() {
-                this.el = {};
+                this.elements = {};
                 const ids = [
                     'total-income', 'month-income', 'today-income', 'calendar-grid',
-                    'current-month', 'prev-month', 'next-month', 'today-btn',
-                    'tasks', 'day-title', 'modal', 'task-form', 'modal-title',
-                    'close-modal', 'cancel-btn', 'client', 'car', 'time', 'price',
-                    'place', 'desc', 'edit-id', 'task-date', 'add-btn',
-                    'total-completed', 'avg-income', 'total-clients', 'completion-rate',
-                    'start-date', 'end-date', 'update-chart', 'income-chart',
-                    'cars-chart'
+                    'current-month', 'prev-month', 'next-month', 'tasks-container',
+                    'day-title', 'modal', 'task-form', 'modal-title', 'close-modal',
+                    'cancel-btn', 'client', 'car', 'time', 'price', 'place', 'desc',
+                    'edit-id', 'task-date', 'add-btn'
                 ];
 
                 ids.forEach(id => {
-                    this.el[id] = document.getElementById(id);
+                    this.elements[id] = document.getElementById(id);
                 });
 
-                this.el.tabBtns = document.querySelectorAll('.tab-btn');
-                this.el.tabContents = document.querySelectorAll('.tab-content');
-
-                // Set default dates
-                const end = new Date();
-                const start = new Date();
-                start.setDate(start.getDate() - 30);
-                this.el.startDate.value = start.toISOString().split('T')[0];
-                this.el.endDate.value = end.toISOString().split('T')[0];
+                this.elements.tabBtns = document.querySelectorAll('.nav-btn-tab');
+                this.elements.tabContents = document.querySelectorAll('.tab-content');
             }
 
             setupEventListeners() {
-                this.el.prevMonth.addEventListener('click', () => this.changeMonth(-1));
-                this.el.nextMonth.addEventListener('click', () => this.changeMonth(1));
-                this.el.todayBtn.addEventListener('click', () => this.goToToday());
-                this.el.addBtn.addEventListener('click', () => this.openModal());
-                this.el.closeModal.addEventListener('click', () => this.closeModal());
-                this.el.cancelBtn.addEventListener('click', () => this.closeModal());
-                this.el.updateChart.addEventListener('click', () => this.updateCharts());
+                // Навигация
+                this.elements.prevMonth.addEventListener('click', () => this.changeMonth(-1));
+                this.elements.nextMonth.addEventListener('click', () => this.changeMonth(1));
                 
-                this.el.taskForm.addEventListener('submit', (e) => this.saveTask(e));
-                this.el.modal.addEventListener('click', (e) => {
-                    if (e.target === this.el.modal) this.closeModal();
+                // Модальное окно
+                this.elements.addBtn.addEventListener('click', () => this.openModal());
+                this.elements.closeModal.addEventListener('click', () => this.closeModal());
+                this.elements.cancelBtn.addEventListener('click', () => this.closeModal());
+                
+                // Форма
+                this.elements.taskForm.addEventListener('submit', (e) => this.saveTask(e));
+                
+                // Закрытие модального окна
+                this.elements.modal.addEventListener('click', (e) => {
+                    if (e.target === this.elements.modal) this.closeModal();
                 });
 
-                this.el.calendarGrid.addEventListener('click', (e) => {
-                    const day = e.target.closest('.calendar-day');
+                // Выбор даты
+                this.elements.calendarGrid.addEventListener('click', (e) => {
+                    const day = e.target.closest('.day');
                     if (day && day.dataset.date) {
                         this.selectDate(day.dataset.date);
                     }
                 });
 
-                this.el.tasks.addEventListener('click', (e) => {
+                // Действия с задачами
+                this.elements.tasksContainer.addEventListener('click', (e) => {
                     const btn = e.target.closest('.action-btn');
-                    const task = e.target.closest('.task-card');
+                    const task = e.target.closest('.task');
                     if (!btn || !task) return;
 
-                    const taskId = task.dataset.taskId;
+                    const taskId = parseInt(task.dataset.taskId);
+                    
                     if (btn.classList.contains('toggle')) {
                         this.toggleTask(taskId);
                     } else if (btn.classList.contains('edit')) {
@@ -815,126 +513,13 @@
                     }
                 });
 
-                this.el.tabBtns.forEach(btn => {
+                // Вкладки
+                this.elements.tabBtns.forEach(btn => {
                     btn.addEventListener('click', () => {
                         const tab = btn.dataset.tab;
                         this.switchTab(tab);
                     });
                 });
-            }
-
-            setupCharts() {
-                // Income chart
-                this.charts.income = new Chart(this.el.incomeChart, {
-                    type: 'line',
-                    data: { labels: [], datasets: [{
-                        label: 'Доход',
-                        data: [],
-                        borderColor: '#007AFF',
-                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]},
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { 
-                                beginAtZero: true,
-                                ticks: { callback: value => value + ' ₽' }
-                            }
-                        }
-                    }
-                });
-
-                // Cars chart
-                this.charts.cars = new Chart(this.el.carsChart, {
-                    type: 'doughnut',
-                    data: { labels: [], datasets: [{
-                        data: [],
-                        backgroundColor: ['#007AFF', '#5856D6', '#34C759', '#FF9500', '#FF3B30']
-                    }]},
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'bottom' } }
-                    }
-                });
-
-                this.updateCharts();
-            }
-
-            updateCharts() {
-                this.updateIncomeChart();
-                this.updateCarsChart();
-                this.updateStats();
-            }
-
-            updateIncomeChart() {
-                const start = new Date(this.el.startDate.value);
-                const end = new Date(this.el.endDate.value);
-                const dates = [];
-                const income = [];
-                const current = new Date(start);
-
-                while (current <= end) {
-                    const dateStr = current.toISOString().split('T')[0];
-                    dates.push(current.getDate() + '.' + (current.getMonth() + 1));
-                    
-                    let dayIncome = 0;
-                    if (this.tasks[dateStr]) {
-                        this.tasks[dateStr].forEach(task => {
-                            if (task.done) dayIncome += parseInt(task.price) || 0;
-                        });
-                    }
-                    income.push(dayIncome);
-                    current.setDate(current.getDate() + 1);
-                }
-
-                this.charts.income.data.labels = dates;
-                this.charts.income.data.datasets[0].data = income;
-                this.charts.income.update();
-            }
-
-            updateCarsChart() {
-                const carData = {};
-                Object.values(this.tasks).flat().forEach(task => {
-                    if (task.done) {
-                        const car = task.car;
-                        const price = parseInt(task.price) || 0;
-                        carData[car] = (carData[car] || 0) + price;
-                    }
-                });
-
-                const entries = Object.entries(carData).sort((a, b) => b[1] - a[1]).slice(0, 5);
-                this.charts.cars.data.labels = entries.map(e => e[0]);
-                this.charts.cars.data.datasets[0].data = entries.map(e => e[1]);
-                this.charts.cars.update();
-            }
-
-            updateStats() {
-                let totalIncome = 0;
-                let completedCount = 0;
-                let totalCount = 0;
-                const clients = new Set();
-
-                Object.values(this.tasks).flat().forEach(task => {
-                    totalCount++;
-                    clients.add(task.client);
-                    if (task.done) {
-                        completedCount++;
-                        totalIncome += parseInt(task.price) || 0;
-                    }
-                });
-
-                const avg = completedCount ? Math.round(totalIncome / completedCount) : 0;
-                const rate = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
-
-                this.el.totalCompleted.textContent = totalIncome.toLocaleString() + ' ₽';
-                this.el.avgIncome.textContent = avg.toLocaleString() + ' ₽';
-                this.el.totalClients.textContent = clients.size;
-                this.el.completionRate.textContent = rate + '%';
             }
 
             renderCalendar() {
@@ -945,20 +530,21 @@
                 const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
                                   'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
                 
-                this.el.currentMonth.textContent = `${monthNames[this.currentMonth]} ${this.currentYear}`;
+                this.elements.currentMonth.textContent = `${monthNames[this.currentMonth]} ${this.currentYear}`;
 
                 let html = '';
-                // Weekdays
+                
+                // Дни недели
                 ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].forEach(day => {
-                    html += `<div class="calendar-day weekday">${day}</div>`;
+                    html += `<div class="day">${day}</div>`;
                 });
 
-                // Empty days
+                // Пустые дни в начале месяца
                 for (let i = 0; i < (startDay === 0 ? 6 : startDay - 1); i++) {
-                    html += '<div class="calendar-day other-month"></div>';
+                    html += '<div class="day other"></div>';
                 }
 
-                // Days
+                // Дни месяца
                 const today = new Date().toISOString().split('T')[0];
                 for (let day = 1; day <= daysInMonth; day++) {
                     const date = new Date(this.currentYear, this.currentMonth, day);
@@ -967,7 +553,7 @@
                     const isToday = dateStr === today;
                     const isSelected = dateStr === this.currentDate;
 
-                    let cls = 'calendar-day';
+                    let cls = 'day';
                     if (isToday) cls += ' today';
                     if (isSelected) cls += ' selected';
                     if (hasWork) cls += ' has-work';
@@ -975,7 +561,7 @@
                     html += `<div class="${cls}" data-date="${dateStr}">${day}</div>`;
                 }
 
-                this.el.calendarGrid.innerHTML = html;
+                this.elements.calendarGrid.innerHTML = html;
             }
 
             renderTasks() {
@@ -985,48 +571,40 @@
                 
                 let title = this.currentDate === today ? 'Сегодня' : 
                     date.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
-                this.el.dayTitle.textContent = title;
+                this.elements.dayTitle.textContent = title;
 
                 if (tasks.length === 0) {
-                    this.el.tasks.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-calendar-plus"></i>
+                    this.elements.tasksContainer.innerHTML = `
+                        <div class="empty">
                             <p>На этот день записей нет</p>
-                            <button class="btn btn-primary" onclick="app.openModal()">Добавить запись</button>
                         </div>
                     `;
                     return;
                 }
 
-                this.el.tasks.innerHTML = tasks.map((task, i) => `
-                    <div class="task-card" data-task-id="${i}">
+                this.elements.tasksContainer.innerHTML = tasks.map((task, i) => `
+                    <div class="task" data-task-id="${i}">
                         <div class="task-header">
-                            <h3 class="client-name">${task.client}</h3>
-                            <div class="task-time">${task.time}</div>
+                            <div class="client">${task.client}</div>
+                            <div class="time">${task.time}</div>
                         </div>
-                        <div class="task-details">
-                            <div class="detail-item">
-                                <i class="fas fa-car"></i>
-                                <span>${task.car}</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>${task.place}</span>
-                            </div>
+                        <div class="details">
+                            <div class="detail">🚗 ${task.car}</div>
+                            <div class="detail">📍 ${task.place}</div>
                         </div>
-                        <div class="price-tag ${task.done ? 'completed' : 'pending'}">
+                        <div class="price ${task.done ? '' : 'pending'}">
                             ${parseInt(task.price).toLocaleString()} ₽
-                            <div style="font-size:12px;margin-top:4px">
+                            <div style="font-size:11px;margin-top:2px">
                                 ${task.done ? '✅ Выполнено' : '❌ Не выполнено'}
                             </div>
                         </div>
-                        ${task.desc ? `<div class="task-description">${task.desc}</div>` : ''}
-                        <div class="task-actions">
-                            <button class="action-btn toggle ${task.done ? 'done' : ''}">
-                                <i class="fas ${task.done ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                        ${task.desc ? `<div class="desc">${task.desc}</div>` : ''}
+                        <div class="actions">
+                            <button class="action-btn toggle" title="${task.done ? 'Не выполнено' : 'Выполнено'}">
+                                ${task.done ? '✅' : '❌'}
                             </button>
-                            <button class="action-btn edit"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                            <button class="action-btn edit" title="Редактировать">✏️</button>
+                            <button class="action-btn delete" title="Удалить">🗑️</button>
                         </div>
                     </div>
                 `).join('');
@@ -1048,50 +626,50 @@
                     });
                 }
 
-                this.el.totalIncome.textContent = total.toLocaleString() + ' ₽';
-                this.el.monthIncome.textContent = month.toLocaleString() + ' ₽';
-                this.el.todayIncome.textContent = today.toLocaleString() + ' ₽';
+                this.elements.totalIncome.textContent = total.toLocaleString() + ' ₽';
+                this.elements.monthIncome.textContent = month.toLocaleString() + ' ₽';
+                this.elements.todayIncome.textContent = today.toLocaleString() + ' ₽';
             }
 
             openModal(taskId = null) {
-                this.el.modal.style.display = 'flex';
-                this.el.taskDate.value = this.currentDate;
+                this.elements.modal.style.display = 'flex';
+                this.elements.taskDate.value = this.currentDate;
 
                 if (taskId !== null) {
                     const task = this.tasks[this.currentDate][taskId];
-                    this.el.modalTitle.textContent = 'Редактировать запись';
-                    this.el.client.value = task.client;
-                    this.el.car.value = task.car;
-                    this.el.time.value = task.time;
-                    this.el.price.value = task.price;
-                    this.el.place.value = task.place;
-                    this.el.desc.value = task.desc || '';
-                    this.el.editId.value = taskId;
+                    this.elements.modalTitle.textContent = 'Редактировать запись';
+                    this.elements.client.value = task.client;
+                    this.elements.car.value = task.car;
+                    this.elements.time.value = task.time;
+                    this.elements.price.value = task.price;
+                    this.elements.place.value = task.place;
+                    this.elements.desc.value = task.desc || '';
+                    this.elements.editId.value = taskId;
                 } else {
-                    this.el.modalTitle.textContent = 'Новая запись';
-                    this.el.taskForm.reset();
-                    this.el.editId.value = '';
+                    this.elements.modalTitle.textContent = 'Новая запись';
+                    this.elements.taskForm.reset();
+                    this.elements.editId.value = '';
                 }
             }
 
             closeModal() {
-                this.el.modal.style.display = 'none';
+                this.elements.modal.style.display = 'none';
             }
 
             saveTask(e) {
                 e.preventDefault();
                 const taskData = {
-                    client: this.el.client.value,
-                    car: this.el.car.value,
-                    time: this.el.time.value,
-                    price: this.el.price.value,
-                    place: this.el.place.value,
-                    desc: this.el.desc.value,
+                    client: this.elements.client.value,
+                    car: this.elements.car.value,
+                    time: this.elements.time.value,
+                    price: this.elements.price.value,
+                    place: this.elements.place.value,
+                    desc: this.elements.desc.value,
                     done: false
                 };
 
-                const date = this.el.taskDate.value;
-                const taskId = this.el.editId.value;
+                const date = this.elements.taskDate.value;
+                const taskId = this.elements.editId.value;
 
                 if (!this.tasks[date]) this.tasks[date] = [];
 
@@ -1106,7 +684,6 @@
                 this.renderTasks();
                 this.renderCalendar();
                 this.updateIncome();
-                this.updateCharts();
                 this.closeModal();
             }
 
@@ -1115,7 +692,6 @@
                 this.saveToStorage();
                 this.renderTasks();
                 this.updateIncome();
-                this.updateCharts();
             }
 
             editTask(taskId) {
@@ -1132,7 +708,6 @@
                     this.renderTasks();
                     this.renderCalendar();
                     this.updateIncome();
-                    this.updateCharts();
                 }
             }
 
@@ -1148,15 +723,6 @@
                 this.renderCalendar();
             }
 
-            goToToday() {
-                const today = new Date();
-                this.currentDate = today.toISOString().split('T')[0];
-                this.currentMonth = today.getMonth();
-                this.currentYear = today.getFullYear();
-                this.renderCalendar();
-                this.renderTasks();
-            }
-
             selectDate(date) {
                 this.currentDate = date;
                 const d = new Date(date);
@@ -1167,21 +733,22 @@
             }
 
             switchTab(tabName) {
-                this.el.tabContents.forEach(tab => tab.classList.remove('active'));
-                this.el.tabBtns.forEach(btn => btn.classList.remove('active'));
+                this.elements.tabContents.forEach(tab => tab.classList.remove('active'));
+                this.elements.tabBtns.forEach(btn => btn.classList.remove('active'));
                 
                 document.getElementById(tabName).classList.add('active');
                 document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-
-                if (tabName === 'analytics-tab') {
-                    setTimeout(() => this.updateCharts(), 100);
-                }
             }
 
             saveToStorage() {
                 localStorage.setItem("tasks", JSON.stringify(this.tasks));
             }
         }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            window.app = new IncomeCalendar();
+        });
     </script>
 </body>
 </html>
