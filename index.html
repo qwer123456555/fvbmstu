@@ -3,163 +3,299 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Income Calendar Pro</title>
-    <link rel="stylesheet" href="style.css">
+    <title>💰 Income Master</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Анимированный фон -->
+    <div class="animated-bg">
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+        </div>
+    </div>
+
     <div class="app-container">
-        <header class="income-header">
-            <div>
-                <div class="label">Всего</div>
-                <div class="value" id="total-income">0 ₽</div>
-            </div>
-            <div>
-                <div class="label">Месяц</div>
-                <div class="value" id="month-income">0 ₽</div>
-            </div>
-            <div>
-                <div class="label">Сегодня</div>
-                <div class="value" id="today-income">0 ₽</div>
+        <!-- Хедер с стеклянным эффектом -->
+        <header class="glass-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <span>IncomeMaster</span>
+                </div>
+                <div class="income-stats">
+                    <div class="stat">
+                        <div class="stat-label">Всего</div>
+                        <div class="stat-value" id="total-income">0 ₽</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Месяц</div>
+                        <div class="stat-value" id="month-income">0 ₽</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Сегодня</div>
+                        <div class="stat-value" id="today-income">0 ₽</div>
+                    </div>
+                </div>
             </div>
         </header>
 
         <main class="main-content">
+            <!-- Вкладка календаря -->
             <div id="calendar-tab" class="tab-content active">
-                <div class="calendar-container">
-                    <div class="calendar-header">
-                        <div class="calendar-nav">
-                            <button class="nav-btn" id="prev-month">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="nav-btn" id="today-btn">Сегодня</button>
+                <div class="calendar-section">
+                    <!-- Навигация календаря -->
+                    <div class="calendar-nav glass-card">
+                        <button class="nav-btn prev" id="prev-month">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="month-display">
+                            <div class="current-month" id="current-month">Июнь 2025</div>
+                            <div class="month-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="month-progress"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="current-month" id="current-month">Июнь 2025</div>
-                        <div class="calendar-nav">
-                            <button class="nav-btn" id="next-month">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
+                        <button class="nav-btn next" id="next-month">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Сетка календаря -->
+                    <div class="calendar-grid glass-card" id="calendar-grid">
+                        <!-- Динамически генерируется -->
+                    </div>
+
+                    <!-- Заголовок дня -->
+                    <div class="day-header glass-card">
+                        <div class="day-title" id="day-title">Сегодня</div>
+                        <div class="day-stats">
+                            <span class="tasks-count" id="tasks-count">0 записей</span>
+                            <span class="day-income" id="day-income">0 ₽</span>
                         </div>
                     </div>
 
-                    <div class="calendar-grid" id="calendar-grid"></div>
-
-                    <div class="day-title" id="day-title">Сегодня</div>
-                    <div id="tasks" class="tasks-container"></div>
+                    <!-- Список задач -->
+                    <div class="tasks-container" id="tasks">
+                        <!-- Задачи появятся здесь -->
+                    </div>
                 </div>
             </div>
 
+            <!-- Вкладка аналитики -->
             <div id="analytics-tab" class="tab-content">
-                <div class="analytics-container">
-                    <div class="day-title">Аналитика доходов</div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="total-completed">0 ₽</div>
-                            <div class="stat-label">Выполнено работ</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="avg-income">0 ₽</div>
-                            <div class="stat-label">Средний чек</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="total-clients">0</div>
-                            <div class="stat-label">Всего клиентов</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="completion-rate">0%</div>
-                            <div class="stat-label">Выполнено</div>
-                        </div>
+                <div class="analytics-section">
+                    <div class="section-title glass-card">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Аналитика доходов</span>
                     </div>
 
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <div class="chart-title">Доходы по дням</div>
-                            <div class="date-range">
-                                <input type="date" id="start-date" class="date-input">
-                                <span>-</span>
-                                <input type="date" id="end-date" class="date-input">
-                                <button class="chart-btn" id="update-chart">Обновить</button>
+                    <!-- Статистика -->
+                    <div class="stats-grid">
+                        <div class="stat-card income">
+                            <div class="stat-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="total-completed">0 ₽</div>
+                                <div class="stat-label">Выполнено работ</div>
                             </div>
                         </div>
-                        <div class="chart-wrapper">
-                            <canvas id="income-chart"></canvas>
+                        <div class="stat-card avg">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="avg-income">0 ₽</div>
+                                <div class="stat-label">Средний чек</div>
+                            </div>
+                        </div>
+                        <div class="stat-card clients">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="total-clients">0</div>
+                                <div class="stat-label">Клиентов</div>
+                            </div>
+                        </div>
+                        <div class="stat-card rate">
+                            <div class="stat-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="completion-rate">0%</div>
+                                <div class="stat-label">Выполнено</div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <div class="chart-title">Доходы по маркам авто</div>
+                    <!-- Графики -->
+                    <div class="charts-grid">
+                        <div class="chart-card glass-card">
+                            <div class="chart-header">
+                                <h3><i class="fas fa-chart-line"></i> Доходы по дням</h3>
+                                <div class="date-controls">
+                                    <input type="date" id="start-date" class="date-input">
+                                    <span class="separator">—</span>
+                                    <input type="date" id="end-date" class="date-input">
+                                    <button class="refresh-btn" id="update-chart">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="income-chart"></canvas>
+                            </div>
                         </div>
-                        <div class="chart-wrapper">
-                            <canvas id="cars-chart"></canvas>
+
+                        <div class="chart-card glass-card">
+                            <div class="chart-header">
+                                <h3><i class="fas fa-car"></i> По маркам авто</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="cars-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Быстрая статистика -->
+                    <div class="quick-stats glass-card">
+                        <h3><i class="fas fa-bolt"></i> Быстрая статистика</h3>
+                        <div class="stats-list">
+                            <div class="quick-stat">
+                                <span class="stat-name">Лучший день:</span>
+                                <span class="stat-value" id="best-day">—</span>
+                            </div>
+                            <div class="quick-stat">
+                                <span class="stat-name">Популярный авто:</span>
+                                <span class="stat-value" id="popular-car">—</span>
+                            </div>
+                            <div class="quick-stat">
+                                <span class="stat-name">Записей/месяц:</span>
+                                <span class="stat-value" id="month-tasks">0</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
 
-        <button class="add-btn" id="add-btn">
+        <!-- Плавающая кнопка добавления -->
+        <button class="floating-add-btn" id="add-btn">
             <i class="fas fa-plus"></i>
+            <div class="pulse-ring"></div>
         </button>
 
-        <div class="tab-navigation">
-            <button class="tab-btn active" data-tab="calendar-tab">
-                <i class="fas fa-calendar"></i>
-                <span>Календарь</span>
-            </button>
-            <button class="tab-btn" data-tab="analytics-tab">
-                <i class="fas fa-chart-line"></i>
-                <span>Аналитика</span>
-            </button>
+        <!-- Навигация -->
+        <nav class="bottom-nav">
+            <div class="nav-container">
+                <button class="nav-item active" data-tab="calendar-tab">
+                    <div class="nav-icon">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <span class="nav-label">Календарь</span>
+                </button>
+                <button class="nav-item" data-tab="analytics-tab">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <span class="nav-label">Аналитика</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-container">
+            <div class="modal-content glass-card">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modal-title">
+                        <i class="fas fa-plus"></i>
+                        Новая запись
+                    </h2>
+                    <button class="close-btn" id="close-modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="task-form" class="task-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>
+                                Клиент
+                            </label>
+                            <input type="text" id="client" class="form-input" placeholder="Имя клиента" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-car"></i>
+                                Автомобиль
+                            </label>
+                            <input type="text" id="car" class="form-input" placeholder="Марка и модель" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i>
+                                Время
+                            </label>
+                            <input type="text" id="time" class="form-input" placeholder="14:00–15:30" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-ruble-sign"></i>
+                                Стоимость
+                            </label>
+                            <input type="number" id="price" class="form-input" placeholder="Сумма в рублях" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Место
+                            </label>
+                            <input type="text" id="place" class="form-input" placeholder="Адрес встречи" required>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label">
+                                <i class="fas fa-sticky-note"></i>
+                                Описание
+                            </label>
+                            <textarea id="desc" class="form-input" rows="3" placeholder="Детали работы..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" id="edit-id">
+                    <input type="hidden" id="task-date">
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-btn">
+                            <i class="fas fa-times"></i>
+                            Отмена
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i>
+                            Сохранить
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modal-title">Новая запись</h2>
-                <button class="close-btn" id="close-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="task-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Клиент</label>
-                        <input type="text" id="client" class="form-input" placeholder="Имя клиента" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Автомобиль</label>
-                        <input type="text" id="car" class="form-input" placeholder="Марка и модель" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Время</label>
-                        <input type="text" id="time" class="form-input" placeholder="14:00–15:30" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Стоимость</label>
-                        <input type="number" id="price" class="form-input" placeholder="₽" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Место</label>
-                        <input type="text" id="place" class="form-input" placeholder="Адрес" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Описание</label>
-                        <textarea id="desc" class="form-input" rows="3" placeholder="Детали работы..."></textarea>
-                    </div>
-                </div>
-                <input type="hidden" id="edit-id">
-                <input type="hidden" id="task-date">
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancel-btn">Отмена</button>
-                    <button type="submit" class="btn btn-primary">Сохранить</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- Уведомления -->
+    <div class="notification-container" id="notifications"></div>
 
     <script src="script.js"></script>
 </body>
