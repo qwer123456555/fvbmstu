@@ -1,280 +1,434 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Income Calendar — Mobile Premium Edition</title>
+<title>Income Calendar — Mobile Premium (v2)</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root {
-    --primary: #4A6CFA;
-    --secondary: #9A4AFF;
-    --accent: #3DF0B5;
-    --danger: #FF4A6A;
-    --bg: #090A15;
-    --glass: rgba(255,255,255,0.08);
-    --text: #fff;
-    --text-soft: rgba(255,255,255,0.6);
-    --radius: 20px;
-    --blur: 22px;
+:root{
+  --primary:#4A6CFA; --secondary:#9A4AFF; --accent:#3DF0B5; --bg:#090A15; --glass:rgba(255,255,255,0.06);
+  --text:#fff; --soft:rgba(255,255,255,0.62); --radius:18px; --blur:20px;
 }
-body {
-    margin:0;
-    background: var(--bg);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Roboto, sans-serif;
-    color: var(--text);
-    height: 100vh;
-    overflow: hidden;
+:root.light{
+  --primary:#2B6FFF; --secondary:#8A2BFF; --accent:#00CC88; --bg:#F7F8FC; --glass:rgba(6,10,24,0.04); --text:#07122b; --soft:rgba(7,18,43,0.6);
 }
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',Roboto,Arial; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased}
+.bg-anim{position:fixed;inset:0;z-index:-3;background:radial-gradient(circle at 28% 78%, rgba(82,140,255,0.20), transparent 30%), radial-gradient(circle at 78% 12%, rgba(255,87,180,0.12), transparent 40%), linear-gradient(180deg,#06060F,#0B0D1A)}
+.floating{position:absolute;border-radius:50%;filter:blur(60px);opacity:0.95}
+.f1{width:180px;height:180px;left:6%;top:8%;background:linear-gradient(135deg,#4A6CFA66,#9A4AFF33);animation:floatA 14s ease-in-out infinite}
+.f2{width:120px;height:120px;right:6%;bottom:6%;background:linear-gradient(135deg,#FF7AB266,#FFD47733);animation:floatB 18s ease-in-out infinite}
+@keyframes floatA{0%{transform:translateY(0)}50%{transform:translateY(-36px) translateX(12px)}100%{transform:translateY(0)}}
+@keyframes floatB{0%{transform:translateY(0)}50%{transform:translateY(26px) translateX(-10px)}100%{transform:translateY(0)}}
+.container{display:flex;flex-direction:column;height:100vh;position:relative}
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--glass);backdrop-filter:blur(var(--blur));border-bottom:1px solid rgba(255,255,255,0.03)}
+.title{font-weight:900;font-size:18px}
+.header-controls{display:flex;gap:8px;align-items:center}
+.icon-btn{width:44px;height:44px;border-radius:12px;background:transparent;border:0;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:18px}
 
-/* Background FX */
-.bg-anim {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at 30% 80%, rgba(98,87,255,0.25) 0%, transparent 55%),
-                radial-gradient(circle at 70% 20%, rgba(255,87,180,0.18) 0%, transparent 60%),
-                linear-gradient(180deg, #06060F, #0B0D1A);
-    z-index: -2;
-}
-.floating {
-    position:absolute;
-    width: 160px;
-    height:160px;
-    background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
-    border-radius:50%;
-    filter: blur(55px);
-    animation: float 14s infinite ease-in-out;
-}
-@keyframes float {
-    0% { transform: translateY(0px) translateX(0px); }
-    50% { transform: translateY(-40px) translateX(20px); }
-    100% { transform: translateY(0px) translateX(0px); }
-}
+/* main area */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.tab-strip{display:flex;gap:10px;padding:10px 12px;align-items:center;overflow:auto}
+.tab{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);font-weight:800;font-size:13px;cursor:pointer}
+.tab.active{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
+.content{flex:1;overflow:auto;padding:12px}
 
-/* Main layout - Mobile First */
-.container {
-    position: relative;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
+/* calendar */
+.calendar-card{background:var(--glass);border-radius:16px;padding:12px;backdrop-filter:blur(var(--blur));box-shadow:0 12px 30px rgba(0,0,0,0.45)}
+.month-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.month-name{font-weight:900;font-size:18px}
+.swipe-area{touch-action:pan-y}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px}
+.weekdays div{font-size:11px;color:var(--soft);text-align:center}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.day{aspect-ratio:1/1;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;position:relative}
+.day.has::after{content:'';position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));box-shadow:0 6px 18px rgba(88,86,214,0.15)}
+.day.today{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#07122b}
+.day.selected{outline:2px solid var(--accent)}
 
-/* Header — compact glass */
-.header {
-    padding: 18px 20px;
-    background: var(--glass);
-    backdrop-filter: blur(var(--blur));
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.header-title {
-    font-size: 20px;
-    font-weight: 800;
-}
+/* tasks */
+.tasks{margin-top:12px;display:flex;flex-direction:column;gap:12px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:12px;border-radius:14px;backdrop-filter:blur(6px);box-shadow:0 10px 26px rgba(0,0,0,0.45);animation:cardIn .36s ease}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card-top{display:flex;justify-content:space-between;align-items:center}
+.client{font-weight:900}
+.car{font-size:13px;color:var(--soft)}
+.time-pill{padding:6px 10px;border-radius:12px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--secondary));font-size:13px}
+.price{margin-top:10px;padding:10px;border-radius:12px;font-weight:900;text-align:center}
+.price.done{background:linear-gradient(135deg,#3DF0B5,#20BB82);color:#07122b}
+.price.pending{background:linear-gradient(135deg,#FFD477,#FF9F45);color:#07122b}
+.card-actions{display:flex;gap:10px;margin-top:10px;justify-content:flex-end}
+.small-btn{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center}
 
-/* Calendar view */
-.calendar-view {
-    padding: 14px 16px;
-    overflow-y: auto;
-    flex: 1;
-}
-.month-switch {
-    display:flex;
-    justify-content: space-between;
-    align-items:center;
-    margin-bottom: 14px;
-}
-.month-name {
-    font-size: 22px;
-    font-weight: 800;
-}
-.switch-btn {
-    background: var(--glass);
-    backdrop-filter: blur(var(--blur));
-    width:46px;
-    height:46px;
-    border-radius: var(--radius);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:20px;
-}
+/* chart area */
+.chart-card{background:var(--glass);padding:12px;border-radius:14px}
+.chart-canvas{height:220px}
 
-/* Days grid */
-.days-grid {
-    display:grid;
-    grid-template-columns: repeat(7,1fr);
-    gap: 8px;
-}
-.day {
-    aspect-ratio: 1/1;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius: 16px;
-    font-weight:700;
-    transition: 0.25s;
-    position: relative;
-}
-.day.has { box-shadow: 0 0 18px rgba(82,140,255,0.4); }
-.day.today { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
-.day.selected { outline:2px solid var(--accent); }
+/* modal */
+.modal-wrap{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;padding:16px;z-index:50}
+.modal{width:100%;max-width:520px;border-radius:20px;background:var(--bg);padding:14px;box-shadow:0 18px 46px rgba(0,0,0,0.6)}
+.field{margin-bottom:10px}
+.input{width:100%;padding:10px;border-radius:12px;border:0;background:rgba(255,255,255,0.03);color:var(--text)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+.btn{padding:10px 12px;border-radius:12px;border:0;font-weight:800}
+.btn.primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
 
-/* Tasks list */
-.tasks {
-    margin-top: 14px;
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-}
-.task-card {
-    background: var(--glass);
-    padding: 14px;
-    border-radius: var(--radius);
-    backdrop-filter: blur(var(--blur));
-    box-shadow:0 14px 32px rgba(0,0,0,0.45);
-    animation: fadeUp 0.4s ease;
-}
-@keyframes fadeUp {
-    from { opacity:0; transform: translateY(14px); }
-    to { opacity:1; transform: translateY(0px); }
-}
-.task-top {
-    display:flex;
-    justify-content: space-between;
-}
-.client-name { font-size:18px; font-weight:800; }
-.car { font-size:14px; color:var(--text-soft); margin-top:4px; }
+/* bottom nav */
+.bottom-nav{position:fixed;left:12px;right:12px;bottom:12px;height:68px;border-radius:18px;background:var(--glass);backdrop-filter:blur(var(--blur));display:flex;align-items:center;justify-content:space-around}
+.nav-item{display:flex;flex-direction:column;align-items:center;font-size:12px;color:var(--soft)}
+.add-fab{position:fixed;right:28px;bottom:92px;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:30px;color:#fff;box-shadow:0 18px 48px rgba(0,0,0,0.45)}
 
-.time-tag {
-    padding:8px 12px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border-radius:12px;
-    font-size:14px;
-    font-weight:700;
-}
+/* settings panel */
+.settings{display:none;padding:12px}
+.switch{display:flex;align-items:center;gap:10px}
 
-.price {
-    margin-top:14px;
-    padding: 10px;
-    border-radius: 14px;
-    font-size:18px;
-    font-weight:900;
-    text-align:center;
-}
-.price.done {
-    background: linear-gradient(135deg,#3DF0B5,#20BB82);
-}
-.price.pending {
-    background: linear-gradient(135deg,#FFD477,#FF9F45);
-    color:#000;
-}
-
-.task-actions {
-    display:flex;
-    justify-content:space-between;
-    margin-top:14px;
-}
-.action-btn {
-    width:48px;
-    height:48px;
-    border-radius:14px;
-    background: rgba(255,255,255,0.05);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:20px;
-}
-
-/* Bottom Navigation */
-.navbar {
-    background: var(--glass);
-    backdrop-filter: blur(var(--blur));
-    height:68px;
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-    border-top:1px solid rgba(255,255,255,0.05);
-}
-.nav-btn {
-    font-size:22px;
-}
-
-/* Floating Add Button */
-.add-btn {
-    position:fixed;
-    bottom: 94px;
-    right: 22px;
-    width:64px;
-    height:64px;
-    border-radius:50%;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:30px;
-    box-shadow:0 18px 48px rgba(0,0,0,0.45);
-}
-
+/* responsive tweaks */
+@media (min-width:600px){.container{max-width:420px;margin:0 auto}}
 </style>
 </head>
 <body>
 <div class="bg-anim"></div>
-<div class="floating" style="top:20%; left:10%;"></div>
-<div class="floating" style="bottom:10%; right:5%; animation-delay:4s;"></div>
+<div class="floating f1"></div>
+<div class="floating f2"></div>
 
-<div class="container">
-    <div class="header">
-        <div class="header-title">График работ</div>
+<div class="container" id="app">
+  <div class="header">
+    <div class="title">Записи — Premium</div>
+    <div class="header-controls">
+      <button class="icon-btn" id="themeToggle" title="Тема"><i class="fas fa-adjust"></i></button>
+      <button class="icon-btn" id="openSettings" title="Настройки"><i class="fas fa-gear"></i></button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="tab-strip" id="tabs">
+      <div class="tab active" data-tab="calendar">Календарь</div>
+      <div class="tab" data-tab="chart">График</div>
+      <div class="tab" data-tab="settings">Настройки</div>
     </div>
 
-    <div class="calendar-view">
-
-        <div class="month-switch">
-            <div class="switch-btn">❮</div>
-            <div class="month-name">Март 2025</div>
-            <div class="switch-btn">❯</div>
-        </div>
-
-        <div class="days-grid">
-            <div class="day">1</div>
-            <div class="day has">2</div>
-            <div class="day">3</div>
-            <div class="day has today">4</div>
-            <div class="day">5</div>
-            <div class="day">6</div>
-            <div class="day">7</div>
-        </div>
-
-        <div class="tasks">
-            <div class="task-card">
-                <div class="task-top">
-                    <div>
-                        <div class="client-name">Иван</div>
-                        <div class="car">BMW X5</div>
-                    </div>
-                    <div class="time-tag">12:00</div>
-                </div>
-                <div class="price done">4 500 ₽</div>
-                <div class="task-actions">
-                    <div class="action-btn">✔</div>
-                    <div class="action-btn">✎</div>
-                    <div class="action-btn">🗑</div>
-                </div>
+    <div class="content">
+      <!-- Calendar Tab -->
+      <div class="calendar-tab tab-content" id="calendarTab">
+        <div class="calendar-card">
+          <div class="month-row">
+            <div class="month-name" id="monthLabel">—</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="icon-btn" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+              <button class="icon-btn" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
             </div>
+          </div>
+
+          <div class="swipe-area" id="swipeArea">
+            <div class="weekdays" id="weekdays"></div>
+            <div class="days" id="daysGrid"></div>
+          </div>
+
+          <div class="tasks" id="tasksList"></div>
         </div>
+      </div>
+
+      <!-- Chart Tab -->
+      <div class="chart-tab tab-content" style="display:none" id="chartTab">
+        <div class="chart-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-weight:900">Доход — Выполненные</div>
+            <div style="display:flex;gap:8px">
+              <button class="icon-btn" id="chartDaily">День</button>
+              <button class="icon-btn" id="chartMonthly">Месяц</button>
+            </div>
+          </div>
+          <canvas id="mainChart" class="chart-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div class="settings-tab tab-content" style="display:none" id="settingsTab">
+        <div class="calendar-card settings" id="settingsPanel">
+          <div style="font-weight:900;margin-bottom:8px">Настройки</div>
+          <div class="switch"><div style="font-weight:700">Тёмная тема</div><label style="margin-left:auto"><input type="checkbox" id="themeSwitch"> </label></div>
+          <div style="margin-top:12px">Мелкие фишки: свайп для смены месяца, анимация карточек, большие кнопки управления.</div>
+          <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn ghost" id="resetData">Сбросить данные</button>
+          </div>
+        </div>
+      </div>
 
     </div>
+  </div>
 
-    <div class="navbar">
-        <div class="nav-btn">📅</div>
-        <div class="nav-btn">📊</div>
-        <div class="nav-btn">⚙️</div>
-    </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><i class="fas fa-calendar-day"></i><div>Календарь</div></div>
+    <div class="nav-item"><i class="fas fa-chart-line"></i><div>График</div></div>
+    <div class="nav-item"><i class="fas fa-cog"></i><div>Настройки</div></div>
+  </div>
 
-    <div class="add-btn">＋</div>
+  <div class="add-fab" id="openAdd">＋</div>
 </div>
 
+<!-- Modal Add/Edit -->
+<div class="modal-wrap" id="modalWrap">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-weight:900">Новая запись</div>
+      <button class="icon-btn" id="closeModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="field">
+      <input id="m-client" class="input" placeholder="Клиент" />
+    </div>
+    <div class="field">
+      <input id="m-car" class="input" placeholder="Авто" />
+    </div>
+    <div class="field" style="display:flex;gap:8px">
+      <input id="m-time" class="input" placeholder="12:00" style="flex:1" />
+      <input id="m-price" class="input" placeholder="₽" style="width:110px" />
+    </div>
+    <div class="field">
+      <input id="m-place" class="input" placeholder="Место" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="cancelModal">Отмена</button>
+      <button class="btn primary" id="saveModal">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Mobile Premium App Script — stores in localStorage, Chart.js, swipe months, themes, settings
+(function(){
+  const DAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const app = { state:{} };
+
+  // DOM
+  const monthLabel = document.getElementById('monthLabel');
+  const daysGrid = document.getElementById('daysGrid');
+  const weekdaysEl = document.getElementById('weekdays');
+  const tasksList = document.getElementById('tasksList');
+  const tabs = document.getElementById('tabs');
+  const tabContents = document.querySelectorAll('.tab-content');
+  const modalWrap = document.getElementById('modalWrap');
+
+  // modal inputs
+  const mClient = document.getElementById('m-client');
+  const mCar = document.getElementById('m-car');
+  const mTime = document.getElementById('m-time');
+  const mPrice = document.getElementById('m-price');
+  const mPlace = document.getElementById('m-place');
+
+  // chart
+  const chartCtx = document.getElementById('mainChart').getContext('2d');
+  let chartMode = 'daily';
+  let mainChart = null;
+
+  // theme
+  const themeToggle = document.getElementById('themeToggle');
+  const themeSwitch = document.getElementById('themeSwitch');
+
+  // initialize
+  function init(){
+    // load data
+    app.state.tasks = JSON.parse(localStorage.getItem('m_tasks')|| '{}');
+    const now = new Date();
+    app.state.viewYear = now.getFullYear();
+    app.state.viewMonth = now.getMonth();
+    app.state.selectedDate = new Date().toISOString().slice(0,10);
+
+    renderWeekdays();
+    renderCalendar();
+    renderTasks();
+    initTabs();
+    initChart();
+    bindEvents();
+    applyTheme();
+    addSampleIfEmpty();
+  }
+
+  function renderWeekdays(){
+    weekdaysEl.innerHTML = DAYS.map(d=>`<div>${d}</div>`).join('');
+  }
+
+  function monthLabelText(year,month){
+    const names = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+    return names[month] + ' ' + year;
+  }
+
+  function renderCalendar(){
+    const y = app.state.viewYear; const m = app.state.viewMonth;
+    monthLabel.textContent = monthLabelText(y,m);
+    daysGrid.innerHTML = '';
+    const first = new Date(y,m,1);
+    const last = new Date(y,m+1,0);
+    const pad = (first.getDay() === 0) ? 6 : first.getDay()-1; // Mon-first
+    // pad blanks
+    for(let i=0;i<pad;i++){
+      const el = document.createElement('div'); el.className='day'; el.innerHTML=''; daysGrid.appendChild(el);
+    }
+    const today = new Date().toISOString().slice(0,10);
+    for(let d=1;d<=last.getDate();d++){
+      const date = new Date(y,m,d); const ds = date.toISOString().slice(0,10);
+      const el = document.createElement('div'); el.className='day'; el.textContent = d;
+      if(ds===today) el.classList.add('today');
+      if(ds===app.state.selectedDate) el.classList.add('selected');
+      if((app.state.tasks[ds]||[]).length) el.classList.add('has');
+      el.dataset.date = ds;
+      el.addEventListener('click',()=>{ app.state.selectedDate = ds; renderCalendar(); renderTasks(); });
+      daysGrid.appendChild(el);
+    }
+  }
+
+  function renderTasks(){
+    const date = app.state.selectedDate;
+    const list = app.state.tasks[date] || [];
+    tasksList.innerHTML = '';
+    if(!list.length){
+      tasksList.innerHTML = '<div style="text-align:center;color:var(--soft);padding:18px;font-weight:700">Нет записей на этот день</div>';
+      return;
+    }
+    list.forEach((t,i)=>{
+      const card = document.createElement('div'); card.className='card';
+      card.innerHTML = `
+        <div class="card-top">
+          <div>
+            <div class="client">${escape(t.client)}</div>
+            <div class="car">${escape(t.car)}</div>
+          </div>
+          <div class="time-pill">${escape(t.time)}</div>
+        </div>
+        <div class="price ${t.done? 'done' : 'pending'}">${Number(t.price||0).toLocaleString()} ₽</div>
+        <div class="card-actions">
+          <div class="small-btn" data-act="toggle" data-i="${i}" title="Отметить"><i class="fas ${t.done? 'fa-check' : 'fa-circle'}"></i></div>
+          <div class="small-btn" data-act="edit" data-i="${i}" title="Правка"><i class="fas fa-edit"></i></div>
+          <div class="small-btn" data-act="del" data-i="${i}" title="Удалить"><i class="fas fa-trash"></i></div>
+        </div>
+      `;
+      tasksList.appendChild(card);
+    });
+  }
+
+  // tabs
+  function initTabs(){
+    tabs.addEventListener('click', (e)=>{
+      const t = e.target.closest('.tab'); if(!t) return;
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+      const tab = t.dataset.tab;
+      tabContents.forEach(c=> c.style.display = c.id===tab+'Tab' ? '' : 'none');
+      if(tab==='chart') updateChart();
+      if(tab==='settings') { document.getElementById('settingsTab').style.display=''; }
+    });
+    // bottom-nav mimic
+    document.querySelectorAll('.bottom-nav .nav-item').forEach((el,i)=>{
+      el.addEventListener('click', ()=>{ document.querySelectorAll('.tab')[i].click(); });
+    });
+  }
+
+  // modal
+  document.getElementById('openAdd').addEventListener('click', ()=>{
+    openModal();
+  });
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  document.getElementById('cancelModal').addEventListener('click', closeModal);
+  document.getElementById('saveModal').addEventListener('click', ()=>{
+    saveModal();
+  });
+
+  function openModal(editIndex=null){
+    modalWrap.style.display='flex';
+    modalWrap.scrollTop=0;
+    modalWrap.dataset.edit = (editIndex===null)? '' : editIndex;
+    mClient.value=''; mCar.value=''; mTime.value=''; mPrice.value=''; mPlace.value='';
+    if(editIndex!==null){ const t = (app.state.tasks[app.state.selectedDate]||[])[editIndex]; if(t){ mClient.value=t.client; mCar.value=t.car; mTime.value=t.time; mPrice.value=t.price; mPlace.value=t.place; }}
+  }
+  function closeModal(){ modalWrap.style.display='none'; }
+
+  function saveModal(){
+    const date = app.state.selectedDate;
+    if(!app.state.tasks[date]) app.state.tasks[date]=[];
+    const edit = modalWrap.dataset.edit;
+    const obj = { client:mClient.value, car:mCar.value, time:mTime.value, price:mPrice.value, place:mPlace.value, done:false, createdAt:new Date().toISOString() };
+    if(edit){ app.state.tasks[date][edit] = obj; } else { app.state.tasks[date].push(obj); }
+    persist(); renderCalendar(); renderTasks(); closeModal(); updateChart();
+  }
+
+  // delegate card actions
+  tasksList.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-act]'); if(!btn) return;
+    const act = btn.dataset.act; const i = parseInt(btn.dataset.i);
+    const date = app.state.selectedDate;
+    if(act==='toggle'){ app.state.tasks[date][i].done = !app.state.tasks[date][i].done; persist(); renderTasks(); updateChart(); }
+    if(act==='edit'){ openModal(i); }
+    if(act==='del'){ if(confirm('Удалить запись?')){ app.state.tasks[date].splice(i,1); if(!app.state.tasks[date].length) delete app.state.tasks[date]; persist(); renderCalendar(); renderTasks(); updateChart(); }}
+  });
+
+  // persistence
+  function persist(){ localStorage.setItem('m_tasks', JSON.stringify(app.state.tasks)); }
+  function resetData(){ if(confirm('Сбросить все данные?')){ localStorage.removeItem('m_tasks'); app.state.tasks={}; renderCalendar(); renderTasks(); updateChart(); }}
+  document.getElementById('resetData').addEventListener('click', resetData);
+
+  // sample data
+  function addSampleIfEmpty(){ if(Object.keys(app.state.tasks||{}).length===0){ const today = new Date(); const tom = new Date(); tom.setDate(tom.getDate()+1);
+    const a = {};
+    a[today.toISOString().slice(0,10)] = [{client:'Иван Петров',car:'BMW X5',time:'10:00',price:'4500',place:'Мойка',done:true,createdAt:new Date().toISOString()},{client:'Анна С',car:'Mercedes',time:'14:30',price:'3200',place:'Химчистка',done:false,createdAt:new Date().toISOString()}];
+    a[tom.toISOString().slice(0,10)] = [{client:'Петр',car:'Audi A6',time:'11:00',price:'7500',place:'Сервис',done:false,createdAt:new Date().toISOString()}];
+    app.state.tasks = {...a}; persist(); renderCalendar(); renderTasks(); updateChart(); }}
+
+  // chart
+  function initChart(){ mainChart = new Chart(chartCtx, { type:'line', data:{ labels:[], datasets:[{ label:'Доход', data:[], tension:0.35, fill:true, pointRadius:3 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{ticks:{color:getComputedStyle(document.documentElement).getPropertyValue('--soft')||'#999'}}, y:{ticks:{color:getComputedStyle(document.documentElement).getPropertyValue('--soft')||'#999'}} } } }); updateChart(); }
+
+  function updateChart(){
+    if(chartMode==='daily'){
+      const labels=[]; const data=[];
+      for(let i=29;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const ds=d.toISOString().slice(0,10); labels.push(d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})); let s=0; (app.state.tasks[ds]||[]).forEach(t=>{ if(t.done) s+=Number(t.price||0); }); data.push(s); }
+      mainChart.data.labels=labels; mainChart.data.datasets[0].data=data; mainChart.data.datasets[0].borderColor=window.getComputedStyle(document.documentElement).getPropertyValue('--primary')||'#4A6CFA'; mainChart.data.datasets[0].backgroundColor=createGradient(mainChart.ctx, mainChart.canvas.height);
+    } else {
+      const labels=[]; const data=[]; const now=new Date(); for(let i=11;i>=0;i--){ const d=new Date(now.getFullYear(), now.getMonth()-i,1); const key=d.toISOString().slice(0,7); labels.push(d.toLocaleDateString('ru-RU',{month:'short','year':'numeric'})); let s=0; for(const date in app.state.tasks){ if(date.slice(0,7)===key) (app.state.tasks[date]||[]).forEach(t=>{ if(t.done) s+=Number(t.price||0); }); } data.push(s); }
+      mainChart.data.labels=labels; mainChart.data.datasets[0].data=data; mainChart.data.datasets[0].borderColor=window.getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#3DF0B5'; mainChart.data.datasets[0].backgroundColor=createGradient(mainChart.ctx, mainChart.canvas.height, true);
+    }
+    mainChart.update();
+  }
+
+  function createGradient(ctx, height, inverted=false){ const g = ctx.createLinearGradient(0,0,0,height); if(!inverted){ g.addColorStop(0, 'rgba(74,108,250,0.36)'); g.addColorStop(1, 'rgba(61,240,181,0.06)'); } else { g.addColorStop(0, 'rgba(61,240,181,0.36)'); g.addColorStop(1, 'rgba(88,86,214,0.06)'); } return g; }
+
+  // chart mode buttons
+  document.getElementById('chartDaily').addEventListener('click', ()=>{ chartMode='daily'; updateChart(); });
+  document.getElementById('chartMonthly').addEventListener('click', ()=>{ chartMode='monthly'; updateChart(); });
+
+  // month controls
+  document.getElementById('prevMonth').addEventListener('click', ()=>{ changeMonth(-1); });
+  document.getElementById('nextMonth').addEventListener('click', ()=>{ changeMonth(1); });
+  function changeMonth(dir){ app.state.viewMonth += dir; if(app.state.viewMonth<0){ app.state.viewMonth=11; app.state.viewYear--; } if(app.state.viewMonth>11){ app.state.viewMonth=0; app.state.viewYear++; } renderCalendar(); }
+
+  // touch swipe for month change (horizontal swipe)
+  (function addSwipe(){ const area = document.getElementById('swipeArea'); let startX=null; area.addEventListener('touchstart', (e)=>{ startX=e.touches[0].clientX; }); area.addEventListener('touchend', (e)=>{ if(startX===null) return; const endX = e.changedTouches[0].clientX; const dx = endX - startX; if(Math.abs(dx)>50){ if(dx<0) changeMonth(1); else changeMonth(-1); } startX=null; }); })();
+
+  // theme
+  themeToggle.addEventListener('click', ()=>{ document.documentElement.classList.toggle('light'); applyTheme(); });
+  themeSwitch.addEventListener('change', ()=>{ document.documentElement.classList.toggle('light', themeSwitch.checked); applyTheme(); });
+  function applyTheme(){ const light = document.documentElement.classList.contains('light'); themeSwitch.checked = light; document.body.style.background = getComputedStyle(document.documentElement).getPropertyValue('--bg'); }
+
+  // gesture: swipe tasks to archive could be added later — experiment: double tap on card toggles done
+  tasksList.addEventListener('dblclick', (e)=>{ const card = e.target.closest('.card'); if(!card) return; const idx = Array.from(tasksList.children).indexOf(card); if(idx>=0){ const d = app.state.selectedDate; app.state.tasks[d][idx].done = !app.state.tasks[d][idx].done; persist(); renderTasks(); updateChart(); } });
+
+  // helper
+  function escape(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>'"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c])); }
+
+  // add touch-friendly month flick (also mouse)
+  let mouseDownX=null; daysGrid.addEventListener('mousedown', (e)=>{ mouseDownX=e.clientX; }); daysGrid.addEventListener('mouseup', (e)=>{ if(mouseDownX===null) return; const dx = e.clientX - mouseDownX; if(Math.abs(dx)>80){ if(dx<0) changeMonth(1); else changeMonth(-1); } mouseDownX=null; });
+
+  // keyboard support (for device emulators)
+  document.addEventListener('keydown', (e)=>{ if(e.key==='ArrowLeft') changeMonth(-1); if(e.key==='ArrowRight') changeMonth(1); });
+
+  // open settings button
+  document.getElementById('openSettings').addEventListener('click', ()=>{ document.querySelector('.tab[data-tab=settings]').click(); });
+
+  // theme button toggles
+  // reset data button handled earlier
+
+  init();
+  window.appMobile = app; // expose for debugging
+})();
+</script>
 </body>
 </html>
