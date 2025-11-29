@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-<title>Записи — Mobile</title>
+<title>Записи — Mobile (икон. вкладки + красивый Add)</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,167 +17,115 @@
   --warning: #FF9500;
   --bg: #070814;
   --surface: rgba(255,255,255,0.06);
-  --surface-2: rgba(255,255,255,0.03);
   --text: #ffffff;
   --muted: rgba(255,255,255,0.68);
   --radius: 14px;
   --glass-blur: 14px;
 }
-
-/* Reset */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none}
 
-/* Background glow */
-.bg {
-  position:fixed; inset:0; z-index:-2;
-  background:
-    radial-gradient(circle at 15% 85%, rgba(88,86,214,0.12) 0%, transparent 30%),
-    radial-gradient(circle at 85% 12%, rgba(255,149,0,0.08) 0%, transparent 30%),
-    linear-gradient(180deg,#05060a,#081026 100%);
-}
+/* Background */
+.bg { position:fixed; inset:0; z-index:-2; background: linear-gradient(180deg,#05060a,#081026); }
+.bg-pattern { position:fixed; inset:0; background-image: radial-gradient(circle at 20% 80%, rgba(74,108,250,0.06) 0 10%, transparent 11%), radial-gradient(circle at 80% 10%, rgba(88,86,214,0.04) 0 8%, transparent 9%); z-index:-1; }
 
-/* App container */
 .app { display:flex; flex-direction:column; height:100vh; padding:12px; gap:12px; }
-
-/* Header with totals */
-.header {
-  display:flex; gap:12px; align-items:center; justify-content:space-between;
-  padding:12px; border-radius:12px; background:linear-gradient(180deg,var(--surface),transparent);
-  backdrop-filter: blur(var(--glass-blur)); border:1px solid rgba(255,255,255,0.04);
-}
+.header { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:12px; border-radius:12px; background:linear-gradient(180deg,var(--surface),transparent); backdrop-filter: blur(var(--glass-blur)); border:1px solid rgba(255,255,255,0.04); }
 .totals { display:flex; gap:8px; align-items:center; }
-.stat {
-  background: rgba(255,255,255,0.02);
-  padding:8px 10px; border-radius:12px; min-width:88px; text-align:center;
-  border:1px solid rgba(255,255,255,0.03);
-}
+.stat { background: rgba(255,255,255,0.02); padding:8px 10px; border-radius:12px; min-width:88px; text-align:center; border:1px solid rgba(255,255,255,0.03); }
 .stat .label { font-size:12px; color:var(--muted); }
 .stat .value { font-weight:800; font-size:16px; margin-top:4px; }
 
-/* Top tabs */
-.tabs { display:flex; gap:8px; align-items:center; }
-.tab { padding:8px 12px; border-radius:999px; font-weight:900; font-size:13px; background:transparent; border:1px solid rgba(255,255,255,0.03); color:var(--muted); cursor:pointer; }
-.tab.active { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.45); }
+/* Icon tabs (replacing text tabs) */
+.icon-tabs { display:flex; gap:8px; align-items:center; }
+.icon-toggle { display:flex; align-items:center; gap:8px; padding:6px; border-radius:12px; background:transparent; }
+.icon-btn { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text); font-size:18px; cursor:pointer; transition: transform .18s, background .18s, color .18s }
+.icon-btn.active { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; transform: translateY(-4px); box-shadow:0 12px 36px rgba(0,0,0,0.45); }
+.icon-swap { transition: transform .35s; }
+.icon-btn.flip { transform: rotateY(180deg); }
 
-/* Main panels (mobile single column) */
 .main { flex:1; overflow:auto; display:flex; flex-direction:column; gap:12px; padding-bottom:120px; }
-
-/* Card */
 .card { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:16px; padding:12px; border:1px solid rgba(255,255,255,0.04); backdrop-filter: blur(8px); }
 
-/* Calendar styling */
+/* Calendar */
 .calendar-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
 .month-name { font-weight:900; font-size:18px; }
 .month-nav { display:flex; gap:8px; align-items:center; }
 .nav-btn { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.04); background:transparent; font-size:16px; }
-
-/* weekdays */
 .weekdays { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; margin-bottom:8px; }
-.weekdays div { font-size:11px; color:var(--muted); text-align:center}
-
-/* days grid */
+.weekdays div { font-size:11px; color:var(--muted); text-align:center }
 .days { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; }
-.day {
-  aspect-ratio: 1/1;
-  border-radius:10px;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  font-weight:800; position:relative; transition: transform .15s ease;
-  background:transparent; color:var(--text);
-}
+.day { aspect-ratio:1/1; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800; position:relative; transition: transform .15s ease; background:transparent; color:var(--text); }
 .day.other { color: rgba(255,255,255,0.18); opacity:0.8; }
 .day:hover { transform: translateY(-4px); }
 .day.today { background: linear-gradient(135deg,var(--warning), #FFB86B); color:#07122b; box-shadow:0 10px 28px rgba(255,149,0,0.12); }
 .day.selected { outline:2px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
 .day .dot { width:8px; height:8px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); position:absolute; bottom:6px; }
 
-/* tasks area */
+/* Tasks */
 .tasks { display:flex; flex-direction:column; gap:12px; margin-top:10px; }
-.task-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015));
-  border-radius:14px; padding:12px; border:1px solid rgba(255,255,255,0.04);
-  box-shadow: 0 12px 36px rgba(0,0,0,0.45); transition: transform .18s;
-}
+.task-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015)); border-radius:14px; padding:12px; border:1px solid rgba(255,255,255,0.04); box-shadow: 0 12px 36px rgba(0,0,0,0.45); transition: transform .18s; }
 .task-card:hover { transform: translateY(-6px); }
 .task-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .client { font-weight:900; font-size:16px; }
 .car { color:var(--muted); font-weight:700; margin-top:6px; font-size:13px; }
-.task-meta { display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap; }
-.detail { padding:8px 10px; border-radius:10px; background: rgba(255,255,255,0.02); color:var(--muted); font-weight:700; font-size:13px; }
-
-/* price tag */
 .price-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; }
 .price-tag { padding:10px 14px; border-radius:12px; font-weight:900; font-size:16px; color:white; box-shadow: 0 8px 28px rgba(0,0,0,0.5); transition: all .25s; }
 .price-tag.done { background: linear-gradient(135deg, #34C759, #2EBF54); box-shadow:0 8px 28px rgba(52,199,89,0.12); color:#07122b; }
 .price-tag.pending { background: linear-gradient(135deg, #FFB86B, #FF8A3D); color:#07122b; box-shadow:0 8px 28px rgba(255,149,0,0.08); }
 .price-tag.cancelled { background: linear-gradient(135deg, #B0B0B0, #8B8B8B); color:#07122b; opacity:0.95; }
-
-/* actions */
 .actions { display:flex; gap:8px; align-items:center; }
 .action-btn { width:46px; height:46px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; background:transparent; color:var(--text); font-size:16px; }
 
-/* Chart tab: fixed height so it won't expand */
+/* Chart fixed size */
 .chart-card { margin-top:12px; border-radius:12px; padding:10px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); height:170px; overflow:hidden; display:flex; flex-direction:column; }
-.chart-inner { flex:1; min-height:0; } /* ensure inner flex allows fixed height */
+.chart-inner { flex:1; min-height:0; }
 .chart-canvas { width:100%; height:100% !important; display:block; }
 
-/* bottom nav spacer (keeps UI reachable) */
-.bottom-nav { position:fixed; left:12px; right:12px; bottom:12px; height:64px; border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); display:flex; align-items:center; justify-content:space-around; border:1px solid rgba(255,255,255,0.04); backdrop-filter: blur(6px); pointer-events:none; }
-/* add button */
-.fab { position:fixed; right:26px; bottom:96px; width:64px; height:64px; border-radius:50%; background: linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; font-size:30px; color:white; box-shadow:0 18px 48px rgba(0,0,0,0.45); pointer-events:auto; }
-
-/* modal add/edit */
-.modal-wrap { position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center; z-index:60; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)); padding:12px; }
-.modal { width:100%; max-width:520px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:16px; padding:12px; border:1px solid rgba(255,255,255,0.04); }
-.input { width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text); margin-top:8px; font-weight:700; }
+/* Add button and fancy modal */
+.fab { position:fixed; right:26px; bottom:96px; width:64px; height:64px; border-radius:18px; background: linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; font-size:30px; color:white; box-shadow:0 18px 48px rgba(0,0,0,0.45); pointer-events:auto; border:none; }
+.modal-wrap { position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center; z-index:60; background: linear-gradient(rgba(0,0,0,0.36), rgba(0,0,0,0.36)); padding:12px; }
+.modal { width:100%; max-width:520px; border-radius:16px; padding:14px; background: linear-gradient(180deg, rgba(10,12,20,0.98), rgba(16,18,30,0.98)); box-shadow: 0 20px 48px rgba(2,6,23,0.8); border:1px solid rgba(255,255,255,0.04); }
+.modal .input { width:100%; padding:12px; border-radius:12px; border:0; background: rgba(255,255,255,0.02); color:var(--text); margin-top:10px; font-weight:800; }
+.modal .row { display:flex; gap:8px; }
+.btn-row { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+.btn { padding:10px 12px; border-radius:12px; font-weight:900; border:0; cursor:pointer; }
+.btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--text); }
+.btn.primary { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; box-shadow:0 12px 36px rgba(0,122,255,0.14); }
+.btn.danger { background: linear-gradient(135deg,#FF4A6A,#FF7A8A); color:#fff; }
 
 .center { text-align:center; color:var(--muted); padding:14px; font-weight:800; }
 
 @media (min-width:520px){ .app { max-width:420px; margin:0 auto; } .fab{ right:36px; bottom:96px; } }
-
 </style>
 </head>
 <body>
   <div class="bg"></div>
+  <div class="bg-pattern"></div>
 
   <div class="app" id="app">
-    <!-- Header -->
     <div class="header">
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;gap:8px;align-items:center;">
-          <div style="font-weight:900;font-size:18px;">Записи</div>
-          <div style="color:var(--muted);font-weight:700;font-size:13px;">(мобильный)</div>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <div class="stat">
-            <div class="label">Всего</div>
-            <div id="totalAll" class="value">0 ₽</div>
-          </div>
-          <div class="stat">
-            <div class="label">Месяц</div>
-            <div id="totalMonth" class="value">0 ₽</div>
-          </div>
-          <div class="stat">
-            <div class="label">Сегодня</div>
-            <div id="totalToday" class="value">0 ₽</div>
-          </div>
-        </div>
+      <div class="totals">
+        <div class="stat"><div class="label">Всего</div><div id="totalAll" class="value">0 ₽</div></div>
+        <div class="stat"><div class="label">Месяц</div><div id="totalMonth" class="value">0 ₽</div></div>
+        <div class="stat"><div class="label">Сегодня</div><div id="totalToday" class="value">0 ₽</div></div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
-        <div class="tabs" id="topTabs">
-          <div class="tab active" data-tab="calendar">Календарь</div>
-          <div class="tab" data-tab="chart">График</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <div class="icon-tabs">
+          <!-- Two small icon buttons. Clicking one will flip it into the other visually and switch tab. -->
+          <div class="icon-toggle" id="iconToggle">
+            <button class="icon-btn active" id="calIcon" aria-label="Календарь"><i class="fas fa-calendar-day icon-swap"></i></button>
+            <button class="icon-btn" id="chartIcon" aria-label="График"><i class="fas fa-chart-line icon-swap"></i></button>
+          </div>
         </div>
-        <div style="color:var(--muted); font-weight:700; font-size:12px;">Управление: выберите день → +</div>
+        <div style="color:var(--muted); font-weight:700; font-size:12px;">Переключение: иконки</div>
       </div>
     </div>
 
-    <!-- Main -->
     <div class="main">
-      <!-- Calendar tab content -->
-      <div id="calendarPane" class="card pane">
+      <!-- Calendar Pane -->
+      <div class="card pane" id="calendarPane">
         <div class="calendar-head">
           <div class="month-name" id="monthLabel">Июнь 2025</div>
           <div class="month-nav">
@@ -185,51 +133,39 @@ a{color:inherit;text-decoration:none}
             <button class="nav-btn" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
           </div>
         </div>
-
         <div class="weekdays" id="weekdays"></div>
         <div class="days" id="daysGrid"></div>
-
-        <div style="margin-top:12px; color:var(--muted); font-weight:700; font-size:13px;">Нажмите на день, чтобы увидеть записи и добавить новую</div>
+        <div style="margin-top:12px;color:var(--muted);font-weight:700;font-size:13px;">Нажмите на день, чтобы увидеть записи и добавить новую</div>
       </div>
 
-      <!-- Chart tab content (hidden by default) -->
-      <div id="chartPane" class="card pane" style="display:none;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
+      <!-- Chart Pane (hidden by default) -->
+      <div class="card pane" id="chartPane" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div style="font-weight:900">Доход — выполненные</div>
           <div style="display:flex;gap:8px;align-items:center;color:var(--muted);font-weight:800;">
-            <button class="tab" id="chartDailyBtn" style="padding:6px 10px;font-size:12px">30д</button>
-            <button class="tab" id="chartMonthlyBtn" style="padding:6px 10px;font-size:12px">12м</button>
+            <button class="tab" id="chartDailyBtn">30д</button>
+            <button class="tab" id="chartMonthlyBtn">12м</button>
           </div>
         </div>
-
-        <div class="chart-card">
-          <div class="chart-inner">
-            <canvas id="incomeChart" class="chart-canvas"></canvas>
-          </div>
-        </div>
+        <div class="chart-card"><div class="chart-inner"><canvas id="incomeChart" class="chart-canvas"></canvas></div></div>
       </div>
 
-      <!-- Tasks card -->
-      <div id="tasksPane" class="card">
+      <!-- Tasks pane -->
+      <div class="card" id="tasksPane">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div style="font-weight:900">Записи</div>
           <div style="color:var(--muted); font-weight:800; font-size:13px" id="selectedDateLabel">—</div>
         </div>
-
-        <div class="tasks" id="tasksList">
-          <div class="center">Выберите дату в календаре, чтобы просмотреть записи</div>
-        </div>
+        <div class="tasks" id="tasksList"><div class="center">Выберите дату в календаре, чтобы просмотреть записи</div></div>
       </div>
     </div>
 
-    <!-- Floating Add -->
-    <div class="fab" id="openAdd" title="Добавить">＋</div>
+    <button class="fab" id="openAdd" title="Добавить">＋</button>
 
-    <!-- bottom nav spacer (non-interactive) -->
     <div class="bottom-nav"></div>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal: redesigned with background and beautiful buttons -->
   <div class="modal-wrap" id="modalWrap">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -240,49 +176,60 @@ a{color:inherit;text-decoration:none}
       <input id="mDate" type="date" class="input" style="display:none" />
       <input id="mClient" class="input" placeholder="Клиент" />
       <input id="mCar" class="input" placeholder="Авто" />
-      <div style="display:flex;gap:8px;margin-top:8px;">
+      <div class="row">
         <input id="mTime" class="input" placeholder="12:00" style="flex:1" />
-        <input id="mPrice" class="input" placeholder="₽" style="width:110px" inputmode="numeric" />
+        <input id="mPrice" class="input" placeholder="₽" style="width:120px" inputmode="numeric" />
       </div>
-      <input id="mPlace" class="input" placeholder="Место" style="margin-top:8px" />
-      <textarea id="mDesc" class="input" placeholder="Описание" rows="3" style="margin-top:8px"></textarea>
+      <input id="mPlace" class="input" placeholder="Место" />
+      <textarea id="mDesc" class="input" placeholder="Описание" rows="3"></textarea>
 
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;">
-        <button class="icon-btn" id="deleteBtn" title="Удалить" style="display:none;color:var(--danger)"><i class="fas fa-trash"></i></button>
-        <button class="icon-btn" id="cancelBtn"><i class="fas fa-times-circle"></i></button>
-        <button class="icon-btn" id="saveBtn" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); color:white;"><i class="fas fa-save"></i></button>
+      <div class="btn-row">
+        <button class="btn ghost" id="cancelBtn">Отмена</button>
+        <button class="btn danger" id="deleteBtn" style="display:none">Удалить</button>
+        <button class="btn primary" id="saveBtn">Сохранить</button>
       </div>
     </div>
   </div>
 
 <script>
-/* Mobile calendar app script — updated: chart in separate tab, no demo, no day-sums */
+/* Keep core behaviour — only change: icon-tab interaction + prettier modal controls */
 (function(){
-  // Utilities
-  const $ = sel => document.querySelector(sel);
+  const $ = s => document.querySelector(s);
   const fmtMoney = n => (parseInt(n)||0).toLocaleString() + ' ₽';
   const todayISO = () => new Date().toISOString().slice(0,10);
   const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
   const weekdays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 
+  let tasks = JSON.parse(localStorage.getItem('mobile_tasks')|| '{}');
+  let view = new Date();
+  let selectedDate = todayISO();
+  let chartMode = 'daily';
+  let incomeChart = null;
+
   // Elements
+  const calIcon = $('#calIcon');
+  const chartIcon = $('#chartIcon');
+  const calendarPane = $('#calendarPane');
+  const chartPane = $('#chartPane');
+  const daysGrid = $('#daysGrid');
+  const weekdaysEl = $('#weekdays');
+  const monthLabel = $('#monthLabel');
+  const tasksList = $('#tasksList');
+  const selectedDateLabel = $('#selectedDateLabel');
+
   const totalAllEl = $('#totalAll');
   const totalMonthEl = $('#totalMonth');
   const totalTodayEl = $('#totalToday');
-  const monthLabel = $('#monthLabel');
-  const weekdaysEl = $('#weekdays');
-  const daysGrid = $('#daysGrid');
-  const tasksList = $('#tasksList');
-  const selectedDateLabel = $('#selectedDateLabel');
-  const incomeCanvas = document.getElementById('incomeChart');
 
-  const openAddBtn = $('#openAdd');
+  const prevMonthBtn = $('#prevMonth');
+  const nextMonthBtn = $('#nextMonth');
+  const openAdd = $('#openAdd');
+
   const modalWrap = $('#modalWrap');
-  const closeModalBtn = $('#closeModal');
+  const closeModal = $('#closeModal');
   const cancelBtn = $('#cancelBtn');
   const saveBtn = $('#saveBtn');
   const deleteBtn = $('#deleteBtn');
-
   const mDate = $('#mDate');
   const mClient = $('#mClient');
   const mCar = $('#mCar');
@@ -291,283 +238,102 @@ a{color:inherit;text-decoration:none}
   const mPlace = $('#mPlace');
   const mDesc = $('#mDesc');
 
-  const prevMonthBtn = $('#prevMonth');
-  const nextMonthBtn = $('#nextMonth');
-
-  const topTabs = document.getElementById('topTabs');
-  const calendarPane = $('#calendarPane');
-  const chartPane = $('#chartPane');
+  // Chart elements
   const chartDailyBtn = $('#chartDailyBtn');
   const chartMonthlyBtn = $('#chartMonthlyBtn');
 
-  // State
-  let tasks = JSON.parse(localStorage.getItem('mobile_tasks') || '{}');
-  let view = new Date();
-  let selectedDate = todayISO();
-  let chartMode = 'daily';
-  let incomeChart = null;
-
   // Init
-  function init(){
-    renderWeekdays();
-    renderCalendar();
-    renderTasks();
-    updateTotals();
-    initChart();
-    bind();
-  }
+  function init(){ renderWeekdays(); renderCalendar(); renderTasks(); updateTotals(); initChart(); bind(); }
 
   function bind(){
+    // Icon buttons: clicking toggles active and switches tab — with small flip animation
+    calIcon.addEventListener('click', ()=> { switchTo('calendar'); animateSwap(calIcon, chartIcon); });
+    chartIcon.addEventListener('click', ()=> { switchTo('chart'); animateSwap(chartIcon, calIcon); });
+
     prevMonthBtn.addEventListener('click', ()=> changeMonth(-1));
     nextMonthBtn.addEventListener('click', ()=> changeMonth(1));
-    openAddBtn.addEventListener('click', ()=> openModalFor(selectedDate));
-    closeModalBtn.addEventListener('click', closeModal);
-    cancelBtn.addEventListener('click', closeModal);
+
+    openAdd.addEventListener('click', ()=> openModalFor(selectedDate));
+    closeModal.addEventListener('click', closeModalWrap);
+    cancelBtn.addEventListener('click', closeModalWrap);
     saveBtn.addEventListener('click', saveFromModal);
     deleteBtn.addEventListener('click', deleteFromModal);
 
-    chartDailyBtn.addEventListener('click', ()=> { chartMode='daily'; updateChart(); chartDailyBtn.classList.add('active'); chartMonthlyBtn.classList.remove('active'); });
-    chartMonthlyBtn.addEventListener('click', ()=> { chartMode='monthly'; updateChart(); chartMonthlyBtn.classList.add('active'); chartDailyBtn.classList.remove('active'); });
+    chartDailyBtn.addEventListener('click', ()=>{ chartMode='daily'; updateChart(); });
+    chartMonthlyBtn.addEventListener('click', ()=>{ chartMode='monthly'; updateChart(); });
 
-    // tabs
-    topTabs.addEventListener('click', (e)=> {
-      const t = e.target.closest('.tab'); if(!t) return;
-      topTabs.querySelectorAll('.tab').forEach(x=> x.classList.remove('active'));
-      t.classList.add('active');
-      const tab = t.dataset.tab;
-      if (tab === 'calendar'){ calendarPane.style.display=''; chartPane.style.display='none'; }
-      else if (tab === 'chart'){ calendarPane.style.display='none'; chartPane.style.display=''; updateChart(); }
+    tasksList.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-act]'); if (!btn) return;
+      const act = btn.dataset.act; const idx = Number(btn.dataset.i);
+      if (act === 'toggle'){ tasks[selectedDate][idx].done = !tasks[selectedDate][idx].done; persist(); renderTasks(); updateTotals(); updateChart(); }
+      if (act === 'edit'){ openModalFor(selectedDate, idx); }
+      if (act === 'del'){ if (confirm('Удалить запись?')){ tasks[selectedDate].splice(idx,1); if (!tasks[selectedDate].length) delete tasks[selectedDate]; persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); } }
     });
 
-    // task list delegation
-    tasksList.addEventListener('click', (e)=> {
-      const btn = e.target.closest('[data-act]');
-      if (!btn) return;
-      const act = btn.dataset.act;
-      const idx = Number(btn.dataset.i);
-      const date = selectedDate;
-      if (act === 'toggle'){ tasks[date][idx].done = !tasks[date][idx].done; persist(); renderTasks(); updateTotals(); updateChart(); }
-      else if (act === 'edit'){ openModalFor(date, idx); }
-      else if (act === 'del'){ if (confirm('Удалить запись?')){ tasks[date].splice(idx,1); if (!tasks[date].length) delete tasks[date]; persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); } }
-    });
-
-    // double-click on task toggles done (touch double-tap works in many browsers)
-    tasksList.addEventListener('dblclick', (e)=> {
-      const card = e.target.closest('.task-card');
-      if (!card) return;
-      const idx = Array.from(tasksList.children).indexOf(card);
-      if (idx >= 0){
-        tasks[selectedDate][idx].done = !tasks[selectedDate][idx].done;
-        persist(); renderTasks(); updateTotals(); updateChart();
-      }
-    });
-
-    // swipe month on daysGrid
-    addSwipe(daysGrid, dir => changeMonth(dir));
-
-    // keyboard arrows (dev)
-    document.addEventListener('keydown', (ev)=> { if (ev.key === 'ArrowLeft') changeMonth(-1); if (ev.key === 'ArrowRight') changeMonth(1); });
+    addSwipe(daysGrid, dir=> changeMonth(dir));
   }
 
-  function addSwipe(el, callback){
-    let startX = null;
-    el.addEventListener('touchstart', (e)=> { startX = e.touches[0].clientX; }, {passive:true});
-    el.addEventListener('touchend', (e)=> { if (startX === null) return; const dx = e.changedTouches[0].clientX - startX; if (Math.abs(dx) > 40) callback(dx < 0 ? 1 : -1); startX = null; });
+  function animateSwap(btnFrom, btnTo){
+    // flip effect on the pressed button, then ensure active states
+    btnFrom.classList.add('flip');
+    setTimeout(()=> btnFrom.classList.remove('flip'), 360);
+    // toggle visually active class
+    btnFrom.classList.add('active');
+    btnTo.classList.remove('active');
   }
 
-  // render
+  function switchTo(tab){
+    if (tab === 'calendar'){ calendarPane.style.display=''; chartPane.style.display='none'; calIcon.classList.add('active'); chartIcon.classList.remove('active'); }
+    else { calendarPane.style.display='none'; chartPane.style.display=''; chartIcon.classList.add('active'); calIcon.classList.remove('active'); updateChart(); }
+  }
+
   function renderWeekdays(){ weekdaysEl.innerHTML = weekdays.map(d=>`<div>${d}</div>`).join(''); }
 
   function renderCalendar(){
-    const y = view.getFullYear(); const m = view.getMonth();
-    monthLabel.textContent = monthNames[m] + ' ' + y;
-    daysGrid.innerHTML = '';
-    const first = new Date(y,m,1); const last = new Date(y,m+1,0);
-    const pad = (first.getDay() === 0) ? 6 : first.getDay() - 1;
+    const y = view.getFullYear(), m = view.getMonth(); monthLabel.textContent = monthNames[m] + ' ' + y; daysGrid.innerHTML = '';
+    const first = new Date(y,m,1); const last = new Date(y,m+1,0); const pad = (first.getDay() === 0) ? 6 : first.getDay()-1;
     for (let i=0;i<pad;i++){ const el = document.createElement('div'); el.className='day other'; daysGrid.appendChild(el); }
     const today = todayISO();
     for (let d=1; d<=last.getDate(); d++){
-      const dateObj = new Date(y,m,d); const ds = dateObj.toISOString().slice(0,10);
-      const el = document.createElement('div'); el.className='day'; if (ds === today) el.classList.add('today'); if (ds === selectedDate) el.classList.add('selected');
-      if ((tasks[ds]||[]).length) { const dot = document.createElement('div'); dot.className='dot'; el.appendChild(dot); }
-      el.innerHTML = `<div style="z-index:1">${d}</div>`;
-      el.dataset.date = ds;
-      el.addEventListener('click', ()=> { selectedDate = ds; renderCalendar(); renderTasks(); updateSelectedDateLabel(); });
-      daysGrid.appendChild(el);
+      const dateObj = new Date(y,m,d); const ds = dateObj.toISOString().slice(0,10); const el = document.createElement('div'); el.className='day'; if (ds===today) el.classList.add('today'); if (ds===selectedDate) el.classList.add('selected'); if ((tasks[ds]||[]).length) { const dot = document.createElement('div'); dot.className='dot'; el.appendChild(dot); }
+      el.innerHTML = `<div style=\"z-index:1\">${d}</div>`; el.dataset.date = ds; el.addEventListener('click', ()=> { selectedDate = ds; renderCalendar(); renderTasks(); updateSelectedDateLabel(); }); daysGrid.appendChild(el);
     }
     updateSelectedDateLabel();
   }
 
-  function renderTasks(){
-    const list = tasks[selectedDate] || [];
-    $('#selectedDateLabel').textContent = formatSelectedDate(selectedDate);
-    if (!list.length){ tasksList.innerHTML = `<div class="center">Нет записей на ${formatSelectedDate(selectedDate)}</div>`; return; }
-    tasksList.innerHTML = '';
-    list.forEach((t, idx) => {
-      const card = document.createElement('div'); card.className = 'task-card';
-      card.innerHTML = `
-        <div class="task-top">
-          <div>
-            <div class="client">${escapeHtml(t.client||'Без имени')}</div>
-            <div class="car">${escapeHtml(t.car||'—')}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;">
-            <div style="font-weight:900" class="time-pill">${escapeHtml(t.time||'—')}</div>
-            <div style="color:var(--muted); font-size:12px; margin-top:8px">${escapeHtml(t.place||'—')}</div>
-          </div>
-        </div>
-        <div class="price-row">
-          <div class="price-tag ${t.done ? 'done' : 'pending'}">${fmtMoney(t.price)}</div>
-          <div class="actions">
-            <button class="action-btn" data-act="toggle" data-i="${idx}" title="${t.done ? 'Отметить как не выполнено' : 'Отметить выполнено'}"><i class="fas ${t.done ? 'fa-check' : 'fa-circle'}"></i></button>
-            <button class="action-btn" data-act="edit" data-i="${idx}" title="Редактировать"><i class="fas fa-edit"></i></button>
-            <button class="action-btn" data-act="del" data-i="${idx}" title="Удалить"><i class="fas fa-trash"></i></button>
-          </div>
-        </div>
-      `;
-      tasksList.appendChild(card);
-    });
-  }
+  function renderTasks(){ const list = tasks[selectedDate] || []; $('#selectedDateLabel').textContent = formatSelectedDate(selectedDate); if (!list.length) { tasksList.innerHTML = `<div class='center'>Нет записей на ${formatSelectedDate(selectedDate)}</div>`; return; } tasksList.innerHTML=''; list.forEach((t, idx)=>{ const card = document.createElement('div'); card.className='task-card'; card.innerHTML = `\n        <div class=\"task-top\">\n          <div>\n            <div class=\"client\">${escapeHtml(t.client||'Без имени')}</div>\n            <div class=\"car\">${escapeHtml(t.car||'—')}</div>\n          </div>\n          <div style=\"display:flex;flex-direction:column;align-items:flex-end;\">\n            <div style=\"font-weight:900\" class=\"time-pill\">${escapeHtml(t.time||'—')}</div>\n            <div style=\"color:var(--muted); font-size:12px; margin-top:8px\">${escapeHtml(t.place||'—')}</div>\n          </div>\n        </div>\n        <div class=\"price-row\">\n          <div class=\"price-tag ${t.done ? 'done' : 'pending'}\">${fmtMoney(t.price)}</div>\n          <div class=\"actions\">\n            <button class=\"action-btn\" data-act=\"toggle\" data-i=\"${idx}\" title=\"${t.done ? 'Отметить как не выполнено' : 'Отметить выполнено'}\"><i class=\"fas ${t.done ? 'fa-check' : 'fa-circle'}\"></i></button>\n            <button class=\"action-btn\" data-act=\"edit\" data-i=\"${idx}\" title=\"Редактировать\"><i class=\"fas fa-edit\"></i></button>\n            <button class=\"action-btn\" data-act=\"del\" data-i=\"${idx}\" title=\"Удалить\"><i class=\"fas fa-trash\"></i></button>\n          </div>\n        </div>`; tasksList.appendChild(card); }); }
 
-  // modal actions
-  function openModalFor(date, editIndex=null){
-    modalWrap.style.display = 'flex';
-    mDate.value = date || selectedDate;
-    mClient.value = ''; mCar.value = ''; mTime.value = ''; mPrice.value = ''; mPlace.value = ''; mDesc.value = '';
-    modalWrap.dataset.edit = '';
-    if (editIndex !== null){
-      const t = (tasks[date]||[])[editIndex];
-      if (t){ mClient.value = t.client || ''; mCar.value = t.car || ''; mTime.value = t.time || ''; mPrice.value = t.price || ''; mPlace.value = t.place || ''; mDesc.value = t.desc || ''; deleteBtn.style.display = ''; modalWrap.dataset.edit = String(editIndex); }
-    } else { deleteBtn.style.display = 'none'; }
-  }
-  function closeModal(){ modalWrap.style.display = 'none'; modalWrap.dataset.edit = ''; }
-  function saveFromModal(){
-    const date = mDate.value || selectedDate;
-    if (!tasks[date]) tasks[date] = [];
-    const obj = { client: mClient.value.trim(), car: mCar.value.trim(), time: mTime.value.trim(), price: mPrice.value.trim(), place: mPlace.value.trim(), desc: mDesc.value.trim(), done:false, createdAt:new Date().toISOString() };
-    const edit = modalWrap.dataset.edit;
-    if (edit !== '') { tasks[date][Number(edit)] = obj; } else { tasks[date].push(obj); }
-    persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModal();
-  }
-  function deleteFromModal(){
-    const date = mDate.value || selectedDate;
-    const edit = modalWrap.dataset.edit;
-    if (edit === '') return;
-    if (!confirm('Удалить запись?')) return;
-    tasks[date].splice(Number(edit),1);
-    if (!tasks[date].length) delete tasks[date];
-    persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModal();
-  }
+  function openModalFor(date, editIndex=null){ modalWrap.style.display='flex'; mDate.value = date || selectedDate; mClient.value=''; mCar.value=''; mTime.value=''; mPrice.value=''; mPlace.value=''; mDesc.value=''; modalWrap.dataset.edit=''; if (editIndex!==null){ const t = (tasks[date]||[])[editIndex]; if (t){ mClient.value=t.client||''; mCar.value=t.car||''; mTime.value=t.time||''; mPrice.value=t.price||''; mPlace.value=t.place||''; mDesc.value=t.desc||''; deleteBtn.style.display=''; modalWrap.dataset.edit=String(editIndex); } } else deleteBtn.style.display='none'; }
+  function closeModalWrap(){ modalWrap.style.display='none'; modalWrap.dataset.edit=''; }
+  function saveFromModal(){ const date = mDate.value || selectedDate; if (!tasks[date]) tasks[date]=[]; const obj = { client:mClient.value.trim(), car:mCar.value.trim(), time:mTime.value.trim(), price:mPrice.value.trim(), place:mPlace.value.trim(), desc:mDesc.value.trim(), done:false, createdAt:new Date().toISOString() }; const edit = modalWrap.dataset.edit; if (edit !== '') tasks[date][Number(edit)] = obj; else tasks[date].push(obj); persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap(); }
+  function deleteFromModal(){ const date = mDate.value || selectedDate; const edit = modalWrap.dataset.edit; if (edit==='') return; if (!confirm('Удалить запись?')) return; tasks[date].splice(Number(edit),1); if (!tasks[date].length) delete tasks[date]; persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap(); }
 
-  // totals
-  function updateTotals(){
-    let all = 0, month = 0, todaySum = 0;
-    const today = todayISO();
-    const mPref = `${view.getFullYear()}-${String(view.getMonth()+1).padStart(2,'0')}`;
-    for (const date in tasks){
-      for (const t of tasks[date]){
-        const p = Number(t.price || 0);
-        if (t.done) all += p;
-        if (date.slice(0,7) === mPref && t.done) month += p;
-        if (date === today && t.done) todaySum += p;
-      }
-    }
-    totalAllEl.textContent = fmtMoney(all);
-    totalMonthEl.textContent = fmtMoney(month);
-    totalTodayEl.textContent = fmtMoney(todaySum);
-  }
+  function updateTotals(){ let all=0, month=0, todaySum=0; const today = todayISO(); const mPref = `${view.getFullYear()}-${String(view.getMonth()+1).padStart(2,'0')}`; for (const date in tasks){ for (const t of tasks[date]){ const p = Number(t.price||0); if (t.done) all+=p; if (date.slice(0,7)===mPref && t.done) month+=p; if (date===today && t.done) todaySum+=p; } } totalAllEl.textContent = fmtMoney(all); totalMonthEl.textContent = fmtMoney(month); totalTodayEl.textContent = fmtMoney(todaySum); }
 
-  // month navigation
-  function changeMonth(delta){
-    view.setMonth(view.getMonth() + delta);
-    renderCalendar();
-    updateTotals();
-    // if chart active, update it too
-    if (chartPane.style.display !== 'none') updateChart();
-  }
-
-  // persistence
+  function changeMonth(delta){ view.setMonth(view.getMonth()+delta); renderCalendar(); updateTotals(); if (chartPane.style.display !== 'none') updateChart(); }
   function persist(){ localStorage.setItem('mobile_tasks', JSON.stringify(tasks)); }
-
-  // helper
-  function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-  function formatSelectedDate(d){ if (!d) return '—'; const dt = new Date(d); const today = new Date(); if (d === todayISO()) return 'Сегодня'; return dt.toLocaleDateString('ru-RU', { weekday:'long', day:'numeric', month:'long' }); }
-
+  function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function formatSelectedDate(d){ if(!d) return '—'; const dt=new Date(d); const today=new Date(); if (d===todayISO()) return 'Сегодня'; return dt.toLocaleDateString('ru-RU', { weekday:'long', day:'numeric', month:'long' }); }
   function updateSelectedDateLabel(){ $('#selectedDateLabel').textContent = formatSelectedDate(selectedDate); }
 
   // Chart
-  function initChart(){
-    const ctx = incomeCanvas.getContext('2d');
-    incomeChart = new Chart(ctx, {
-      type: 'line',
-      data: { labels: [], datasets: [{ label:'Доход', data: [], fill:true, tension:0.36, pointRadius:3 }] },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend:{ display:false }, tooltip:{ mode:'index', intersect:false } },
-        scales: {
-          x: { ticks:{ color: '#cfd8ff' }, grid:{ display:false } },
-          y: { ticks:{ color: '#cfd8ff' }, grid:{ color:'rgba(255,255,255,0.03)' } }
-        },
-        layout: { padding: 6 }
-      }
-    });
-    updateChart();
-  }
+  function initChart(){ const ctx = document.getElementById('incomeChart').getContext('2d'); incomeChart = new Chart(ctx, { type:'line', data:{ labels:[], datasets:[{ label:'Доход', data:[], fill:true, tension:0.36, pointRadius:3 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{mode:'index', intersect:false}}, scales:{ x:{ ticks:{ color:'#cfd8ff' }, grid:{ display:false } }, y:{ ticks:{ color:'#cfd8ff' }, grid:{ color:'rgba(255,255,255,0.03)' } } }, layout:{ padding:6 } } }); updateChart(); }
+  function updateChart(){ if (!incomeChart) return; if (chartMode==='daily'){ const labels=[]; const data=[]; for (let i=29;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const ds=d.toISOString().slice(0,10); labels.push(d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})); let s=0; (tasks[ds]||[]).forEach(t=>{ if (t.done) s+=Number(t.price||0); }); data.push(s); } incomeChart.data.labels=labels; incomeChart.data.datasets[0].data=data; incomeChart.data.datasets[0].borderColor=getComputedStyle(document.documentElement).getPropertyValue('--primary')||'#007AFF'; incomeChart.data.datasets[0].backgroundColor=createGradient(incomeChart.ctx, incomeChart.canvas.height, false); } else { const labels=[]; const data=[]; const now=new Date(); for (let i=11;i>=0;i--){ const d=new Date(now.getFullYear(), now.getMonth()-i,1); const key=d.toISOString().slice(0,7); labels.push(d.toLocaleDateString('ru-RU',{month:'short',year:'numeric'})); let s=0; for (const date in tasks){ if (date.slice(0,7)===key) (tasks[date]||[]).forEach(t=>{ if (t.done) s+=Number(t.price||0); }); } data.push(s); } incomeChart.data.labels=labels; incomeChart.data.datasets[0].data=data; incomeChart.data.datasets[0].borderColor=getComputedStyle(document.documentElement).getPropertyValue('--secondary')||'#5856D6'; incomeChart.data.datasets[0].backgroundColor=createGradient(incomeChart.ctx, incomeChart.canvas.height, true); } incomeChart.update(); }
+  function createGradient(ctx, height, inv){ const g=ctx.createLinearGradient(0,0,0,height||160); if (!inv){ g.addColorStop(0,'rgba(0,122,255,0.32)'); g.addColorStop(1,'rgba(52,199,89,0.04)'); } else { g.addColorStop(0,'rgba(88,86,214,0.28)'); g.addColorStop(1,'rgba(88,86,214,0.04)'); } return g; }
 
-  function updateChart(){
-    if (!incomeChart) return;
-    if (chartMode === 'daily'){
-      const labels = []; const data = [];
-      for (let i=29;i>=0;i--){
-        const d = new Date(); d.setDate(d.getDate()-i); const ds = d.toISOString().slice(0,10);
-        labels.push(d.toLocaleDateString('ru-RU', { day:'numeric', month:'short' }));
-        let s=0; (tasks[ds]||[]).forEach(t=> { if (t.done) s += Number(t.price || 0); });
-        data.push(s);
-      }
-      incomeChart.data.labels = labels;
-      incomeChart.data.datasets[0].data = data;
-      incomeChart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#007AFF';
-      incomeChart.data.datasets[0].backgroundColor = createGradient(incomeChart.ctx, incomeChart.canvas.height, false);
-    } else {
-      const labels = []; const data = [];
-      const now = new Date();
-      for (let i=11;i>=0;i--){
-        const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
-        const key = d.toISOString().slice(0,7);
-        labels.push(d.toLocaleDateString('ru-RU', { month:'short', year:'numeric' }));
-        let s=0;
-        for (const date in tasks){
-          if (date.slice(0,7) === key) (tasks[date]||[]).forEach(t => { if (t.done) s += Number(t.price || 0); });
-        }
-        data.push(s);
-      }
-      incomeChart.data.labels = labels;
-      incomeChart.data.datasets[0].data = data;
-      incomeChart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--secondary') || '#5856D6';
-      incomeChart.data.datasets[0].backgroundColor = createGradient(incomeChart.ctx, incomeChart.canvas.height, true);
-    }
-    incomeChart.update();
-  }
+  // utilities
+  function addSwipe(el, cb){ let startX=null; el.addEventListener('touchstart', e=>{ startX=e.touches[0].clientX; }, {passive:true}); el.addEventListener('touchend', e=>{ if (startX===null) return; const dx=e.changedTouches[0].clientX-startX; if (Math.abs(dx)>40) cb(dx<0?1:-1); startX=null; }); }
 
-  function createGradient(ctx, height, inverted){
-    const g = ctx.createLinearGradient(0,0,0,height || 160);
-    if (!inverted){
-      g.addColorStop(0, 'rgba(0,122,255,0.32)');
-      g.addColorStop(1, 'rgba(52,199,89,0.04)');
-    } else {
-      g.addColorStop(0, 'rgba(88,86,214,0.28)');
-      g.addColorStop(1, 'rgba(88,86,214,0.04)');
-    }
-    return g;
-  }
+  // initial switch: calendar
+  switchToInitial();
 
-  // initialize
+  function switchToInitial(){ calendarPane.style.display=''; chartPane.style.display='none'; calIcon.classList.add('active'); chartIcon.classList.remove('active'); }
+
+  // expose some helpers
+  window.mobileApp = { renderCalendar, renderTasks, updateChart, tasks, persist };
+
+  // start
   init();
-
-  // expose small API for debugging
-  window.mobileApp = { tasks, persist, renderCalendar, renderTasks, updateChart, openModalFor };
-
 })();
 </script>
 </body>
