@@ -12,10 +12,11 @@
             --success: #34C759;
             --danger: #FF3B30;
             --warning: #FF9500;
-            --background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            --surface: rgba(255, 255, 255, 0.15);
+            --background: #0A0A0A;
+            --surface: rgba(255, 255, 255, 0.12);
+            --surface-solid: rgba(30, 30, 30, 0.95);
             --text-primary: #FFFFFF;
-            --text-secondary: rgba(255, 255, 255, 0.8);
+            --text-secondary: rgba(255, 255, 255, 0.7);
             --border-radius: 20px;
             --blur-intensity: 25px;
         }
@@ -40,15 +41,36 @@
 
         body {
             background: var(--background);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
             color: var(--text-primary);
         }
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* Анимированный фон с частицами */
+        .particles-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 149, 92, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 220, 82, 0.2) 0%, transparent 50%),
+                linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
         }
 
         .app-container {
@@ -67,16 +89,17 @@
             display: flex;
             justify-content: space-around;
             padding: 20px 15px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(var(--blur-intensity));
             -webkit-backdrop-filter: blur(var(--blur-intensity));
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             z-index: 10;
         }
 
         .income-header > div {
             text-align: center;
+            animation: fadeInUp 0.6s ease;
         }
 
         .income-header .label {
@@ -134,7 +157,7 @@
         .nav-btn {
             background: var(--surface);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             width: 44px;
             height: 44px;
             border-radius: 50%;
@@ -144,6 +167,12 @@
             font-size: 18px;
             cursor: pointer;
             color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .current-month {
@@ -183,23 +212,30 @@
             height: 6px;
             background: var(--success);
             border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
         }
 
         .calendar-day.selected {
             background: var(--primary);
             color: white;
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 122, 255, 0.4);
         }
 
         .calendar-day.today {
             background: var(--warning);
             color: white;
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             animation: pulse 2s infinite;
+            box-shadow: 0 4px 20px rgba(255, 149, 0, 0.4);
         }
 
         .calendar-day.other-month {
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .calendar-day:active {
+            transform: scale(0.9);
         }
 
         /* Day Title */
@@ -213,7 +249,7 @@
             backdrop-filter: blur(20px);
             padding: 15px;
             border-radius: var(--border-radius);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         /* Tasks */
@@ -229,7 +265,7 @@
             border-radius: var(--border-radius);
             padding: 20px;
             margin-bottom: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             animation: slideInUp 0.5s ease;
             position: relative;
             overflow: hidden;
@@ -242,11 +278,11 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
             transition: left 0.5s ease;
         }
 
-        .task-card:hover::before {
+        .task-card:active::before {
             left: 100%;
         }
 
@@ -271,6 +307,7 @@
             border-radius: 20px;
             font-size: 14px;
             font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
         }
 
         .task-details {
@@ -287,9 +324,14 @@
             font-size: 15px;
             color: var(--text-secondary);
             padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             backdrop-filter: blur(10px);
+        }
+
+        .detail-item i {
+            font-size: 16px;
+            color: var(--primary);
         }
 
         .price-tag {
@@ -302,16 +344,18 @@
             text-align: center;
             margin: 15px 0;
             animation: pulse 2s infinite;
+            box-shadow: 0 4px 20px rgba(52, 199, 89, 0.3);
         }
 
         .task-description {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             padding: 15px;
             border-radius: 15px;
             font-size: 15px;
             line-height: 1.5;
             margin-bottom: 16px;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .task-actions {
@@ -321,9 +365,9 @@
         }
 
         .action-btn {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -336,23 +380,27 @@
             color: var(--text-primary);
         }
 
+        .action-btn:active {
+            transform: scale(0.9);
+        }
+
         .action-btn.toggle {
-            background: rgba(255, 59, 48, 0.2);
+            background: rgba(255, 59, 48, 0.15);
             color: var(--danger);
         }
 
         .action-btn.toggle.done {
-            background: rgba(52, 199, 89, 0.2);
+            background: rgba(52, 199, 89, 0.15);
             color: var(--success);
         }
 
         .action-btn.edit {
-            background: rgba(0, 122, 255, 0.2);
+            background: rgba(0, 122, 255, 0.15);
             color: var(--primary);
         }
 
         .action-btn.delete {
-            background: rgba(255, 59, 48, 0.2);
+            background: rgba(255, 59, 48, 0.15);
             color: var(--danger);
         }
 
@@ -373,6 +421,11 @@
             animation: pulse 2s infinite;
             backdrop-filter: blur(10px);
             border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 122, 255, 0.4);
+        }
+
+        .add-btn:active {
+            transform: scale(0.9) rotate(90deg);
         }
 
         /* Navigation */
@@ -381,9 +434,9 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(var(--blur-intensity));
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             padding: 12px 20px;
             z-index: 100;
@@ -403,32 +456,57 @@
             cursor: pointer;
             border-radius: 16px;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .tab-btn:active::before {
+            left: 100%;
         }
 
         .tab-btn.active {
             color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
         }
 
         .tab-btn i {
             font-size: 22px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active i {
+            transform: scale(1.1);
+            color: var(--primary);
         }
 
         /* Modal */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 2000;
             padding: 20px;
+            animation: fadeIn 0.3s ease;
         }
 
         .modal-content {
-            background: var(--surface);
+            background: var(--surface-solid);
             backdrop-filter: blur(var(--blur-intensity));
             border-radius: var(--border-radius);
             padding: 24px;
@@ -436,7 +514,9 @@
             max-width: 400px;
             max-height: 90vh;
             overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: modalSlideIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         .modal-header {
@@ -466,6 +546,11 @@
             font-size: 20px;
             cursor: pointer;
             color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:active {
+            transform: scale(0.9);
         }
 
         .form-grid {
@@ -490,14 +575,21 @@
             padding: 16px;
             border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
             font-size: 16px;
             color: var(--text-primary);
             backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
 
         .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .form-actions {
@@ -514,25 +606,41 @@
             font-weight: 600;
             font-size: 16px;
             cursor: pointer;
+            transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
+            box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
             color: var(--text-primary);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         /* Animations */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes slideInUp {
@@ -546,11 +654,29 @@
             }
         }
 
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
             padding: 40px 20px;
             color: var(--text-secondary);
+            animation: fadeIn 0.5s ease;
         }
 
         .empty-state i {
@@ -559,31 +685,36 @@
             opacity: 0.5;
         }
 
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
         /* Notifications */
         .notification {
             position: fixed;
             top: 100px;
             right: 20px;
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--surface-solid);
             backdrop-filter: blur(20px);
             border-radius: 15px;
             padding: 16px 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             z-index: 3000;
             animation: slideInRight 0.3s ease;
             max-width: 300px;
         }
 
-        .notification-success { border-left: 4px solid #34C759; }
-        .notification-warning { border-left: 4px solid #FF9500; }
-        .notification-info { border-left: 4px solid #007AFF; }
+        .notification-success { border-left: 4px solid var(--success); }
+        .notification-warning { border-left: 4px solid var(--warning); }
+        .notification-info { border-left: 4px solid var(--primary); }
 
         .notification-content {
             display: flex;
             align-items: center;
             gap: 12px;
-            color: #000;
+            color: var(--text-primary);
             font-weight: 600;
         }
 
@@ -591,20 +722,34 @@
             font-size: 20px;
         }
 
-        .notification-success i { color: #34C759; }
-        .notification-warning i { color: #FF9500; }
-        .notification-info i { color: #007AFF; }
+        .notification-success i { color: var(--success); }
+        .notification-warning i { color: var(--warning); }
+        .notification-info i { color: var(--primary); }
 
         @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .task-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .calendar-grid {
+                gap: 6px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="animated-bg"></div>
-    <div class="app-container">
-        <!-- остальной код -->
+    <div class="particles-bg" id="particles-bg"></div>
+    
     <div class="app-container">
         <header class="income-header">
             <div>
@@ -741,6 +886,31 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Создаем частицы для фона
+            function createParticles() {
+                const container = document.getElementById('particles-bg');
+                const particleCount = 15;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    // Случайный размер и позиция
+                    const size = Math.random() * 4 + 2;
+                    const left = Math.random() * 100;
+                    const animationDuration = Math.random() * 20 + 15;
+                    const animationDelay = Math.random() * 5;
+                    
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${left}%`;
+                    particle.style.animationDuration = `${animationDuration}s`;
+                    particle.style.animationDelay = `${animationDelay}s`;
+                    
+                    container.appendChild(particle);
+                }
+            }
+
             class IncomeCalendar {
                 constructor() {
                     this.dates = this.generateDates('2025-01-01', '2027-12-31');
@@ -1237,6 +1407,9 @@
                 }
             }
 
+            // Создаем частицы
+            createParticles();
+
             const app = new IncomeCalendar();
             window.app = app;
 
@@ -1251,6 +1424,7 @@
             }
         });
 
+        // Запрет масштабирования
         document.addEventListener('touchmove', function (event) {
             if (event.scale !== 1) { event.preventDefault(); }
         }, { passive: false });
