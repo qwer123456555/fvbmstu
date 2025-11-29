@@ -402,4 +402,175 @@ document.addEventListener("DOMContentLoaded", () => {
       this.currentMonth += direction;
       
       if (this.currentMonth < 0) {
-        this.current
+        this.currentMonth = 11;
+        this.currentYear--;
+      } else if (this.currentMonth > 11) {
+        this.currentMonth = 0;
+        this.currentYear++;
+      }
+      
+      this.renderCalendar();
+    }
+
+    goToToday() {
+      const today = new Date();
+      this.currentDate = today.toISOString().split('T')[0];
+      this.currentMonth = today.getMonth();
+      this.currentYear = today.getFullYear();
+      this.renderCalendar();
+      this.renderTasks();
+    }
+
+    selectDate(date) {
+      this.currentDate = date;
+      const selectedDate = new Date(date);
+      this.currentMonth = selectedDate.getMonth();
+      this.currentYear = selectedDate.getFullYear();
+      this.renderCalendar();
+      this.renderTasks();
+    }
+
+    // Обновление доходов
+    updateIncome() {
+      let total = 0, month = 0, today = 0;
+      const currentDate = new Date().toISOString().split('T')[0];
+      const currentMonth = currentDate.slice(0, 7);
+      
+      for (const date in this.tasks) {
+        this.tasks[date].forEach(task => {
+          const price = parseInt(task.price) || 0;
+          if (task.done) {
+            total += price;
+            if (date === currentDate) today += price;
+            if (date.slice(0, 7) === currentMonth) month += price;
+          }
+        });
+      }
+      
+      this.el.totalIncome.textContent = `${total.toLocaleString()} ₽`;
+      this.el.monthIncome.textContent = `${month.toLocaleString()} ₽`;
+      this.el.todayIncome.textContent = `${today.toLocaleString()} ₽`;
+    }
+
+    // График
+    setupChart() {
+      this.chart = new Chart(this.el.incomeChart, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Доходы',
+            data: [],
+            borderColor: '#007AFF',
+            backgroundColor: 'rgba(0, 122, 255, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value + ' ₽';
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      this.updateChart();
+    }
+
+    updateChart() {
+      const startDate = new Date(this.el.startDate.value);
+      const endDate = new Date(this.el.endDate.value);
+      
+      const dates = [];
+      const incomeData = [];
+      const currentDate = new Date(startDate);
+      
+      while (currentDate <= endDate) {
+        const dateString = currentDate.toISOString().split('T')[0];
+        dates.push(currentDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }));
+        
+        let dayIncome = 0;
+        if (this.tasks[dateString]) {
+          this.tasks[dateString].forEach(task => {
+            if (task.done) {
+              dayIncome += parseInt(task.price) || 0;
+            }
+          });
+        }
+        
+        incomeData.push(dayIncome);
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      
+      this.chart.data.labels = dates;
+      this.chart.data.datasets[0].data = incomeData;
+      this.chart.update();
+    }
+
+    // Навигация по вкладкам
+    switchTab(tabName) {
+      // Обновляем активные вкладки
+      this.el.tabContents.forEach(content => {
+        content.classList.remove('active');
+      });
+      this.el.tabBtns.forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Активируем выбранную вкладку
+      document.getElementById(tabName).classList.add('active');
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+      
+      // Обновляем график при переключении на вкладку аналитики
+      if (tabName === 'chart-tab') {
+        setTimeout(() => this.updateChart(), 100);
+      }
+    }
+
+    // Свайпы
+    setupSwipeEvents() {
+      let startX = 0;
+      
+      document.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+      });
+      
+      document.addEventListener('touchend', (e) => {
+        const endX = e.changedTouches[0].clientX;
+        const diffX = startX - endX;
+        
+        if (Math.abs(diffX) > 50) {
+          if (diffX > 0) {
+            // Свайп влево - следующий месяц
+            this.changeMonth(1);
+          } else {
+            // Свайп вправо - предыдущий месяц
+            this.changeMonth(-1);
+          }
+        }
+      });
+    }
+
+    // Сохранение в localStorage
+    saveToStorage() {
+      localStorage.setItem("tasks", JSON.stringify(this.tasks));
+    }
+  }
+
+  // Инициализация приложения
+  const app = new IncomeCalendar();
+  window.app = app; // Делаем глобально доступным для обработчиков в HTML
+});
