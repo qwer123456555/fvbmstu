@@ -1,946 +1,280 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Income Calendar Pro — обновлённый</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --primary: #007AFF;
-            --secondary: #5856D6;
-            --success: #34C759;
-            --danger: #FF3B30;
-            --warning: #FF9500;
-            --background: #0A0A0A;
-            --surface: rgba(255, 255, 255, 0.08);
-            --surface-solid: rgba(18, 18, 18, 0.95);
-            --text-primary: #FFFFFF;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --border-radius: 18px;
-            --blur-intensity: 18px;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Income Calendar — Mobile Premium Edition</title>
+<style>
+:root {
+    --primary: #4A6CFA;
+    --secondary: #9A4AFF;
+    --accent: #3DF0B5;
+    --danger: #FF4A6A;
+    --bg: #090A15;
+    --glass: rgba(255,255,255,0.08);
+    --text: #fff;
+    --text-soft: rgba(255,255,255,0.6);
+    --radius: 20px;
+    --blur: 22px;
+}
+body {
+    margin:0;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Roboto, sans-serif;
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        html, body { width: 100%; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--background); color: var(--text-primary); }
-        body { overflow: hidden; }
+/* Background FX */
+.bg-anim {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 30% 80%, rgba(98,87,255,0.25) 0%, transparent 55%),
+                radial-gradient(circle at 70% 20%, rgba(255,87,180,0.18) 0%, transparent 60%),
+                linear-gradient(180deg, #06060F, #0B0D1A);
+    z-index: -2;
+}
+.floating {
+    position:absolute;
+    width: 160px;
+    height:160px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
+    border-radius:50%;
+    filter: blur(55px);
+    animation: float 14s infinite ease-in-out;
+}
+@keyframes float {
+    0% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-40px) translateX(20px); }
+    100% { transform: translateY(0px) translateX(0px); }
+}
 
-        /* Background */
-        .particles-bg { position: fixed; inset: 0; z-index: -2;
-            background:
-                radial-gradient(circle at 20% 80%, rgba(120,119,198,0.18) 0%, transparent 45%),
-                radial-gradient(circle at 80% 20%, rgba(255,149,92,0.12) 0%, transparent 45%),
-                linear-gradient(180deg, #0f1724 0%, #07122b 100%);
-        }
-        .particle { position: absolute; background: rgba(255,255,255,0.06); border-radius: 50%; filter: blur(0.5px); animation: float 18s infinite linear; }
+/* Main layout - Mobile First */
+.container {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-        @keyframes float { 0% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.25; } 90% { opacity: 0.25; } 100% { transform: translateY(-120px) rotate(360deg); opacity: 0; } }
+/* Header — compact glass */
+.header {
+    padding: 18px 20px;
+    background: var(--glass);
+    backdrop-filter: blur(var(--blur));
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header-title {
+    font-size: 20px;
+    font-weight: 800;
+}
 
-        /* Layout */
-        .app-container { height: 100dvh; display:flex; flex-direction:column; position:relative; }
-        .income-header {
-            display:flex; gap:12px; align-items:center; justify-content:space-between;
-            padding: 14px; margin: 12px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-            border-radius: 14px; backdrop-filter: blur(var(--blur-intensity)); border: 1px solid rgba(255,255,255,0.04);
-        }
-        .income-header-left { display:flex; gap:12px; align-items:center; }
-        .header-stats { display:flex; gap:10px; align-items:center; }
-        .stat { padding:10px 12px; border-radius:12px; background: rgba(255,255,255,0.02); text-align:center; min-width:86px; }
-        .label { font-size:12px; color:var(--text-secondary); }
-        .value { font-weight:800; font-size:18px; color:var(--text-primary); letter-spacing:0.3px; }
+/* Calendar view */
+.calendar-view {
+    padding: 14px 16px;
+    overflow-y: auto;
+    flex: 1;
+}
+.month-switch {
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    margin-bottom: 14px;
+}
+.month-name {
+    font-size: 22px;
+    font-weight: 800;
+}
+.switch-btn {
+    background: var(--glass);
+    backdrop-filter: blur(var(--blur));
+    width:46px;
+    height:46px;
+    border-radius: var(--radius);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:20px;
+}
 
-        /* Quick controls */
-        .controls { display:flex; gap:8px; align-items:center; }
-        .icon-btn { background: transparent; border:1px solid rgba(255,255,255,0.06); padding:10px; border-radius:10px; cursor:pointer; color:var(--text-primary); display:inline-flex; align-items:center; gap:8px; }
-        .search-input { background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); padding:8px 12px; border-radius:12px; color:var(--text-primary); width:220px; }
+/* Days grid */
+.days-grid {
+    display:grid;
+    grid-template-columns: repeat(7,1fr);
+    gap: 8px;
+}
+.day {
+    aspect-ratio: 1/1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius: 16px;
+    font-weight:700;
+    transition: 0.25s;
+    position: relative;
+}
+.day.has { box-shadow: 0 0 18px rgba(82,140,255,0.4); }
+.day.today { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+.day.selected { outline:2px solid var(--accent); }
 
-        /* Main content */
-        .main { display:flex; gap:16px; padding: 12px; flex:1; overflow:hidden; }
-        .left { width: 580px; max-width: 42%; min-width:320px; display:flex; flex-direction:column; gap:12px; overflow:hidden; }
-        .right { flex:1; display:flex; flex-direction:column; gap:12px; overflow:hidden; }
+/* Tasks list */
+.tasks {
+    margin-top: 14px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+.task-card {
+    background: var(--glass);
+    padding: 14px;
+    border-radius: var(--radius);
+    backdrop-filter: blur(var(--blur));
+    box-shadow:0 14px 32px rgba(0,0,0,0.45);
+    animation: fadeUp 0.4s ease;
+}
+@keyframes fadeUp {
+    from { opacity:0; transform: translateY(14px); }
+    to { opacity:1; transform: translateY(0px); }
+}
+.task-top {
+    display:flex;
+    justify-content: space-between;
+}
+.client-name { font-size:18px; font-weight:800; }
+.car { font-size:14px; color:var(--text-soft); margin-top:4px; }
 
-        /* Calendar container */
-        .calendar-container { background: var(--surface); border-radius: 16px; padding: 14px; backdrop-filter: blur(12px); border:1px solid rgba(255,255,255,0.06); overflow:hidden; display:flex; flex-direction:column; gap:12px; }
-        .calendar-header { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-        .calendar-nav { display:flex; gap:8px; }
-        .nav-btn { background: transparent; border:1px solid rgba(255,255,255,0.06); width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-        .current-month { font-weight:800; font-size:16px; text-align:center; }
+.time-tag {
+    padding:8px 12px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius:12px;
+    font-size:14px;
+    font-weight:700;
+}
 
-        .calendar-grid { display:grid; grid-template-columns: repeat(7,1fr); gap:8px; }
-        .calendar-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:10px; font-weight:700; cursor:pointer; transition:all .25s; position:relative; user-select:none; }
-        .calendar-day.weekday { font-weight:700; color:var(--text-secondary); background:transparent; }
-        .calendar-day.other-month { color: rgba(255,255,255,0.18); }
-        .calendar-day.has-work::after { content:''; position:absolute; bottom:6px; left:50%; transform:translateX(-50%); width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); box-shadow:0 6px 18px rgba(88,86,214,0.18); }
-        .calendar-day.selected { outline: 2px solid rgba(255,255,255,0.06); box-shadow: 0 8px 30px rgba(0,0,0,0.6); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); }
-        .calendar-day.today { background: linear-gradient(135deg, var(--warning), #FFB86B); color:#07122b; box-shadow:0 8px 28px rgba(255,149,0,0.12); }
+.price {
+    margin-top:14px;
+    padding: 10px;
+    border-radius: 14px;
+    font-size:18px;
+    font-weight:900;
+    text-align:center;
+}
+.price.done {
+    background: linear-gradient(135deg,#3DF0B5,#20BB82);
+}
+.price.pending {
+    background: linear-gradient(135deg,#FFD477,#FF9F45);
+    color:#000;
+}
 
-        .day-title { font-size:20px; font-weight:800; padding:10px 12px; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); text-align:center; }
+.task-actions {
+    display:flex;
+    justify-content:space-between;
+    margin-top:14px;
+}
+.action-btn {
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    background: rgba(255,255,255,0.05);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:20px;
+}
 
-        /* Tasks */
-        .tasks-container { overflow:auto; padding-right:6px; display:flex; flex-direction:column; gap:12px; max-height:420px; }
-        .task-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015)); border-radius:14px; padding:12px; border:1px solid rgba(255,255,255,0.04); box-shadow: 0 10px 30px rgba(2,6,23,0.6); transition: transform .18s; }
-        .task-card:hover { transform: translateY(-6px) rotateX(4deg); }
-        .task-header { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
-        .client-name { font-size:16px; font-weight:800; color:var(--text-primary); }
-        .task-time { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:white; padding:6px 12px; border-radius:12px; font-weight:700; }
+/* Bottom Navigation */
+.navbar {
+    background: var(--glass);
+    backdrop-filter: blur(var(--blur));
+    height:68px;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    border-top:1px solid rgba(255,255,255,0.05);
+}
+.nav-btn {
+    font-size:22px;
+}
 
-        .task-details { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
-        .detail-item { padding:8px 10px; border-radius:10px; background: rgba(255,255,255,0.02); color:var(--text-secondary); font-weight:600; display:flex; gap:8px; align-items:center; }
+/* Floating Add Button */
+.add-btn {
+    position:fixed;
+    bottom: 94px;
+    right: 22px;
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:30px;
+    box-shadow:0 18px 48px rgba(0,0,0,0.45);
+}
 
-        /* Price tag - изменяется в зависимости от статуса */
-        .price-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; }
-        .price-tag { padding:10px 16px; border-radius:12px; font-weight:900; font-size:16px; color:white; box-shadow: 0 8px 28px rgba(0,0,0,0.5); transition: all .25s; }
-        .price-tag.done { background: linear-gradient(135deg, #34C759, #2EBF54); box-shadow: 0 8px 28px rgba(52,199,89,0.12); }
-        .price-tag.pending { background: linear-gradient(135deg, #FFB86B, #FF8A3D); color:#07122b; box-shadow: 0 8px 28px rgba(255,149,0,0.08); }
-        .price-tag.cancelled { background: linear-gradient(135deg, #B0B0B0, #8B8B8B); opacity:0.95; }
-
-        .task-actions { display:flex; gap:8px; margin-top:10px; justify-content:flex-end; }
-        .action-btn { width:48px; height:48px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; background:transparent; cursor:pointer; transition: all .18s; color:var(--text-primary); }
-        .action-btn.toggle { border-color: rgba(255,255,255,0.06); }
-        .action-btn.toggle.done { background: rgba(52,199,89,0.10); color:var(--success); }
-        .action-btn.edit { background: rgba(0,122,255,0.06); color:var(--primary); }
-        .action-btn.delete { background: rgba(255,59,48,0.06); color:var(--danger); }
-
-        /* Right column: analytics + controls */
-        .panel { background: var(--surface); border-radius:14px; padding:12px; border:1px solid rgba(255,255,255,0.04); backdrop-filter: blur(10px); display:flex; flex-direction:column; gap:12px; }
-        .stats-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .stat-card { padding:10px; border-radius:10px; background: rgba(255,255,255,0.02); text-align:center; }
-        .chart-wrap { height:260px; position:relative; padding:6px 0; }
-
-        /* Add button */
-        .add-btn { position: fixed; right: 20px; bottom: 86px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; font-size:28px; width:70px; height:70px; border-radius:50%; border:none; cursor:pointer; z-index:1000; box-shadow:0 12px 48px rgba(0,122,255,0.22); display:flex; align-items:center; justify-content:center; }
-
-        /* Bottom nav */
-        .tab-navigation { position: fixed; bottom: 0; left: 0; right: 0; padding:12px; display:flex; gap:8px; margin:12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); justify-content:center; }
-
-        /* Modal */
-        .modal-overlay { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:2000; padding:16px; }
-        .modal-content { width:100%; max-width:520px; background: var(--surface-solid); border-radius:14px; padding:18px; border:1px solid rgba(255,255,255,0.06); }
-        .form-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
-        .form-grid.full { grid-template-columns:1fr; }
-        .form-input, textarea { width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); color:var(--text-primary); }
-        .btn { padding:10px 12px; border-radius:10px; cursor:pointer; border:none; font-weight:700; }
-        .btn-primary { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:white; }
-        .btn-secondary { background:transparent; color:var(--text-primary); border:1px solid rgba(255,255,255,0.04); }
-
-        /* Notification */
-        .notification { position:fixed; top:100px; right:20px; background:var(--surface-solid); padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); z-index:3000; box-shadow:0 10px 40px rgba(0,0,0,0.6); }
-
-        @media (max-width: 1000px) {
-            .main { flex-direction:column; padding:12px; }
-            .left { width:100%; max-width:100%; min-width:unset; }
-            .right { width:100%; }
-            .search-input { width:140px; }
-        }
-    </style>
+</style>
 </head>
 <body>
-    <div class="particles-bg" id="particles-bg"></div>
+<div class="bg-anim"></div>
+<div class="floating" style="top:20%; left:10%;"></div>
+<div class="floating" style="bottom:10%; right:5%; animation-delay:4s;"></div>
 
-    <div class="app-container">
-        <!-- Header -->
-        <div class="income-header">
-            <div class="income-header-left">
-                <div class="header-stats">
-                    <div class="stat">
-                        <div class="label">Всего</div>
-                        <div class="value" id="total-income">0 ₽</div>
-                    </div>
-                    <div class="stat">
-                        <div class="label">Месяц</div>
-                        <div class="value" id="month-income">0 ₽</div>
-                    </div>
-                    <div class="stat">
-                        <div class="label">Сегодня</div>
-                        <div class="value" id="today-income">0 ₽</div>
-                    </div>
-                </div>
-                <div style="width:12px;"></div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <input id="global-search" class="search-input" placeholder="Поиск клиентов / авто / адреса" />
-                    <button class="icon-btn" id="filter-btn" title="Фильтр">
-                        <i class="fas fa-filter"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="controls">
-                <button class="icon-btn" id="export-csv"><i class="fas fa-file-csv"></i> Экспорт</button>
-                <label class="icon-btn" for="import-json" style="cursor:pointer;"><i class="fas fa-file-import"></i> Импорт</label>
-                <input type="file" id="import-json" accept="application/json" style="display:none;">
-                <button class="icon-btn" id="toggle-demo">Демо данные</button>
-            </div>
-        </div>
-
-        <!-- Main -->
-        <div class="main">
-            <!-- Left: Calendar & Tasks -->
-            <div class="left">
-                <div class="calendar-container">
-                    <div class="calendar-header">
-                        <div class="calendar-nav">
-                            <button class="nav-btn" id="prev-month"><i class="fas fa-chevron-left"></i></button>
-                            <button class="nav-btn" id="today-btn" title="Сегодня"><i class="fas fa-circle"></i></button>
-                        </div>
-                        <div class="current-month" id="current-month">Июнь 2025</div>
-                        <div class="calendar-nav">
-                            <button class="nav-btn" id="next-month"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="calendar-grid" id="calendar-grid">
-                        <!-- fill -->
-                    </div>
-
-                    <div class="day-title" id="day-title">Сегодня</div>
-
-                    <div id="tasks" class="tasks-container">
-                        <!-- tasks -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right: Analytics -->
-            <div class="right">
-                <div class="panel">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="font-weight:900; font-size:16px;">Аналитика</div>
-                        <div style="display:flex; gap:8px;">
-                            <button class="icon-btn" id="view-daily">День</button>
-                            <button class="icon-btn" id="view-monthly">Месяц</button>
-                        </div>
-                    </div>
-
-                    <div class="stats-grid" id="mini-stats">
-                        <div class="stat-card">
-                            <div class="label">Выполнено</div>
-                            <div class="value" id="stat-done">0 ₽</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="label">В ожидании</div>
-                            <div class="value" id="stat-pending">0 ₽</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="label">Средний чек</div>
-                            <div class="value" id="stat-avg">0 ₽</div>
-                        </div>
-                    </div>
-
-                    <div class="chart-wrap">
-                        <canvas id="incomeChart"></canvas>
-                    </div>
-
-                    <div style="display:flex; gap:8px; justify-content:space-between; align-items:center;">
-                        <div style="color:var(--text-secondary); font-weight:700;">Последние 30 дней</div>
-                        <div style="display:flex; gap:8px;">
-                            <button class="icon-btn" id="export-chart-png" title="Скачать график">
-                                <i class="fas fa-download"></i>
-                            </button>
-                            <button class="icon-btn" id="reset-filters" title="Сбросить фильтры"><i class="fas fa-eraser"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel" style="flex:1; overflow:auto;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="font-weight:900;">Список последних записей</div>
-                        <div style="font-size:13px; color:var(--text-secondary);">Нажмите на чек, чтобы отметить выполнено</div>
-                    </div>
-
-                    <div id="recent-list" style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
-                        <!-- recent tasks -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <button class="add-btn" id="add-btn"><i class="fas fa-plus"></i></button>
-
-        <div class="tab-navigation">
-            <button class="icon-btn" id="open-calendar">Календарь</button>
-            <button class="icon-btn" id="open-analytics">Аналитика</button>
-        </div>
+<div class="container">
+    <div class="header">
+        <div class="header-title">График работ</div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal-overlay" id="modal">
-        <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <div style="font-size:18px; font-weight:900;" id="modal-title">Новая запись</div>
-                <button class="icon-btn" id="close-modal"><i class="fas fa-times"></i></button>
-            </div>
+    <div class="calendar-view">
 
-            <form id="task-form">
-                <div class="form-grid">
-                    <div>
-                        <label class="form-label">Клиент</label>
-                        <input id="client" class="form-input" placeholder="Имя клиента" required />
-                    </div>
-                    <div>
-                        <label class="form-label">Автомобиль</label>
-                        <input id="car" class="form-input" placeholder="Марка и модель" required />
-                    </div>
-                    <div>
-                        <label class="form-label">Время</label>
-                        <input id="time" class="form-input" placeholder="14:00–15:30" required />
-                    </div>
-                    <div>
-                        <label class="form-label">Стоимость</label>
-                        <input id="price" type="number" class="form-input" placeholder="₽" required />
-                    </div>
-                    <div style="grid-column: 1 / -1;">
-                        <label class="form-label">Место</label>
-                        <input id="place" class="form-input" placeholder="Адрес" required />
-                    </div>
-                    <div style="grid-column: 1 / -1;">
-                        <label class="form-label">Описание</label>
-                        <textarea id="desc" class="form-input" rows="3" placeholder="Детали работы..."></textarea>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <input type="checkbox" id="set-reminder" />
-                        <label for="set-reminder">Напомнить за день</label>
-                    </div>
-                </div>
-
-                <input type="hidden" id="edit-id" />
-                <input type="hidden" id="task-date" />
-                <div style="display:flex; gap:8px; margin-top:12px; justify-content:flex-end;">
-                    <button type="button" class="btn btn-secondary" id="cancel-btn">Отмена</button>
-                    <button type="submit" class="btn btn-primary">Сохранить</button>
-                </div>
-            </form>
+        <div class="month-switch">
+            <div class="switch-btn">❮</div>
+            <div class="month-name">Март 2025</div>
+            <div class="switch-btn">❯</div>
         </div>
+
+        <div class="days-grid">
+            <div class="day">1</div>
+            <div class="day has">2</div>
+            <div class="day">3</div>
+            <div class="day has today">4</div>
+            <div class="day">5</div>
+            <div class="day">6</div>
+            <div class="day">7</div>
+        </div>
+
+        <div class="tasks">
+            <div class="task-card">
+                <div class="task-top">
+                    <div>
+                        <div class="client-name">Иван</div>
+                        <div class="car">BMW X5</div>
+                    </div>
+                    <div class="time-tag">12:00</div>
+                </div>
+                <div class="price done">4 500 ₽</div>
+                <div class="task-actions">
+                    <div class="action-btn">✔</div>
+                    <div class="action-btn">✎</div>
+                    <div class="action-btn">🗑</div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <script>
-        // -----------------------------------------
-        // Утилиты
-        // -----------------------------------------
-        function formatMoney(n) {
-            return (parseInt(n) || 0).toLocaleString() + ' ₽';
-        }
+    <div class="navbar">
+        <div class="nav-btn">📅</div>
+        <div class="nav-btn">📊</div>
+        <div class="nav-btn">⚙️</div>
+    </div>
 
-        // Create particles background
-        (function createParticles() {
-            const container = document.getElementById('particles-bg');
-            const particleCount = 18;
-            for (let i=0;i<particleCount;i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                const size = Math.random() * 6 + 2;
-                p.style.width = size + 'px';
-                p.style.height = size + 'px';
-                p.style.left = (Math.random()*100) + '%';
-                p.style.top = (Math.random()*100) + '%';
-                p.style.animationDuration = (Math.random()*25 + 15) + 's';
-                p.style.opacity = Math.random()*0.6;
-                container.appendChild(p);
-            }
-        })();
+    <div class="add-btn">＋</div>
+</div>
 
-        // -----------------------------------------
-        // Основной класс
-        // -----------------------------------------
-        class IncomeCalendar {
-            constructor() {
-                this.currentDate = new Date().toISOString().split('T')[0];
-                this.currentMonth = new Date().getMonth();
-                this.currentYear = new Date().getFullYear();
-                this.tasks = JSON.parse(localStorage.getItem('tasks') || '{}');
-                this.chartMode = 'daily'; // daily or monthly
-                this.chart = null;
-
-                this.initElements();
-                this.bindEvents();
-                this.renderCalendar();
-                this.renderTasks();
-                this.updateIncome(true);
-                this.initChart();
-                this.renderRecent();
-                this.checkReminders();
-
-                this.searchTerm = '';
-            }
-
-            initElements() {
-                this.el = {
-                    totalIncome: document.getElementById('total-income'),
-                    monthIncome: document.getElementById('month-income'),
-                    todayIncome: document.getElementById('today-income'),
-                    calendarGrid: document.getElementById('calendar-grid'),
-                    currentMonth: document.getElementById('current-month'),
-                    prevMonth: document.getElementById('prev-month'),
-                    nextMonth: document.getElementById('next-month'),
-                    todayBtn: document.getElementById('today-btn'),
-                    tasksContainer: document.getElementById('tasks'),
-                    dayTitle: document.getElementById('day-title'),
-                    modal: document.getElementById('modal'),
-                    taskForm: document.getElementById('task-form'),
-                    modalTitle: document.getElementById('modal-title'),
-                    closeModal: document.getElementById('close-modal'),
-                    cancelBtn: document.getElementById('cancel-btn'),
-                    client: document.getElementById('client'),
-                    car: document.getElementById('car'),
-                    time: document.getElementById('time'),
-                    price: document.getElementById('price'),
-                    place: document.getElementById('place'),
-                    desc: document.getElementById('desc'),
-                    setReminder: document.getElementById('set-reminder'),
-                    editId: document.getElementById('edit-id'),
-                    taskDate: document.getElementById('task-date'),
-                    addBtn: document.getElementById('add-btn'),
-                    searchInput: document.getElementById('global-search'),
-                    exportCsv: document.getElementById('export-csv'),
-                    importJson: document.getElementById('import-json'),
-                    toggleDemo: document.getElementById('toggle-demo'),
-                    viewDaily: document.getElementById('view-daily'),
-                    viewMonthly: document.getElementById('view-monthly'),
-                    incomeChart: document.getElementById('incomeChart'),
-                    exportChartPng: document.getElementById('export-chart-png'),
-                    resetFilters: document.getElementById('reset-filters'),
-                    recentList: document.getElementById('recent-list')
-                };
-            }
-
-            bindEvents() {
-                this.el.prevMonth.addEventListener('click', () => this.changeMonth(-1));
-                this.el.nextMonth.addEventListener('click', () => this.changeMonth(1));
-                this.el.todayBtn.addEventListener('click', () => this.goToToday());
-                this.el.calendarGrid.addEventListener('click', (e) => {
-                    const d = e.target.closest('.calendar-day');
-                    if (d && d.dataset.date && !d.classList.contains('other-month')) {
-                        this.selectDate(d.dataset.date);
-                    }
-                });
-                this.el.tasksContainer.addEventListener('click', (e) => {
-                    const card = e.target.closest('.task-card');
-                    if (!card) return;
-                    const taskId = card.dataset.taskId;
-                    const action = e.target.closest('.action-btn');
-                    if (!action) return;
-                    const isToggle = action.classList.contains('toggle');
-                    const isEdit = action.classList.contains('edit');
-                    const isDelete = action.classList.contains('delete');
-                    if (isToggle) this.toggleTask(taskId);
-                    if (isEdit) this.editTask(taskId);
-                    if (isDelete) this.deleteTask(taskId);
-                });
-                this.el.addBtn.addEventListener('click', () => this.openModal());
-                this.el.closeModal.addEventListener('click', () => this.closeModal());
-                this.el.cancelBtn.addEventListener('click', () => this.closeModal());
-                this.el.modal.addEventListener('click', (e) => { if (e.target === this.el.modal) this.closeModal(); });
-                this.el.taskForm.addEventListener('submit', (e) => this.saveTask(e));
-                this.el.searchInput.addEventListener('input', (e) => { this.searchTerm = e.target.value.trim().toLowerCase(); this.renderTasks(); this.renderRecent(); });
-
-                this.el.exportCsv.addEventListener('click', () => this.exportCSV());
-                this.el.importJson.addEventListener('change', (e) => this.importJSON(e));
-                this.el.toggleDemo.addEventListener('click', () => { if (confirm('Добавить демонстрационные данные?')) { this.addSampleData(); } });
-
-                this.el.viewDaily.addEventListener('click', () => { this.chartMode='daily'; this.updateChart(); });
-                this.el.viewMonthly.addEventListener('click', () => { this.chartMode='monthly'; this.updateChart(); });
-
-                this.el.exportChartPng.addEventListener('click', () => {
-                    const url = this.el.incomeChart.toDataURL('image/png');
-                    const a = document.createElement('a'); a.href = url; a.download = 'income-chart.png'; a.click();
-                });
-
-                this.el.resetFilters.addEventListener('click', () => {
-                    this.searchTerm = '';
-                    this.el.searchInput.value = '';
-                    this.renderTasks();
-                    this.renderRecent();
-                });
-            }
-
-            // generate calendar for current month
-            renderCalendar() {
-                const firstDay = new Date(this.currentYear, this.currentMonth, 1);
-                const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
-                const startDay = firstDay.getDay(); // 0-6 (Sun-Sat)
-                const daysInMonth = lastDay.getDate();
-                const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-                this.el.currentMonth.textContent = monthNames[this.currentMonth] + ' ' + this.currentYear;
-
-                const weekdays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
-                let html = weekdays.map(w => `<div class="calendar-day weekday">${w}</div>`).join('');
-                // Padding for first row (convert startDay from Sun=0 to Mon=0)
-                const pad = (startDay === 0) ? 6 : startDay - 1;
-                for (let i=0;i<pad;i++) html += '<div class="calendar-day other-month"></div>';
-
-                const today = new Date().toISOString().split('T')[0];
-                for (let d=1; d<=daysInMonth; d++) {
-                    const date = new Date(this.currentYear, this.currentMonth, d);
-                    const ds = date.toISOString().split('T')[0];
-                    const hasWork = this.tasks[ds] && this.tasks[ds].length;
-                    const isToday = ds === today;
-                    const isSelected = ds === this.currentDate;
-                    // compute total for day for tooltip
-                    let dayTotal = 0;
-                    if (hasWork) {
-                        this.tasks[ds].forEach(t => dayTotal += parseInt(t.price || 0));
-                    }
-                    const title = hasWork ? `Сумма: ${dayTotal.toLocaleString()} ₽ — нажмите для просмотра` : '';
-                    html += `<div class="calendar-day ${hasWork?'has-work':''} ${isToday?'today':''} ${isSelected?'selected':''}" data-date="${ds}" title="${title}">${d}</div>`;
-                }
-                this.el.calendarGrid.innerHTML = html;
-            }
-
-            renderTasks() {
-                const tasks = this.tasks[this.currentDate] || [];
-                const date = new Date(this.currentDate);
-                const today = new Date().toISOString().split('T')[0];
-                let dayTitle;
-                if (this.currentDate === today) dayTitle = 'Сегодня';
-                else dayTitle = date.toLocaleDateString('ru-RU', { weekday:'long', day:'numeric', month:'long' });
-
-                this.el.dayTitle.textContent = dayTitle;
-
-                // apply search filter
-                let filtered = tasks.map((t,i)=> ({...t, __id:i})).filter(t=>{
-                    if (!this.searchTerm) return true;
-                    const s = this.searchTerm;
-                    return (t.client && t.client.toLowerCase().includes(s)) ||
-                           (t.car && t.car.toLowerCase().includes(s)) ||
-                           (t.place && t.place.toLowerCase().includes(s)) ||
-                           (t.time && t.time.toLowerCase().includes(s));
-                });
-
-                if (filtered.length === 0) {
-                    this.el.tasksContainer.innerHTML = `
-                        <div style="text-align:center; padding:30px; color:var(--text-secondary);">
-                            <i class="fas fa-calendar-plus" style="font-size:36px; opacity:0.5;"></i>
-                            <div style="margin-top:8px; font-weight:700;">Записей на этот день нет</div>
-                            <div style="margin-top:8px;">
-                                <button class="btn btn-primary" onclick="app.openModal()">Добавить запись</button>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const html = filtered.map(task => {
-                    const idx = task.__id;
-                    const priceClass = task.done ? 'done' : 'pending';
-                    const icon = task.done ? 'fa-check-circle' : 'fa-times-circle';
-                    const statusTitle = task.done ? 'Выполнено' : 'Не выполнено';
-                    return `
-                    <div class="task-card" data-task-id="${idx}">
-                        <div class="task-header">
-                            <div>
-                                <div class="client-name">${escapeHtml(task.client)}</div>
-                                <div style="color:var(--text-secondary); font-weight:700; margin-top:6px;">${escapeHtml(task.car)}</div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div class="task-time">${escapeHtml(task.time)}</div>
-                                <div style="font-size:12px; color:var(--text-secondary); margin-top:6px;">${escapeHtml(task.place)}</div>
-                            </div>
-                        </div>
-
-                        <div class="task-details">
-                            ${task.desc ? `<div class="detail-item"><i class="fas fa-sticky-note"></i> ${escapeHtml(task.desc)}</div>` : ''}
-                            <div class="detail-item"><i class="fas fa-clock"></i> ${new Date(task.createdAt).toLocaleString()}</div>
-                        </div>
-
-                        <div class="price-row">
-                            <div class="price-tag ${priceClass}">${parseInt(task.price||0).toLocaleString()} ₽</div>
-                            <div class="task-actions">
-                                <button class="action-btn toggle ${task.done ? 'done' : ''}" title="${statusTitle}"><i class="fas ${task.done ? 'fa-check' : 'fa-times'}"></i></button>
-                                <button class="action-btn edit" title="Редактировать"><i class="fas fa-edit"></i></button>
-                                <button class="action-btn delete" title="Удалить"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                    `;
-                }).join('');
-
-                this.el.tasksContainer.innerHTML = html;
-            }
-
-            // Recent list on right panel
-            renderRecent() {
-                const all = [];
-                for (const date in this.tasks) {
-                    for (let i=0;i<this.tasks[date].length;i++) {
-                        const task = {...this.tasks[date][i], __date: date, __id: i};
-                        all.push(task);
-                    }
-                }
-                // sort descending (most recent createdAt)
-                all.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
-                // apply search
-                const filtered = all.filter(t => {
-                    if (!this.searchTerm) return true;
-                    const s = this.searchTerm;
-                    return (t.client && t.client.toLowerCase().includes(s)) ||
-                           (t.car && t.car.toLowerCase().includes(s)) ||
-                           (t.place && t.place.toLowerCase().includes(s));
-                }).slice(0, 10);
-
-                const html = filtered.map(t => {
-                    return `
-                        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px; border-radius:10px; background: rgba(255,255,255,0.01);">
-                            <div style="display:flex; gap:8px; align-items:center;">
-                                <div style="width:46px; height:46px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; font-weight:900;">
-                                    ${escapeInitials(t.client)}
-                                </div>
-                                <div>
-                                    <div style="font-weight:800;">${escapeHtml(t.client)}</div>
-                                    <div style="color:var(--text-secondary); font-size:13px;">${t.car} — ${t.__date}</div>
-                                </div>
-                            </div>
-                            <div style="display:flex; gap:8px; align-items:center;">
-                                <div style="font-weight:900;">${parseInt(t.price||0).toLocaleString()} ₽</div>
-                                <button class="icon-btn" onclick="app.openModalFor('${t.__date}', ${t.__id})" title="Редактировать"><i class="fas fa-edit"></i></button>
-                                <button class="icon-btn" onclick="app.toggleTaskGlobal('${t.__date}', ${t.__id})" title="Отметить выполнено"><i class="fas fa-check"></i></button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                this.el.recentList.innerHTML = html || '<div style="color:var(--text-secondary); text-align:center; padding:18px;">Нет записей</div>';
-            }
-
-            openModal(date = null, taskId = null) {
-                this.el.modal.style.display = 'flex';
-                if (!date) date = this.currentDate;
-                this.el.taskDate.value = date;
-                this.el.modalTitle.textContent = taskId !== null ? 'Редактировать запись' : 'Новая запись';
-
-                if (taskId !== null) {
-                    const task = this.tasks[date][taskId];
-                    this.el.client.value = task.client;
-                    this.el.car.value = task.car;
-                    this.el.time.value = task.time;
-                    this.el.price.value = task.price;
-                    this.el.place.value = task.place;
-                    this.el.desc.value = task.desc || '';
-                    this.el.setReminder.checked = task.reminder || false;
-                    this.el.editId.value = taskId;
-                } else {
-                    this.el.taskForm.reset();
-                    this.el.editId.value = '';
-                }
-            }
-
-            openModalFor(date, taskId) {
-                this.selectDate(date);
-                setTimeout(()=> this.openModal(date, taskId), 200);
-            }
-
-            closeModal() {
-                this.el.modal.style.display = 'none';
-            }
-
-            saveTask(e) {
-                e.preventDefault();
-                const date = this.el.taskDate.value || this.currentDate;
-                const taskData = {
-                    client: this.el.client.value.trim(),
-                    car: this.el.car.value.trim(),
-                    time: this.el.time.value.trim(),
-                    price: this.el.price.value.trim(),
-                    place: this.el.place.value.trim(),
-                    desc: this.el.desc.value.trim(),
-                    done: false,
-                    reminder: this.el.setReminder.checked,
-                    createdAt: new Date().toISOString()
-                };
-                const id = this.el.editId.value;
-                if (!this.tasks[date]) this.tasks[date] = [];
-                if (id !== '') {
-                    // update existing
-                    this.tasks[date][id] = { ...this.tasks[date][id], ...taskData };
-                } else {
-                    this.tasks[date].push(taskData);
-                }
-                if (taskData.reminder) this.setReminder(date, taskData);
-                this.saveToStorage();
-                this.renderTasks();
-                this.renderCalendar();
-                this.updateIncome();
-                this.renderRecent();
-                this.closeModal();
-                this.showNotification('Запись сохранена', 'success');
-            }
-
-            toggleTask(taskId) {
-                if (!this.tasks[this.currentDate] || !this.tasks[this.currentDate][taskId]) return;
-                this.tasks[this.currentDate][taskId].done = !this.tasks[this.currentDate][taskId].done;
-                this.saveToStorage(); this.renderTasks(); this.updateIncome(); this.renderRecent();
-                const status = this.tasks[this.currentDate][taskId].done ? 'выполнена' : 'не выполнена';
-                this.showNotification(`Запись отмечена как ${status}`, 'info');
-            }
-
-            // Global toggle for list
-            toggleTaskGlobal(date, id) {
-                if (!this.tasks[date] || !this.tasks[date][id]) return;
-                this.tasks[date][id].done = !this.tasks[date][id].done;
-                this.saveToStorage(); this.renderTasks(); this.updateIncome(); this.renderRecent();
-            }
-
-            editTask(taskId) { this.openModal(this.currentDate, taskId); }
-
-            deleteTask(taskId) {
-                if (!confirm('Удалить эту запись?')) return;
-                this.tasks[this.currentDate].splice(taskId,1);
-                if (this.tasks[this.currentDate].length === 0) delete this.tasks[this.currentDate];
-                this.saveToStorage(); this.renderTasks(); this.renderCalendar(); this.updateIncome(); this.renderRecent();
-                this.showNotification('Запись удалена', 'warning');
-            }
-
-            setReminder(date, task) {
-                const reminders = JSON.parse(localStorage.getItem('reminders') || '{}');
-                const reminderDate = new Date(date); reminderDate.setDate(reminderDate.getDate()-1);
-                reminders[reminderDate.toISOString().split('T')[0]] = { date, client: task.client, time: task.time, notified:false };
-                localStorage.setItem('reminders', JSON.stringify(reminders));
-                this.showNotification('Напоминание установлено', 'success');
-            }
-
-            showNotification(text, type='info') {
-                const n = document.createElement('div');
-                n.className = 'notification';
-                n.innerHTML = `<div style="display:flex; gap:8px; align-items:center;"><i class="fas ${type==='success'?'fa-check-circle': type==='warning'?'fa-exclamation-triangle':'fa-info-circle'}"></i><div style="font-weight:700;margin-left:6px;">${text}</div></div>`;
-                document.body.appendChild(n);
-                setTimeout(()=> n.style.opacity = 0, 3000);
-                setTimeout(()=> n.remove(), 3400);
-            }
-
-            changeMonth(dir) {
-                this.currentMonth += dir;
-                if (this.currentMonth < 0) { this.currentMonth = 11; this.currentYear--; }
-                if (this.currentMonth > 11) { this.currentMonth = 0; this.currentYear++; }
-                this.renderCalendar();
-            }
-
-            goToToday() {
-                const t = new Date();
-                this.currentDate = t.toISOString().split('T')[0];
-                this.currentMonth = t.getMonth(); this.currentYear = t.getFullYear();
-                this.renderCalendar(); this.renderTasks();
-                this.showNotification('Переход к сегодняшнему дню', 'info');
-            }
-
-            selectDate(date) {
-                this.currentDate = date;
-                const s = new Date(date);
-                this.currentMonth = s.getMonth(); this.currentYear = s.getFullYear();
-                this.renderCalendar(); this.renderTasks();
-            }
-
-            updateIncome(init=false) {
-                let total=0, month=0, today=0, doneSum=0, pendingSum=0, count=0;
-                const currentDate = new Date().toISOString().split('T')[0];
-                const currentMonth = currentDate.slice(0,7);
-                for (const date in this.tasks) {
-                    for (const t of this.tasks[date]) {
-                        const p = parseInt(t.price) || 0;
-                        if (t.done) { total += p; doneSum += p; }
-                        else pendingSum += p;
-                        if (date === currentDate && t.done) today += p;
-                        if (date.slice(0,7) === currentMonth && t.done) month += p;
-                        count++;
-                    }
-                }
-                const avg = count ? Math.round((doneSum + pendingSum) / count) : 0;
-
-                // animate numbers (simple)
-                animateNumber(this.el.totalIncome, total);
-                animateNumber(this.el.monthIncome, month);
-                animateNumber(this.el.todayIncome, today);
-
-                document.getElementById('stat-done').textContent = doneSum.toLocaleString() + ' ₽';
-                document.getElementById('stat-pending').textContent = pendingSum.toLocaleString() + ' ₽';
-                document.getElementById('stat-avg').textContent = avg.toLocaleString() + ' ₽';
-
-                if (!init) this.updateChart();
-            }
-
-            // Chart
-            initChart() {
-                const ctx = this.el.incomeChart.getContext('2d');
-                this.chart = new Chart(ctx, {
-                    type: 'line',
-                    data: { labels: [], datasets: [{ label: 'Доход', data: [], fill:true, tension:0.35, pointRadius:4 }] },
-                    options: {
-                        responsive:true,
-                        maintainAspectRatio:false,
-                        plugins: { legend:{ display:false }, tooltip:{ mode:'index', intersect:false } },
-                        scales: {
-                            x:{ display:true, grid:{ display:false }, ticks: { color: 'rgba(255,255,255,0.8)' } },
-                            y:{ display:true, grid:{ color:'rgba(255,255,255,0.03)' }, ticks:{ color:'rgba(255,255,255,0.8)' } }
-                        }
-                    }
-                });
-                this.updateChart();
-            }
-
-            updateChart() {
-                if (!this.chart) return;
-                if (this.chartMode === 'daily') {
-                    // last 30 days
-                    const labels = [];
-                    const data = [];
-                    for (let i=29;i>=0;i--) {
-                        const d = new Date();
-                        d.setDate(d.getDate() - i);
-                        const ds = d.toISOString().split('T')[0];
-                        labels.push(d.toLocaleDateString('ru-RU', { day:'numeric', month:'numeric' }));
-                        let sum = 0;
-                        (this.tasks[ds]||[]).forEach(t => { if (t.done) sum += parseInt(t.price||0); });
-                        data.push(sum);
-                    }
-                    this.chart.data.labels = labels;
-                    this.chart.data.datasets[0].data = data;
-                    this.chart.data.datasets[0].backgroundColor = createGradient(this.chart, '#007AFF80', '#34C75930');
-                    this.chart.data.datasets[0].borderColor = '#007AFF';
-                } else {
-                    // monthly: last 12 months
-                    const labels = [];
-                    const data = [];
-                    const now = new Date();
-                    for (let i=11;i>=0;i--) {
-                        const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
-                        const key = d.toISOString().slice(0,7);
-                        labels.push(d.toLocaleDateString('ru-RU', { month:'short', year:'numeric' }));
-                        let sum = 0;
-                        for (const date in this.tasks) {
-                            if (date.slice(0,7) === key) {
-                                (this.tasks[date]||[]).forEach(t => { if (t.done) sum += parseInt(t.price||0); });
-                            }
-                        }
-                        data.push(sum);
-                    }
-                    this.chart.data.labels = labels;
-                    this.chart.data.datasets[0].data = data;
-                    this.chart.data.datasets[0].backgroundColor = createGradient(this.chart, '#34C75980', '#5856D630');
-                    this.chart.data.datasets[0].borderColor = '#34C759';
-                }
-                this.chart.update();
-            }
-
-            // storage
-            saveToStorage() { localStorage.setItem('tasks', JSON.stringify(this.tasks)); }
-
-            addSampleData() {
-                const today = new Date();
-                const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
-                const sample = {
-                    [today.toISOString().split('T')[0]]: [
-                        { client:'Иван Петров', car:'BMW X5', time:'10:00-12:00', price:'5000', place:'Автосервис на Ленина', desc:'Замена масла', done:true, reminder:false, createdAt: new Date().toISOString() },
-                        { client:'Анна Сидорова', car:'Mercedes C-Class', time:'14:30-16:00', price:'3000', place:'Мойка Премиум', desc:'Химчистка салона', done:false, reminder:true, createdAt: new Date().toISOString() }
-                    ],
-                    [tomorrow.toISOString().split('T')[0]]: [
-                        { client:'Петр Иванов', car:'Audi A6', time:'11:00-13:30', price:'7500', place:'Шиномонтаж', desc:'Шины', done:false, reminder:true, createdAt: new Date().toISOString() }
-                    ]
-                };
-                this.tasks = {...sample, ...this.tasks};
-                this.saveToStorage();
-                this.renderCalendar(); this.renderTasks(); this.updateIncome(); this.renderRecent();
-            }
-
-            // reminders daily
-            checkReminders() {
-                const today = new Date().toISOString().split('T')[0];
-                const reminders = JSON.parse(localStorage.getItem('reminders') || '{}');
-                const r = reminders[today];
-                if (r && !r.notified) {
-                    this.showNotification(`Напоминание: Завтра в ${r.time} запись с ${r.client}`, 'warning');
-                    r.notified = true;
-                    localStorage.setItem('reminders', JSON.stringify(reminders));
-                }
-            }
-
-            // Export CSV: all tasks to CSV
-            exportCSV() {
-                const rows = [['date','client','car','time','price','place','desc','done','createdAt']];
-                for (const date in this.tasks) {
-                    this.tasks[date].forEach(t => rows.push([date, t.client, t.car, t.time, t.price, t.place, (t.desc||'').replace(/\n/g,' '), t.done ? '1' : '0', t.createdAt]));
-                }
-                const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-                const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url; a.download = 'tasks_export.csv'; a.click();
-                URL.revokeObjectURL(url);
-            }
-
-            importJSON(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    try {
-                        const data = JSON.parse(ev.target.result);
-                        if (typeof data === 'object') {
-                            this.tasks = {...this.tasks, ...data};
-                            this.saveToStorage();
-                            this.renderCalendar(); this.renderTasks(); this.updateIncome(); this.renderRecent();
-                            this.showNotification('Импорт успешно завершён', 'success');
-                        } else {
-                            throw new Error('Неверный формат');
-                        }
-                    } catch (err) {
-                        alert('Не удалось импортировать: ' + err.message);
-                    }
-                };
-                reader.readAsText(file);
-            }
-        }
-
-        // Helpers
-        function animateNumber(el, target) {
-            const start = parseInt((el.textContent||'0').replace(/\D/g,'')) || 0;
-            const duration = 500;
-            const startTime = performance.now();
-            function step(now){
-                const t = Math.min(1, (now-startTime)/duration);
-                const v = Math.round(start + (target-start)*easeOutCubic(t));
-                el.textContent = v.toLocaleString() + ' ₽';
-                if (t < 1) requestAnimationFrame(step);
-            }
-            requestAnimationFrame(step);
-        }
-        function easeOutCubic(t){ return (--t)*t*t+1; }
-
-        function createGradient(chart, c1, c2) {
-            const ctx = chart.ctx;
-            const gradient = ctx.createLinearGradient(0,0,0,chart.height);
-            gradient.addColorStop(0, c1);
-            gradient.addColorStop(1, c2);
-            return gradient;
-        }
-
-        // safe escaping
-        function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
-        function escapeInitials(name){
-            if(!name) return '';
-            const parts = name.trim().split(' ');
-            if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
-            return (parts[0][0] + (parts[1][0]||'')).toUpperCase();
-        }
-
-        // expose app methods that are used directly
-        window.app = null;
-
-        document.addEventListener('DOMContentLoaded', function(){
-            const app = new IncomeCalendar();
-            window.app = app;
-
-            // For compatibility with older actions in HTML (buttons)
-            window.app.openModalFor = (date, id)=> app.openModalFor(date, id);
-            window.app.toggleTaskGlobal = (date, id)=> app.toggleTaskGlobal(date, id);
-
-            // If no tasks — propose demo
-            if (Object.keys(app.tasks).length === 0) {
-                setTimeout(()=> {
-                    if (confirm('Хотите добавить демонстрационные данные для ознакомления с приложением?')) {
-                        app.addSampleData();
-                    }
-                }, 900);
-            }
-        });
-    </script>
 </body>
 </html>
