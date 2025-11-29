@@ -23,7 +23,7 @@
   --glass-blur: 14px;
 }
 
-/* IMPORTANT: lock page scroll */
+/* lock page scrolling but allow scroll inside tasks and modal */
 html,body{
   height:100%;
   margin:0;
@@ -32,8 +32,8 @@ html,body{
   color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
   -webkit-font-smoothing:antialiased;
-  overflow:hidden; /* <--- prevent page scrolling */
-  touch-action: pan-y; /* allow vertical gestures on allowed areas */
+  overflow:hidden; /* prevent page scrolling */
+  touch-action: pan-y;
 }
 
 /* Background */
@@ -41,14 +41,15 @@ html,body{
 .bg-pattern { position:fixed; inset:0; background-image: radial-gradient(circle at 20% 80%, rgba(74,108,250,0.06) 0 10%, transparent 11%), radial-gradient(circle at 80% 10%, rgba(88,86,214,0.04) 0 8%, transparent 9%); z-index:-1; }
 
 .app { display:flex; flex-direction:column; height:100vh; padding:12px; gap:12px; }
-.header { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:12px; border-radius:12px; background:linear-gradient(180deg,var(--surface),transparent); backdrop-filter: blur(var(--glass-blur)); border:1px solid rgba(255,255,255,0.04); }
+.header { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:12px 24px 12px 12px; border-radius:12px; background:linear-gradient(180deg,var(--surface),transparent); backdrop-filter: blur(var(--glass-blur)); border:1px solid rgba(255,255,255,0.04); }
 .totals { display:flex; gap:8px; align-items:center; }
 .stat { background: rgba(255,255,255,0.02); padding:8px 10px; border-radius:12px; min-width:88px; text-align:center; border:1px solid rgba(255,255,255,0.03); }
 .stat .label { font-size:12px; color:var(--muted); }
 .stat .value { font-weight:800; font-size:16px; margin-top:4px; }
 
 /* Single toggle button (replaces two icon buttons) */
-.toggle-wrap { display:flex; align-items:center; gap:8px; margin-right:10px; } /* смещаем чуть левее от края */
+/* moved a bit left so it never touches the very right edge */
+.toggle-wrap { display:flex; align-items:center; gap:8px; margin-right:34px; }
 .toggle-btn { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text); font-size:18px; cursor:pointer; transition: transform .18s, background .18s, color .18s; }
 .toggle-btn.active { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; transform: translateY(-4px); box-shadow:0 12px 36px rgba(0,0,0,0.45); }
 .toggle-btn.flip { transform: rotateY(180deg); transition: transform .35s; }
@@ -57,8 +58,8 @@ html,body{
 .tab { padding:6px 10px; border-radius:999px; background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); font-weight:800; cursor:pointer; }
 .tab.active { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#07122b; box-shadow:0 12px 30px rgba(0,0,0,0.35); transform:translateY(-2px); }
 
-/* Main - no page scroll; internal areas manage their own scrolling */
-.main { flex:1; display:flex; flex-direction:column; gap:12px; padding-bottom:12px; overflow:hidden; } /* <--- prevent main scrolling */
+/* Main - internal areas manage their own scrolling */
+.main { flex:1; display:flex; flex-direction:column; gap:12px; padding-bottom:12px; overflow:hidden; }
 
 /* Cards */
 .card { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:16px; padding:12px; border:1px solid rgba(255,255,255,0.04); backdrop-filter: blur(8px); }
@@ -71,21 +72,21 @@ html,body{
 .weekdays { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; margin-bottom:8px; }
 .weekdays div { font-size:11px; color:var(--muted); text-align:center }
 
-/* Days grid: keep it fixed height so it doesn't cause page scroll */
-.days { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; max-height: calc(100vh * 0.32); overflow:hidden; } /* grid height limited */
+/* Days grid: limited height to avoid page scroll */
+.days { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; max-height: calc(100vh * 0.34); overflow:hidden; }
 .day { aspect-ratio:1/1; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800; position:relative; transition: transform .15s ease; background:transparent; color:var(--text); min-height:42px; }
 .day.other { color: rgba(255,255,255,0.18); opacity:0.8; }
 .day:hover { transform: translateY(-4px); }
 .day.today { background: linear-gradient(135deg,var(--warning), #FFB86B); color:#07122b; box-shadow:0 10px 28px rgba(255,149,0,0.12); }
 .day.selected { outline:2px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
-/* If today is selected - keep visibility */
+/* today & selected combination */
 .day.today.selected { background: linear-gradient(135deg,var(--warning), #FFD49A); color:#07122b; box-shadow:0 12px 36px rgba(255,149,0,0.18); outline:2px solid rgba(255,255,255,0.06); }
 /* dot marker */
 .day .dot { width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); position:absolute; bottom:6px; box-shadow:0 6px 12px rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.08); z-index:2; }
 
-/* Tasks: make only this area scrollable */
+/* Tasks: scroll only this container */
 .tasks-container { margin-top:10px; display:flex; flex-direction:column; gap:12px; }
-#tasksList { overflow:auto; -webkit-overflow-scrolling:touch; max-height: calc(100vh - 340px); padding-right:6px; } /* allow native scrolling for tasks only */
+#tasksList { overflow:auto; -webkit-overflow-scrolling:touch; /* dynamic max-height set by JS */ padding-right:6px; }
 .task-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015)); border-radius:14px; padding:12px; border:1px solid rgba(255,255,255,0.04); box-shadow: 0 12px 36px rgba(0,0,0,0.45); transition: transform .18s; }
 .task-card:hover { transform: translateY(-6px); }
 .task-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
@@ -99,12 +100,12 @@ html,body{
 .actions { display:flex; gap:8px; align-items:center; }
 .action-btn { width:46px; height:46px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; background:transparent; color:var(--text); font-size:16px; }
 
-/* Chart fixed size (no page scroll) */
+/* Chart fixed size */
 .chart-card { margin-top:12px; border-radius:12px; padding:10px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); height:170px; overflow:hidden; display:flex; flex-direction:column; }
 .chart-inner { flex:1; min-height:0; }
 .chart-canvas { width:100%; height:100% !important; display:block; }
 
-/* Add button and fancy modal */
+/* Add button and modal */
 .fab { position:fixed; right:26px; bottom:96px; width:64px; height:64px; border-radius:18px; background: linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; font-size:30px; color:white; box-shadow:0 18px 48px rgba(0,0,0,0.45); pointer-events:auto; border:none; z-index:55; }
 .modal-wrap { position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center; z-index:60; background: linear-gradient(rgba(0,0,0,0.36), rgba(0,0,0,0.36)); padding:12px; }
 .modal { width:100%; max-width:520px; border-radius:16px; padding:14px; background: linear-gradient(180deg, rgba(10,12,20,0.98), rgba(16,18,30,0.98)); box-shadow: 0 20px 48px rgba(2,6,23,0.8); border:1px solid rgba(255,255,255,0.04); max-height: 70vh; overflow:auto; -webkit-overflow-scrolling: touch; }
@@ -135,7 +136,7 @@ html,body{
 
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
         <div class="toggle-wrap">
-          <!-- Single toggle button -->
+          <!-- Single toggle button (moved left from the edge) -->
           <button class="toggle-btn active" id="toggleView" aria-label="Переключить вид"><i id="toggleIcon" class="fas fa-calendar-day"></i></button>
         </div>
       </div>
@@ -189,7 +190,7 @@ html,body{
     <div class="bottom-nav"></div>
   </div>
 
-  <!-- Modal: redesigned without close X -->
+  <!-- Modal -->
   <div class="modal-wrap" id="modalWrap">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -215,8 +216,8 @@ html,body{
   </div>
 
 <script>
-/* Behaviour: dots fix, single toggle moved left, 7-day chart, prettier chart tabs, modal without X,
-   and page scroll locked — only #tasksList and modal are scrollable. */
+/* Behaviour: dots, single toggle moved left, 7-day chart, tasksList scroll enabled and dynamic height,
+   improved touch handling so only tasks/modal scroll, page itself locked */
 (function(){
   const $ = s => document.querySelector(s);
   const fmtMoney = n => (parseInt(n)||0).toLocaleString() + ' ₽';
@@ -227,7 +228,7 @@ html,body{
   let tasks = JSON.parse(localStorage.getItem('mobile_tasks')|| '{}');
   let view = new Date();
   let selectedDate = todayISO();
-  let chartMode = '7d'; // default
+  let chartMode = '7d';
   let incomeChart = null;
   let showingCalendar = true;
 
@@ -266,11 +267,8 @@ html,body{
   const chartDailyBtn = $('#chartDailyBtn');
   const chartMonthlyBtn = $('#chartMonthlyBtn');
 
-  // Init
-  function init(){ renderWeekdays(); renderCalendar(); renderTasks(); updateTotals(); initChart(); bind(); }
-
+  function init(){ renderWeekdays(); renderCalendar(); renderTasks(); updateTotals(); initChart(); bind(); adjustTasksHeight(); }
   function bind(){
-    // Single toggle button: flips icon and switches panes
     toggleViewBtn.addEventListener('click', ()=> {
       showingCalendar = !showingCalendar;
       if (showingCalendar) {
@@ -285,13 +283,14 @@ html,body{
         toggleIcon.className = 'fas fa-chart-line';
         updateChart();
       }
-      // small flip animation
       toggleViewBtn.classList.add('flip');
       setTimeout(()=> toggleViewBtn.classList.remove('flip'), 360);
+      // adjust height because visibility changed
+      setTimeout(adjustTasksHeight, 120);
     });
 
-    prevMonthBtn.addEventListener('click', ()=> changeMonth(-1));
-    nextMonthBtn.addEventListener('click', ()=> changeMonth(1));
+    prevMonthBtn.addEventListener('click', ()=> { changeMonth(-1); adjustTasksHeight(); });
+    nextMonthBtn.addEventListener('click', ()=> { changeMonth(1); adjustTasksHeight(); });
 
     openAdd.addEventListener('click', ()=> openModalFor(selectedDate));
     cancelBtn.addEventListener('click', closeModalWrap);
@@ -306,26 +305,28 @@ html,body{
       const btn = e.target.closest('[data-act]'); if (!btn) return;
       const act = btn.dataset.act; const idx = Number(btn.dataset.i);
       if (act === 'toggle'){ tasks[selectedDate][idx].done = !tasks[selectedDate][idx].done; persist(); renderTasks(); updateTotals(); updateChart(); }
-      if (act === 'edit'){ openModalFor(selectedDate, idx); }
-      if (act === 'del'){ if (confirm('Удалить запись?')){ tasks[selectedDate].splice(idx,1); if (!tasks[selectedDate].length) delete tasks[selectedDate]; persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); } }
+      if (act === 'edit'){ openModalFor(selectedDate, idx); adjustTasksHeight(); }
+      if (act === 'del'){ if (confirm('Удалить запись?')){ tasks[selectedDate].splice(idx,1); if (!tasks[selectedDate].length) delete tasks[selectedDate]; persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); adjustTasksHeight(); } }
     });
 
-    addSwipe(daysGrid, dir=> changeMonth(dir));
+    addSwipe(daysGrid, dir=> { changeMonth(dir); adjustTasksHeight(); });
 
-    // Prevent body touchmove except when inside .modal or #tasksList
+    // allow touchmove inside tasksList and modal, prevent elsewhere
     document.addEventListener('touchmove', function(e){
-      if (e.target.closest('#tasksList') || e.target.closest('.modal')) {
-        // allow scrolling inside tasks list and modal
-        return;
+      if (e.target.closest('#tasksList') || e.target.closest('.modal') || e.target.closest('.chart-card')) {
+        return; // allow
       }
-      // otherwise prevent page scroll
       e.preventDefault();
     }, { passive:false });
+
+    // recalc heights on resize / orientation change
+    window.addEventListener('resize', adjustTasksHeight);
+    window.addEventListener('orientationchange', ()=> setTimeout(adjustTasksHeight, 120));
   }
 
   function setActiveChartTab(btn){
     [chart7Btn, chartDailyBtn, chartMonthlyBtn].forEach(x=> x.classList.remove('active'));
-    btn.classList.add('active');
+    if (btn) btn.classList.add('active');
   }
 
   function renderWeekdays(){ weekdaysEl.innerHTML = weekdays.map(d=>`<div>${d}</div>`).join(''); }
@@ -345,20 +346,15 @@ html,body{
       if (ds===today) el.classList.add('today');
       if (ds===selectedDate) el.classList.add('selected');
 
-      // number node (so dot appended doesn't get removed)
-      const num = document.createElement('div');
-      num.style.zIndex = '1';
-      num.textContent = d;
-      el.appendChild(num);
+      const num = document.createElement('div'); num.style.zIndex='1'; num.textContent = d; el.appendChild(num);
 
-      // dot if any record for the day
       if ((tasks[ds]||[]).length) {
         const dot = document.createElement('div'); dot.className='dot'; el.appendChild(dot);
       }
 
       el.dataset.date = ds;
       el.addEventListener('click', ()=> {
-        selectedDate = ds; renderCalendar(); renderTasks(); updateSelectedDateLabel();
+        selectedDate = ds; renderCalendar(); renderTasks(); updateSelectedDateLabel(); adjustTasksHeight();
       });
       daysGrid.appendChild(el);
     }
@@ -368,7 +364,7 @@ html,body{
   function renderTasks(){
     const list = tasks[selectedDate] || [];
     $('#selectedDateLabel').textContent = formatSelectedDate(selectedDate);
-    if (!list.length) { tasksList.innerHTML = `<div class='center'>Нет записей на ${formatSelectedDate(selectedDate)}</div>`; return; }
+    if (!list.length) { tasksList.innerHTML = `<div class='center'>Нет записей на ${formatSelectedDate(selectedDate)}</div>`; adjustTasksHeight(); return; }
     tasksList.innerHTML='';
     list.forEach((t, idx)=>{
       const card = document.createElement('div'); card.className='task-card';
@@ -393,6 +389,7 @@ html,body{
         </div>`;
       tasksList.appendChild(card);
     });
+    adjustTasksHeight();
   }
 
   function openModalFor(date, editIndex=null){
@@ -412,7 +409,7 @@ html,body{
     const obj = { client:mClient.value.trim(), car:mCar.value.trim(), time:mTime.value.trim(), price:mPrice.value.trim(), place:mPlace.value.trim(), desc:mDesc.value.trim(), done:false, createdAt:new Date().toISOString() };
     const edit = modalWrap.dataset.edit;
     if (edit !== '') tasks[date][Number(edit)] = obj; else tasks[date].push(obj);
-    persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap();
+    persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap(); adjustTasksHeight();
   }
   function deleteFromModal(){
     const date = mDate.value || selectedDate;
@@ -421,7 +418,7 @@ html,body{
     if (!confirm('Удалить запись?')) return;
     tasks[date].splice(Number(edit),1);
     if (!tasks[date].length) delete tasks[date];
-    persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap();
+    persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap(); adjustTasksHeight();
   }
 
   function updateTotals(){
@@ -442,6 +439,7 @@ html,body{
   }
 
   function changeMonth(delta){ view.setMonth(view.getMonth()+delta); renderCalendar(); updateTotals(); if (!showingCalendar) updateChart(); }
+
   function persist(){ localStorage.setItem('mobile_tasks', JSON.stringify(tasks)); }
   function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function formatSelectedDate(d){ if(!d) return '—'; const dt=new Date(d); const today=new Date(); if (d===todayISO()) return 'Сегодня'; return dt.toLocaleDateString('ru-RU', { weekday:'long', day:'numeric', month:'long' }); }
@@ -523,6 +521,21 @@ html,body{
     return g;
   }
 
+  // adjust tasksList max-height dynamically so it scrolls but page doesn't move
+  function adjustTasksHeight(){
+    try{
+      const header = document.querySelector('.header');
+      const tasksPane = document.getElementById('tasksPane');
+      if (!header || !tasksPane) return;
+      const viewport = window.innerHeight;
+      const tasksPaneTop = tasksPane.getBoundingClientRect().top;
+      // leave small bottom gap for FAB + padding
+      const bottomGap = 120; // px (FAB + margins)
+      const maxH = Math.max(120, viewport - tasksPaneTop - bottomGap);
+      tasksList.style.maxHeight = maxH + 'px';
+    }catch(e){ /* ignore */ }
+  }
+
   // utilities
   function addSwipe(el, cb){
     let startX = null;
@@ -530,7 +543,7 @@ html,body{
     el.addEventListener('touchend', (e)=> { if (startX === null) return; const dx = e.changedTouches[0].clientX - startX; if (Math.abs(dx) > 40) cb(dx < 0 ? 1 : -1); startX = null; });
   }
 
-  // initial state: show calendar, but chart tab default mode is 7d
+  // initial state
   (function switchToInitial(){
     calendarPane.style.display=''; chartPane.style.display='none';
     showingCalendar = true;
@@ -539,7 +552,7 @@ html,body{
     setActiveChartTab(chart7Btn);
   })();
 
-  // expose helpers (for debugging)
+  // expose helpers
   window.mobileApp = { renderCalendar, renderTasks, updateChart, tasks, persist };
 
   // start
