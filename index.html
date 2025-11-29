@@ -3,41 +3,142 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Календарь доходов</title>
+  <title>Income Calendar Pro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="income-header">
-    <div><div class="label">Всего</div><div id="total-income">0 ₽</div></div>
-    <div><div class="label">Месяц</div><div id="month-income">0 ₽</div></div>
-    <div><div class="label">Сегодня</div><div id="today-income">0 ₽</div></div>
+    <div>
+      <div class="label">Всего</div>
+      <div class="value" id="total-income">0 ₽</div>
+    </div>
+    <div>
+      <div class="label">Месяц</div>
+      <div class="value" id="month-income">0 ₽</div>
+    </div>
+    <div>
+      <div class="label">Сегодня</div>
+      <div class="value" id="today-income">0 ₽</div>
+    </div>
   </header>
 
-  <main id="calendar-wrapper">
-    <div class="day-title" id="day-title"></div>
-    <div id="tasks" class="tasks"></div>
-  </main>
+  <!-- Вкладка календаря -->
+  <div id="calendar-tab" class="tab-content active">
+    <div class="calendar-container">
+      <div class="calendar-header">
+        <div class="calendar-nav">
+          <button class="nav-btn" id="prev-month"><i class="fas fa-chevron-left"></i></button>
+          <button class="nav-btn" id="today-btn">Сегодня</button>
+        </div>
+        <div class="current-month" id="current-month">Июнь 2025</div>
+        <div class="calendar-nav">
+          <button class="nav-btn" id="next-month"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
 
-  <button class="add-btn" id="add-btn">+</button>
+      <div class="calendar-grid" id="calendar-grid">
+        <!-- Динамически генерируется -->
+      </div>
 
-  <div class="modal" id="modal">
-    <div class="modal-box">
-      <form id="form">
-        <input id="client" placeholder="Имя клиента" required />
-        <input id="car" placeholder="Автомобиль" required />
-        <input id="time" placeholder="Время (например, 14:00–15:30)" required />
-        <input id="price" placeholder="Стоимость (₽)" required />
-        <input id="place" placeholder="Место" required />
-        <textarea id="desc" placeholder="Описание"></textarea>
-        <input type="hidden" id="edit" />
-        <div class="form-buttons">
-          <button type="submit">Сохранить</button>
-          <button type="button" id="cancel">Отмена</button>
+      <div class="day-title" id="day-title"></div>
+      <div id="tasks" class="tasks-container"></div>
+    </div>
+  </div>
+
+  <!-- Вкладка графика -->
+  <div id="chart-tab" class="tab-content">
+    <div class="chart-container">
+      <div class="chart-header">
+        <h2 class="chart-title">График доходов</h2>
+        <div class="date-range">
+          <input type="date" id="start-date" class="date-input">
+          <span>по</span>
+          <input type="date" id="end-date" class="date-input">
+          <button class="btn btn-primary" id="update-chart">Обновить</button>
+        </div>
+      </div>
+      <canvas id="income-chart" class="chart-canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- Кнопка добавления -->
+  <button class="add-btn" id="add-btn">
+    <i class="fas fa-plus"></i>
+  </button>
+
+  <!-- Навигация -->
+  <div class="tab-navigation">
+    <button class="tab-btn active" data-tab="calendar-tab">
+      <i class="fas fa-calendar"></i>
+      <span>Календарь</span>
+    </button>
+    <button class="tab-btn" data-tab="chart-tab">
+      <i class="fas fa-chart-line"></i>
+      <span>Аналитика</span>
+    </button>
+  </div>
+
+  <!-- Модальное окно -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Новая запись</h2>
+        <button class="close-btn" id="close-modal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="task-form">
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label class="form-label">Клиент</label>
+            <input type="text" id="client" class="form-input" placeholder="Имя клиента" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Автомобиль</label>
+            <input type="text" id="car" class="form-input" placeholder="Марка и модель" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Время</label>
+            <input type="text" id="time" class="form-input" placeholder="14:00–15:30" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Стоимость</label>
+            <input type="number" id="price" class="form-input" placeholder="₽" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Место</label>
+            <input type="text" id="place" class="form-input" placeholder="Адрес" required>
+          </div>
+          
+          <div class="form-group full-width">
+            <label class="form-label">Описание</label>
+            <textarea id="desc" class="form-input" rows="3" placeholder="Детали работы..."></textarea>
+          </div>
+          
+          <div class="form-group full-width">
+            <label class="form-label">
+              <input type="checkbox" id="set-reminder"> Напомнить за день до записи
+            </label>
+          </div>
+        </div>
+        
+        <input type="hidden" id="edit-id">
+        <input type="hidden" id="task-date">
+        
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="cancel-btn">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сохранить</button>
         </div>
       </form>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
