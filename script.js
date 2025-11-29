@@ -1,4 +1,4 @@
-class IncomeCalendar {
+class IncomeMaster {
     constructor() {
         this.tasks = JSON.parse(localStorage.getItem("tasks") || "{}");
         this.currentDate = new Date().toISOString().split('T')[0];
@@ -12,15 +12,18 @@ class IncomeCalendar {
     init() {
         this.setupElements();
         this.setupEventListeners();
+        this.setupCharts();
         this.renderCalendar();
         this.renderTasks();
-        this.updateIncome();
-        this.setupCharts();
+        this.updateAllStats();
+        this.showWelcomeNotification();
     }
 
     setupElements() {
         this.el = {};
-        const ids = [
+        
+        // Основные элементы
+        const elements = [
             'total-income', 'month-income', 'today-income', 'calendar-grid',
             'current-month', 'prev-month', 'next-month', 'today-btn',
             'tasks', 'day-title', 'modal', 'task-form', 'modal-title',
@@ -28,17 +31,18 @@ class IncomeCalendar {
             'place', 'desc', 'edit-id', 'task-date', 'add-btn',
             'total-completed', 'avg-income', 'total-clients', 'completion-rate',
             'start-date', 'end-date', 'update-chart', 'income-chart',
-            'cars-chart'
+            'cars-chart', 'tasks-count', 'day-income', 'month-progress',
+            'best-day', 'popular-car', 'month-tasks', 'notifications'
         ];
 
-        ids.forEach(id => {
+        elements.forEach(id => {
             this.el[id] = document.getElementById(id);
         });
 
-        this.el.tabBtns = document.querySelectorAll('.tab-btn');
+        this.el.tabBtns = document.querySelectorAll('.nav-item');
         this.el.tabContents = document.querySelectorAll('.tab-content');
 
-        // Set default dates
+        // Установка дат по умолчанию
         const end = new Date();
         const start = new Date();
         start.setDate(start.getDate() - 30);
@@ -47,25 +51,25 @@ class IncomeCalendar {
     }
 
     setupEventListeners() {
-        // Calendar navigation
+        // Навигация календаря
         this.el.prevMonth.addEventListener('click', () => this.changeMonth(-1));
         this.el.nextMonth.addEventListener('click', () => this.changeMonth(1));
         this.el.todayBtn.addEventListener('click', () => this.goToToday());
         
-        // Modal
+        // Модальное окно
         this.el.addBtn.addEventListener('click', () => this.openModal());
         this.el.closeModal.addEventListener('click', () => this.closeModal());
         this.el.cancelBtn.addEventListener('click', () => this.closeModal());
         
-        // Forms
+        // Формы
         this.el.taskForm.addEventListener('submit', (e) => this.saveTask(e));
         
-        // Modal overlay close
+        // Закрытие модального окна по клику на оверлей
         this.el.modal.addEventListener('click', (e) => {
             if (e.target === this.el.modal) this.closeModal();
         });
 
-        // Calendar day selection
+        // Выбор даты в календаре
         this.el.calendarGrid.addEventListener('click', (e) => {
             const day = e.target.closest('.calendar-day');
             if (day && day.dataset.date && !day.classList.contains('other-month')) {
@@ -73,7 +77,7 @@ class IncomeCalendar {
             }
         });
 
-        // Task actions
+        // Действия с задачами
         this.el.tasks.addEventListener('click', (e) => {
             const btn = e.target.closest('.action-btn');
             const task = e.target.closest('.task-card');
@@ -90,7 +94,7 @@ class IncomeCalendar {
             }
         });
 
-        // Tabs
+        // Переключение вкладок
         this.el.tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const tab = btn.dataset.tab;
@@ -98,12 +102,12 @@ class IncomeCalendar {
             });
         });
 
-        // Charts
+        // Обновление графиков
         this.el.updateChart.addEventListener('click', () => this.updateCharts());
     }
 
     setupCharts() {
-        // Income chart
+        // График доходов по дням
         this.charts.income = new Chart(this.el.incomeChart, {
             type: 'line',
             data: { 
@@ -111,35 +115,51 @@ class IncomeCalendar {
                 datasets: [{
                     label: 'Доход',
                     data: [],
-                    borderColor: '#007AFF',
-                    backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 3,
                     tension: 0.4,
                     fill: true,
-                    borderWidth: 2
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { 
-                    legend: { 
-                        display: false 
-                    } 
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Доход: ${context.parsed.y.toLocaleString()} ₽`;
+                            }
+                        }
+                    }
                 },
                 scales: {
                     y: { 
                         beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
                         ticks: { 
                             callback: function(value) {
-                                return value + ' ₽';
-                            }
+                                return value.toLocaleString() + ' ₽';
+                            },
+                            color: 'rgba(255, 255, 255, 0.7)'
                         }
+                    },
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: 'rgba(255, 255, 255, 0.7)' }
                     }
                 }
             }
         });
 
-        // Cars chart
+        // График по маркам авто
         this.charts.cars = new Chart(this.el.carsChart, {
             type: 'doughnut',
             data: { 
@@ -147,9 +167,11 @@ class IncomeCalendar {
                 datasets: [{
                     data: [],
                     backgroundColor: [
-                        '#007AFF', '#5856D6', '#34C759', '#FF9500', '#FF3B30',
-                        '#5AC8FA', '#FF2D55', '#4CD964'
-                    ]
+                        '#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ef4444',
+                        '#8b5cf6', '#3b82f6', '#84cc16'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 8
                 }]
             },
             options: {
@@ -159,10 +181,23 @@ class IncomeCalendar {
                     legend: { 
                         position: 'bottom',
                         labels: {
-                            color: 'white'
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: { size: 12 },
+                            padding: 20
                         }
-                    } 
-                }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${context.label}: ${value.toLocaleString()} ₽ (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                cutout: '60%'
             }
         });
 
@@ -172,7 +207,7 @@ class IncomeCalendar {
     updateCharts() {
         this.updateIncomeChart();
         this.updateCarsChart();
-        this.updateStats();
+        this.updateAllStats();
     }
 
     updateIncomeChart() {
@@ -184,7 +219,7 @@ class IncomeCalendar {
 
         while (current <= end) {
             const dateStr = current.toISOString().split('T')[0];
-            dates.push(current.getDate() + '.' + (current.getMonth() + 1));
+            dates.push(current.getDate() + ' ' + current.toLocaleDateString('ru-RU', { month: 'short' }));
             
             let dayIncome = 0;
             if (this.tasks[dateStr]) {
@@ -219,30 +254,87 @@ class IncomeCalendar {
         this.charts.cars.update();
     }
 
-    updateStats() {
+    updateAllStats() {
         let totalIncome = 0;
         let completedCount = 0;
         let totalCount = 0;
         const clients = new Set();
+        const carStats = {};
+        const dayStats = {};
+        let bestDay = { date: '', income: 0 };
+        let popularCar = { name: '', count: 0 };
 
+        // Сбор статистики
         for (const date in this.tasks) {
+            let dayIncome = 0;
             this.tasks[date].forEach(task => {
                 totalCount++;
                 clients.add(task.client);
+                
+                // Статистика по автомобилям
+                const car = task.car;
+                carStats[car] = (carStats[car] || 0) + 1;
+                
                 if (task.done) {
                     completedCount++;
-                    totalIncome += parseInt(task.price) || 0;
+                    const price = parseInt(task.price) || 0;
+                    totalIncome += price;
+                    dayIncome += price;
                 }
             });
+            
+            // Лучший день
+            dayStats[date] = dayIncome;
+            if (dayIncome > bestDay.income) {
+                bestDay = { date, income: dayIncome };
+            }
         }
 
+        // Популярный автомобиль
+        for (const [car, count] of Object.entries(carStats)) {
+            if (count > popularCar.count) {
+                popularCar = { name: car, count };
+            }
+        }
+
+        // Расчет показателей
         const avg = completedCount ? Math.round(totalIncome / completedCount) : 0;
         const rate = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
 
+        // Обновление интерфейса
         this.el.totalCompleted.textContent = totalIncome.toLocaleString() + ' ₽';
         this.el.avgIncome.textContent = avg.toLocaleString() + ' ₽';
         this.el.totalClients.textContent = clients.size;
         this.el.completionRate.textContent = rate + '%';
+        
+        // Быстрая статистика
+        this.el.bestDay.textContent = bestDay.income > 0 ? 
+            bestDay.income.toLocaleString() + ' ₽' : '—';
+        this.el.popularCar.textContent = popularCar.name || '—';
+        this.el.monthTasks.textContent = totalCount;
+
+        // Прогресс месяца
+        this.updateMonthProgress();
+        
+        // Статистика текущего дня
+        this.updateDayStats();
+    }
+
+    updateMonthProgress() {
+        const today = new Date();
+        const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+        const progress = (today.getDate() / daysInMonth) * 100;
+        this.el.monthProgress.style.width = `${progress}%`;
+    }
+
+    updateDayStats() {
+        const tasks = this.tasks[this.currentDate] || [];
+        const dayIncome = tasks.reduce((sum, task) => {
+            return task.done ? sum + (parseInt(task.price) || 0) : sum;
+        }, 0);
+
+        this.el.tasksCount.textContent = `${tasks.length} записей`;
+        this.el.dayIncome.textContent = `${dayIncome.toLocaleString()} ₽`;
     }
 
     renderCalendar() {
@@ -256,17 +348,17 @@ class IncomeCalendar {
         this.el.currentMonth.textContent = `${monthNames[this.currentMonth]} ${this.currentYear}`;
 
         let html = '';
-        // Weekdays
+        // Дни недели
         ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].forEach(day => {
             html += `<div class="calendar-day weekday">${day}</div>`;
         });
 
-        // Empty days
+        // Пустые дни
         for (let i = 0; i < (startDay === 0 ? 6 : startDay - 1); i++) {
             html += '<div class="calendar-day other-month"></div>';
         }
 
-        // Days
+        // Дни месяца
         const today = new Date().toISOString().split('T')[0];
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(this.currentYear, this.currentMonth, day);
@@ -301,6 +393,7 @@ class IncomeCalendar {
                     <i class="fas fa-calendar-plus"></i>
                     <p>На этот день записей нет</p>
                     <button class="btn btn-primary" onclick="app.openModal()" style="margin-top: 12px;">
+                        <i class="fas fa-plus"></i>
                         Добавить запись
                     </button>
                 </div>
@@ -332,11 +425,16 @@ class IncomeCalendar {
                 </div>
                 ${task.desc ? `<div class="task-description">${task.desc}</div>` : ''}
                 <div class="task-actions">
-                    <button class="action-btn toggle ${task.done ? 'done' : ''}">
+                    <button class="action-btn toggle ${task.done ? 'done' : ''}" 
+                            title="${task.done ? 'Отметить невыполненным' : 'Отметить выполненным'}">
                         <i class="fas ${task.done ? 'fa-check-circle' : 'fa-times-circle'}"></i>
                     </button>
-                    <button class="action-btn edit"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                    <button class="action-btn edit" title="Редактировать">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete" title="Удалить">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </div>
         `).join('');
@@ -369,7 +467,7 @@ class IncomeCalendar {
 
         if (taskId !== null) {
             const task = this.tasks[this.currentDate][taskId];
-            this.el.modalTitle.textContent = 'Редактировать запись';
+            this.el.modalTitle.innerHTML = '<i class="fas fa-edit"></i> Редактировать запись';
             this.el.client.value = task.client;
             this.el.car.value = task.car;
             this.el.time.value = task.time;
@@ -378,7 +476,7 @@ class IncomeCalendar {
             this.el.desc.value = task.desc || '';
             this.el.editId.value = taskId;
         } else {
-            this.el.modalTitle.textContent = 'Новая запись';
+            this.el.modalTitle.innerHTML = '<i class="fas fa-plus"></i> Новая запись';
             this.el.taskForm.reset();
             this.el.editId.value = '';
         }
@@ -397,7 +495,8 @@ class IncomeCalendar {
             price: this.el.price.value,
             place: this.el.place.value,
             desc: this.el.desc.value,
-            done: false
+            done: false,
+            createdAt: new Date().toISOString()
         };
 
         const date = this.el.taskDate.value;
@@ -408,8 +507,10 @@ class IncomeCalendar {
         if (taskId) {
             taskData.done = this.tasks[date][taskId].done;
             this.tasks[date][taskId] = taskData;
+            this.showNotification('Запись обновлена!', 'success');
         } else {
             this.tasks[date].push(taskData);
+            this.showNotification('Запись добавлена!', 'success');
         }
 
         this.saveToStorage();
@@ -421,11 +522,16 @@ class IncomeCalendar {
     }
 
     toggleTask(taskId) {
-        this.tasks[this.currentDate][taskId].done = !this.tasks[this.currentDate][taskId].done;
+        const task = this.tasks[this.currentDate][taskId];
+        task.done = !task.done;
+        
         this.saveToStorage();
         this.renderTasks();
         this.updateIncome();
         this.updateCharts();
+        
+        const status = task.done ? 'выполнена' : 'не выполнена';
+        this.showNotification(`Запись с ${task.client} отмечена как ${status}`, 'info');
     }
 
     editTask(taskId) {
@@ -433,7 +539,8 @@ class IncomeCalendar {
     }
 
     deleteTask(taskId) {
-        if (confirm('Удалить запись?')) {
+        const task = this.tasks[this.currentDate][taskId];
+        if (confirm(`Удалить запись с ${task.client}?`)) {
             this.tasks[this.currentDate].splice(taskId, 1);
             if (this.tasks[this.currentDate].length === 0) {
                 delete this.tasks[this.currentDate];
@@ -443,6 +550,7 @@ class IncomeCalendar {
             this.renderCalendar();
             this.updateIncome();
             this.updateCharts();
+            this.showNotification('Запись удалена', 'info');
         }
     }
 
@@ -465,6 +573,7 @@ class IncomeCalendar {
         this.currentYear = today.getFullYear();
         this.renderCalendar();
         this.renderTasks();
+        this.showNotification('Переход к сегодняшнему дню', 'info');
     }
 
     selectDate(date) {
@@ -488,12 +597,66 @@ class IncomeCalendar {
         }
     }
 
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        
+        const icons = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            info: 'fa-info-circle'
+        };
+
+        notification.innerHTML = `
+            <i class="fas ${icons[type]}"></i>
+            <div class="notification-content">
+                <div class="notification-title">${type === 'success' ? 'Успех' : type === 'error' ? 'Ошибка' : 'Информация'}</div>
+                <div class="notification-message">${message}</div>
+            </div>
+        `;
+
+        this.el.notifications.appendChild(notification);
+
+        // Автоматическое удаление через 4 секунды
+        setTimeout(() => {
+            notification.style.animation = 'slideInRight 0.3s ease reverse';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 4000);
+    }
+
+    showWelcomeNotification() {
+        if (!localStorage.getItem('welcome_shown')) {
+            setTimeout(() => {
+                this.showNotification('Добро пожаловать в IncomeMaster! Начните добавлять записи о клиентах.', 'info');
+                localStorage.setItem('welcome_shown', 'true');
+            }, 1000);
+        }
+    }
+
     saveToStorage() {
         localStorage.setItem("tasks", JSON.stringify(this.tasks));
     }
 }
 
-// Initialize app
+// Инициализация приложения
 document.addEventListener('DOMContentLoaded', function() {
-    window.app = new IncomeCalendar();
+    window.app = new IncomeMaster();
 });
+
+// Предотвращение масштабирования на iOS
+document.addEventListener('touchmove', function (event) {
+    if (event.scale !== 1) { event.preventDefault(); }
+}, { passive: false });
+
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
