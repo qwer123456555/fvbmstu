@@ -60,7 +60,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .day:hover { transform: translateY(-4px); }
 .day.today { background: linear-gradient(135deg,var(--warning), #FFB86B); color:#07122b; box-shadow:0 10px 28px rgba(255,149,0,0.12); }
 .day.selected { outline:2px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
-.day .dot { width:8px; height:8px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); position:absolute; bottom:6px; }
+.day .dot { width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); position:absolute; bottom:6px; box-shadow:0 6px 12px rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.08); }
 
 /* Tasks */
 .tasks { display:flex; flex-direction:column; gap:12px; margin-top:10px; }
@@ -119,6 +119,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
             <button class="icon-btn" id="chartIcon" aria-label="График"><i class="fas fa-chart-line icon-swap"></i></button>
           </div>
         </div>
+        
       </div>
     </div>
 
@@ -134,7 +135,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
         </div>
         <div class="weekdays" id="weekdays"></div>
         <div class="days" id="daysGrid"></div>
-        <div style="margin-top:12px;color:var(--muted);font-weight:700;font-size:13px;">Нажмите на день, чтобы увидеть записи и добавить новую</div>
       </div>
 
       <!-- Chart Pane (hidden by default) -->
@@ -295,12 +295,30 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     const today = todayISO();
     for (let d=1; d<=last.getDate(); d++){
       const dateObj = new Date(y,m,d); const ds = dateObj.toISOString().slice(0,10); const el = document.createElement('div'); el.className='day'; if (ds===today) el.classList.add('today'); if (ds===selectedDate) el.classList.add('selected'); if ((tasks[ds]||[]).length) { const dot = document.createElement('div'); dot.className='dot'; el.appendChild(dot); }
-      el.innerHTML = `<div style=\"z-index:1\">${d}</div>`; el.dataset.date = ds; el.addEventListener('click', ()=> { selectedDate = ds; renderCalendar(); renderTasks(); updateSelectedDateLabel(); }); daysGrid.appendChild(el);
+      el.innerHTML = `<div style="z-index:1">${d}</div>`; el.dataset.date = ds; el.addEventListener('click', ()=> { selectedDate = ds; renderCalendar(); renderTasks(); updateSelectedDateLabel(); }); daysGrid.appendChild(el);
     }
     updateSelectedDateLabel();
   }
 
-  function renderTasks(){ const list = tasks[selectedDate] || []; $('#selectedDateLabel').textContent = formatSelectedDate(selectedDate); if (!list.length) { tasksList.innerHTML = `<div class='center'>Нет записей на ${formatSelectedDate(selectedDate)}</div>`; return; } tasksList.innerHTML=''; list.forEach((t, idx)=>{ const card = document.createElement('div'); card.className='task-card'; card.innerHTML = `\n        <div class=\"task-top\">\n          <div>\n            <div class=\"client\">${escapeHtml(t.client||'Без имени')}</div>\n            <div class=\"car\">${escapeHtml(t.car||'—')}</div>\n          </div>\n          <div style=\"display:flex;flex-direction:column;align-items:flex-end;\">\n            <div style=\"font-weight:900\" class=\"time-pill\">${escapeHtml(t.time||'—')}</div>\n            <div style=\"color:var(--muted); font-size:12px; margin-top:8px\">${escapeHtml(t.place||'—')}</div>\n          </div>\n        </div>\n        <div class=\"price-row\">\n          <div class=\"price-tag ${t.done ? 'done' : 'pending'}\">${fmtMoney(t.price)}</div>\n          <div class=\"actions\">\n            <button class=\"action-btn\" data-act=\"toggle\" data-i=\"${idx}\" title=\"${t.done ? 'Отметить как не выполнено' : 'Отметить выполнено'}\"><i class=\"fas ${t.done ? 'fa-check' : 'fa-circle'}\"></i></button>\n            <button class=\"action-btn\" data-act=\"edit\" data-i=\"${idx}\" title=\"Редактировать\"><i class=\"fas fa-edit\"></i></button>\n            <button class=\"action-btn\" data-act=\"del\" data-i=\"${idx}\" title=\"Удалить\"><i class=\"fas fa-trash\"></i></button>\n          </div>\n        </div>`; tasksList.appendChild(card); }); }
+  function renderTasks(){ const list = tasks[selectedDate] || []; $('#selectedDateLabel').textContent = formatSelectedDate(selectedDate); if (!list.length) { tasksList.innerHTML = `<div class='center'>Нет записей на ${formatSelectedDate(selectedDate)}</div>`; return; } tasksList.innerHTML=''; list.forEach((t, idx)=>{ const card = document.createElement('div'); card.className='task-card'; card.innerHTML = `
+        <div class="task-top">
+          <div>
+            <div class="client">${escapeHtml(t.client||'Без имени')}</div>
+            <div class="car">${escapeHtml(t.car||'—')}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <div style="font-weight:900" class="time-pill">${escapeHtml(t.time||'—')}</div>
+            <div style="color:var(--muted); font-size:12px; margin-top:8px">${escapeHtml(t.place||'—')}</div>
+          </div>
+        </div>
+        <div class="price-row">
+          <div class="price-tag ${t.done ? 'done' : 'pending'}">${fmtMoney(t.price)}</div>
+          <div class="actions">
+            <button class="action-btn" data-act="toggle" data-i="${idx}" title="${t.done ? 'Отметить как не выполнено' : 'Отметить выполнено'}"><i class="fas ${t.done ? 'fa-check' : 'fa-circle'}"></i></button>
+            <button class="action-btn" data-act="edit" data-i="${idx}" title="Редактировать"><i class="fas fa-edit"></i></button>
+            <button class="action-btn" data-act="del" data-i="${idx}" title="Удалить"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>`; tasksList.appendChild(card); }); }
 
   function openModalFor(date, editIndex=null){ modalWrap.style.display='flex'; mDate.value = date || selectedDate; mClient.value=''; mCar.value=''; mTime.value=''; mPrice.value=''; mPlace.value=''; mDesc.value=''; modalWrap.dataset.edit=''; if (editIndex!==null){ const t = (tasks[date]||[])[editIndex]; if (t){ mClient.value=t.client||''; mCar.value=t.car||''; mTime.value=t.time||''; mPrice.value=t.price||''; mPlace.value=t.place||''; mDesc.value=t.desc||''; deleteBtn.style.display=''; modalWrap.dataset.edit=String(editIndex); } } else deleteBtn.style.display='none'; }
   function closeModalWrap(){ modalWrap.style.display='none'; modalWrap.dataset.edit=''; }
