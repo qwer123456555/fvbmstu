@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Mobile Calendar — updated</title>
+<title>Mobile Calendar</title>
 <!-- Chart.js for chart rendering -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -16,381 +16,267 @@
   --accent:#4a6cfa;
   --accent2:#9a4aff;
 }
-/* lock body scroll; only tasks list and modal scroll */
-html,body{margin:0;background:var(--bg);font-family:system-ui;color:var(--text);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
-.container{display:flex;flex-direction:column;height:100vh;padding:0 12px 12px 12px}
+body{margin:0;background:var(--bg);font-family:system-ui;color:var(--text);overflow:hidden;height:100vh;}
+.container{display:flex;flex-direction:column;height:100vh;}
 
 /* Header */
-.header{padding:12px 8px;background:var(--glass);backdrop-filter:blur(var(--blur));display:flex;justify-content:center;align-items:center;font-size:20px;font-weight:800;position:relative;border-radius:12px;margin-top:12px}
+.header{padding:16px;background:var(--glass);backdrop-filter:blur(var(--blur));display:flex;justify-content:center;align-items:center;font-size:20px;font-weight:800;position:relative}
 
-/* Unified toggle button (moved left a bit) */
-.toggle-btn{position:absolute;right:34px;top:10px;width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;justify-content:center;align-items:center;font-size:18px;box-shadow:0 8px 18px rgba(0,0,0,0.35);border:none}
-.toggle-btn:active{transform:scale(0.96);} 
+/* Unified toggle button */
+.toggle-btn{position:absolute;right:16px;top:14px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;justify-content:center;align-items:center;font-size:22px;box-shadow:0 0 20px rgba(0,0,0,0.4);transition:0.25s;}
+.toggle-btn:active{transform:scale(0.88);} 
 
 /* Views */
-.view{flex:1;padding:12px 8px 0 8px;display:none}
-.view.active{display:block}
+.view{flex:1;overflow-y:auto;padding:16px;display:none;}
+.view.active{display:block;}
 
 /* Calendar */
-.month-switch{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.switch-arrow{width:40px;height:40px;border-radius:12px;background:var(--glass);backdrop-filter:blur(var(--blur));display:flex;justify-content:center;align-items:center;font-size:18px;border:none}
-.month-name{font-size:18px;font-weight:800}
+.month-switch{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.switch-arrow{width:42px;height:42px;border-radius:var(--radius);background:var(--glass);backdrop-filter:blur(var(--blur));display:flex;justify-content:center;align-items:center;font-size:20px;}
+.month-name{font-size:22px;font-weight:800;}
 
-.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.day{aspect-ratio:1/1;display:flex;justify-content:center;align-items:center;border-radius:12px;background:transparent;position:relative;font-weight:700;cursor:pointer;padding:6px}
-.day.other{color:rgba(255,255,255,0.18)}
-.day.today{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#07122b;border-radius:12px}
-.day.selected{box-shadow:0 8px 20px rgba(74,108,250,0.12);background:rgba(255,255,255,0.02)}
-.day .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));position:absolute;bottom:6px;border:1px solid rgba(255,255,255,0.08)}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+.day{aspect-ratio:1;display:flex;justify-content:center;align-items:center;border-radius:14px;background:var(--glass);backdrop-filter:blur(var(--blur));position:relative;font-weight:700;cursor:pointer;}
+.day.has::after{
+  content:"";
+  width:10px;height:10px;
+  border-radius:50%;
+  background:#4affb9;
+  position:absolute;
+  bottom:8px;
+  box-shadow:0 0 6px #4affb9;
+  border:1px solid rgba(255,255,255,0.18);
+}
+.day.today{outline:2px solid var(--accent);} 
+.day.selected{box-shadow:0 8px 20px rgba(74,108,250,0.14);}
 
-/* Tasks area - scrollable only here */
-.tasks-wrap{margin-top:12px}
-#tasksList{overflow:auto;-webkit-overflow-scrolling:touch;padding-right:6px}
-.task-card{background:var(--glass);backdrop-filter:blur(var(--blur));padding:12px;border-radius:14px;margin-bottom:10px}
-.client-name{font-size:16px;font-weight:800}
-.meta{font-size:13px;color:rgba(255,255,255,0.7);margin-top:6px}
-.price{margin-top:8px;padding:8px;border-radius:10px;font-weight:800;text-align:center;background:#111}
+/* Tasks */
+.tasks{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+.task-card{background:var(--glass);backdrop-filter:blur(var(--blur));padding:14px;border-radius:var(--radius);} 
+.client-name{font-size:18px;font-weight:800;}
+.car{font-size:14px;opacity:0.7;margin-top:4px;}
+.time-tag{padding:8px 10px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;font-size:14px;font-weight:700;display:inline-block;margin-top:8px;color:#07122b}
+.price{margin-top:12px;padding:10px;border-radius:12px;font-size:18px;font-weight:900;text-align:center;background:#222;}
+
+/* Earnings */
+.earn-box{margin-top:18px;background:var(--glass);backdrop-filter:blur(var(--blur));padding:14px;border-radius:var(--radius);font-size:16px;line-height:1.4;}
+.earn-title{font-weight:800;margin-bottom:6px;font-size:18px;}
 
 /* Chart view */
-.chart-wrap{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
-.chart-box{flex:1;background:var(--glass);backdrop-filter:blur(var(--blur));border-radius:14px;padding:10px}
-.canvas{width:100%;height:160px}
-.stats-box{width:120px;text-align:center}
-.modem-counter{font-weight:900;font-size:18px;margin-top:8px}
+.chart-wrap{width:100%;height:220px;display:flex;justify-content:center;align-items:center;background:var(--glass);backdrop-filter:blur(var(--blur));border-radius:var(--radius);} 
+canvas{max-height:200px !important; width:100% !important}
 
 /* Modal */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:none;justify-content:center;align-items:flex-end;z-index:60}
-.modal{width:100%;max-width:520px;background:var(--glass);backdrop-filter:blur(var(--blur));padding:14px;border-radius:14px;margin:12px}
-.input{width:100%;margin-bottom:8px;padding:10px;border-radius:10px;background:#111;border:none;color:white;font-weight:800}
-.row{display:flex;gap:8px}
-.btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;text-align:center;font-weight:800;margin-top:8px;color:#07122b;border:none}
-.small{font-size:13px;color:rgba(255,255,255,0.7)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:none;justify-content:center;align-items:center;z-index:50}
+.modal{width:88%;background:var(--glass);backdrop-filter:blur(var(--blur));padding:16px;border-radius:var(--radius);} 
+.input{width:100%;Margin-bottom:12px;padding:12px;border-radius:12px;background:#111;border:none;color:white;font-weight:800}
+.btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;text-align:center;font-weight:800;margin-top:8px;cursor:pointer}
 
+/* small helpers */
 .center{ text-align:center;color:rgba(255,255,255,0.6);padding:14px;font-weight:800}
 
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="header">Календарь и статистика
-    <button id="toggle" class="toggle-btn" aria-label="Переключить вид">📅</button>
-  </div>
 
-  <!-- Calendar view -->
-  <div id="calendar-view" class="view active">
+  <div class="header">График</div>
+  <div class="toggle-btn" id="toggle">📅</div>
+
+  <!-- Calendar View -->
+  <div class="view active" id="calendar-view">
+
     <div class="month-switch">
-      <button id="prevMonth" class="switch-arrow">❮</button>
-      <div class="month-name" id="monthName">Июнь 2025</div>
-      <button id="nextMonth" class="switch-arrow">❯</button>
+      <div class="switch-arrow" id="prevMonth">❮</div>
+      <div class="month-name" id="monthName">Март 2025</div>
+      <div class="switch-arrow" id="nextMonth">❯</div>
     </div>
 
     <div class="days-grid" id="daysGrid"></div>
 
-    <div class="tasks-wrap">
-      <div id="tasksList"><div class="center">Выберите дату, чтобы увидеть записи</div></div>
+    <div class="earn-box">
+      <div class="earn-title">Доход</div>
+      <div>За всё время: <span id="earnAll">0 ₽</span></div>
+      <div>За месяц: <span id="earnMonth">0 ₽</span></div>
+      <div>За день: <span id="earnDay">0 ₽</span></div>
     </div>
+
+    <div class="tasks" id="tasksList"></div>
   </div>
 
-  <!-- Chart / Stats view -->
-  <div id="chart-view" class="view">
+  <!-- Chart View -->
+  <div class="view" id="chart-view">
     <div class="chart-wrap">
-      <div class="chart-box">
-        <div style="font-weight:800;margin-bottom:8px">Доход (последние 30 дней)</div>
-        <canvas id="incomeChart" class="canvas"></canvas>
-      </div>
-      <div class="stats-box">
-        <div style="font-weight:800">Адреса</div>
-        <canvas id="statsChart" width="120" height="120"></canvas>
-        <div class="modem-counter" id="modemCounter">0/0</div>
-        <div class="small">Продано модемов / Всего заказов</div>
-      </div>
-    </div>
-
-    <div style="margin-top:8px;background:var(--glass);backdrop-filter:blur(var(--blur));padding:12px;border-radius:12px">
-      <div style="font-weight:800;margin-bottom:6px">Структура адресов (в %)</div>
-      <div id="addrPercents" class="small">—</div>
+      <canvas id="incomeChart"></canvas>
     </div>
   </div>
 
 </div>
 
-<!-- Modal for adding/editing -->
+<!-- Modal -->
 <div class="modal-bg" id="modalBg">
-  <div class="modal" id="modal">
-    <div style="font-weight:900;margin-bottom:6px">Новая запись</div>
-    <input class="input" id="clientName" placeholder="Имя клиента" />
-    <input class="input" id="carModel" placeholder="Машина" />
-    <div class="row">
-      <input class="input" id="time" placeholder="Время (HH:MM)" style="flex:1" />
-      <input class="input" id="price" placeholder="Цена" style="width:110px" inputmode="numeric" />
-    </div>
-    <select class="input" id="addrType">
-      <option value="home">Дом</option>
-      <option value="online">Онлайн</option>
-      <option value="other">Другое</option>
-    </select>
-    <label style="display:flex;align-items:center;gap:8px;margin-top:6px"><input type="checkbox" id="modemSold"> <span class="small">Продан модем</span></label>
-
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn" id="saveRecord">Сохранить</button>
-      <button class="btn" id="cancelRecord" style="background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,0.06);">Отмена</button>
-    </div>
+  <div class="modal">
+    <input class="input" id="clientName" placeholder="Имя клиента">
+    <input class="input" id="carModel" placeholder="Машина">
+    <input class="input" id="time" placeholder="Время (12:00)">
+    <input class="input" id="price" placeholder="Цена (4500)" inputmode="numeric">
+    <div class="btn" id="saveRecord">Сохранить</div>
   </div>
 </div>
 
 <script>
-// --- Data model ---
-const STORAGE_KEY = 'mobile_tasks_v2';
-// tasks: { 'YYYY-MM-DD': [ {client, car, time, price, addrType, modemSold:boolean, done:boolean, createdAt} ] }
+// Helper: local ISO (YYYY-MM-DD) using local date components (avoids timezone shifts)
+function toLocalISO(d){
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0');
+}
+
+// Data stored as { 'YYYY-MM-DD': [ {client,car,time,price,createdAt} ] }
+const STORAGE_KEY = 'mobile_tasks';
 let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-let view = new Date();
-let selectedDate = new Date().toISOString().slice(0,10); // YYYY-MM-DD (fix timezone issues)
 let onCalendar = true;
+let selectedDate = toLocalISO(new Date());
+let view = new Date(); // current view month
 
-// DOM
-const toggleBtn = document.getElementById('toggle');
-const calView = document.getElementById('calendar-view');
-const chartView = document.getElementById('chart-view');
-const daysGrid = document.getElementById('daysGrid');
-const monthName = document.getElementById('monthName');
-const prevMonth = document.getElementById('prevMonth');
-const nextMonth = document.getElementById('nextMonth');
-const tasksList = document.getElementById('tasksList');
-const modalBg = document.getElementById('modalBg');
-const clientName = document.getElementById('clientName');
-const carModel = document.getElementById('carModel');
-const timeInput = document.getElementById('time');
-const priceInput = document.getElementById('price');
-const addrType = document.getElementById('addrType');
-const modemSold = document.getElementById('modemSold');
-const saveRecordBtn = document.getElementById('saveRecord');
-const cancelRecordBtn = document.getElementById('cancelRecord');
-const incomeCtx = document.getElementById('incomeChart').getContext('2d');
-const statsCtx = document.getElementById('statsChart').getContext('2d');
-const modemCounterEl = document.getElementById('modemCounter');
-const addrPercents = document.getElementById('addrPercents');
+const toggle=document.getElementById("toggle");
+const calendarView=document.getElementById("calendar-view");
+const chartView=document.getElementById("chart-view");
+const daysGrid=document.getElementById("daysGrid");
+const monthName=document.getElementById('monthName');
+const prevMonth=document.getElementById('prevMonth');
+const nextMonth=document.getElementById('nextMonth');
+const tasksList=document.getElementById('tasksList');
+const earnAllEl=document.getElementById('earnAll');
+const earnMonthEl=document.getElementById('earnMonth');
+const earnDayEl=document.getElementById('earnDay');
+const modalBg=document.getElementById('modalBg');
+const clientName=document.getElementById('clientName');
+const carModel=document.getElementById('carModel');
+const timeInput=document.getElementById('time');
+const priceInput=document.getElementById('price');
+const saveRecord=document.getElementById('saveRecord');
+const incomeChartCtx = document.getElementById('incomeChart').getContext('2d');
+let incomeChart=null;
 
-let incomeChart = null;
-let statsChart = null;
+// toggle single button
+toggle.onclick=()=>{
+  onCalendar = !onCalendar;
+  calendarView.classList.toggle("active", onCalendar);
+  chartView.classList.toggle("active", !onCalendar);
+  toggle.textContent = onCalendar ? "📅" : "📊";
+  if(!onCalendar) updateChart();
+};
 
-// --- Helpers ---
-function persist(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
-function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>'\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-function formatMonthYear(d){ return d.toLocaleString('ru', { month:'long', year:'numeric' }); }
-
-// --- Calendar rendering (fixed timezone issue by using toISOString date strings) ---
-function renderCalendar(){
-  daysGrid.innerHTML = '';
-  const y = view.getFullYear(); const m = view.getMonth();
+// render calendar for current view (view is Date)
+function renderCal(){
+  daysGrid.innerHTML='';
+  const y = view.getFullYear();
+  const m = view.getMonth();
   const first = new Date(y,m,1);
   const daysInMonth = new Date(y,m+1,0).getDate();
-  monthName.textContent = formatMonthYear(first);
+  monthName.textContent = first.toLocaleString('ru',{month:'long'}) + ' ' + y;
 
-  // pad with empty boxes for weekdays (Mon-first)
-  const startWeekday = (first.getDay() + 6) % 7; // 0..6 where 0=Mon
-  for(let i=0;i<startWeekday;i++){ const empty = document.createElement('div'); empty.className='day other'; daysGrid.appendChild(empty); }
-
+  // optionally pad if you want Mon-first; here we just show days sequentially to fit mobile
   for(let d=1; d<=daysInMonth; d++){
-    const dateObj = new Date(Date.UTC(y,m,d)); // use UTC to avoid TZ shift
-    const iso = dateObj.toISOString().slice(0,10);
-    const el = document.createElement('div'); el.className='day'; el.dataset.date = iso;
-
-    // day number
-    const num = document.createElement('div'); num.textContent = d; num.style.zIndex='1'; el.appendChild(num);
-
-    // marker if records exist
-    if((tasks[iso]||[]).length){ const dot = document.createElement('div'); dot.className='dot'; el.appendChild(dot); }
-
-    // today
-    const today = new Date().toISOString().slice(0,10);
-    if(iso === today) el.classList.add('today');
-    if(iso === selectedDate) el.classList.add('selected');
-
-    el.addEventListener('click', ()=>{ selectedDate = iso; renderCalendar(); renderTasks(); });
+    const date = new Date(y,m,d);
+    const iso = toLocalISO(date);
+    const el = document.createElement('div');
+    el.className = 'day';
+    el.dataset.date = iso;
+    el.textContent = d;
+    if(tasks[iso] && tasks[iso].length) el.classList.add('has');
+    if(iso===toLocalISO(new Date())) el.classList.add('today');
+    if(iso===selectedDate) el.classList.add('selected');
+    el.addEventListener('click', ()=>{ selectedDate = iso; renderCal(); renderTasks(); });
     daysGrid.appendChild(el);
   }
 }
 
-// --- Tasks rendering ---
 function renderTasks(){
   const list = tasks[selectedDate] || [];
   tasksList.innerHTML = '';
-  if(!list.length){ tasksList.innerHTML = `<div class="center">Нет записей на ${selectedDate}</div>`; return; }
-
-  list.forEach((t,i)=>{
+  if(!list.length){ tasksList.innerHTML = '<div class="center">Нет записей на этот день. Нажмите + чтобы добавить.</div>'; updateEarnings(); return; }
+  list.forEach((r, i)=>{
     const card = document.createElement('div'); card.className='task-card';
     card.innerHTML = `
-      <div class="client-name">${escapeHtml(t.client)}</div>
-      <div class="meta">${escapeHtml(t.car)} • ${escapeHtml(t.time)} • ${t.addrType || '—'}</div>
-      <div class="price">${Number(t.price||0).toLocaleString()} ₽ ${t.modemSold? '<span style="margin-left:8px;color:#9af">[Модем]</span>':''}</div>
+      <div class="client-name">${escapeHtml(r.client)}</div>
+      <div class="car">${escapeHtml(r.car)}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <div class="time-tag">${escapeHtml(r.time)}</div>
+        <div style="font-weight:800">${Number(r.price).toLocaleString()} ₽</div>
+      </div>
     `;
-    const del = document.createElement('div'); del.style.textAlign='right'; del.style.marginTop='8px';
-    del.innerHTML = `<button style="padding:8px 10px;border-radius:10px;border:0;background:rgba(255,255,255,0.04);color:#fff;">Удалить</button>`;
-    del.querySelector('button').addEventListener('click', ()=>{ if(confirm('Удалить запись?')){ tasks[selectedDate].splice(i,1); if(!tasks[selectedDate].length) delete tasks[selectedDate]; persist(); renderCalendar(); renderTasks(); updateAllCharts(); } });
+    // delete button
+    const del = document.createElement('div'); del.style.marginTop='10px'; del.style.textAlign='right';
+    del.innerHTML = '<button style="padding:8px 10px;border-radius:10px;border:0;background:rgba(255,255,255,0.04);color:#fff;">Удалить</button>';
+    del.querySelector('button').addEventListener('click', ()=>{ if(confirm('Удалить запись?')){ tasks[selectedDate].splice(i,1); if(!tasks[selectedDate].length) delete tasks[selectedDate]; persist(); renderCal(); renderTasks(); updateEarnings(); } });
     card.appendChild(del);
     tasksList.appendChild(card);
   });
+  updateEarnings();
 }
 
-// --- Income chart (line) and stats chart (doughnut) ---
-function initCharts(){
-  incomeChart = new Chart(incomeCtx, { type:'line', data:{ labels:[], datasets:[{ label:'Доход', data:[], fill:true, backgroundColor:'rgba(74,108,250,0.14)', borderColor:'#4a6cfa', tension:0.35 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } });
+function updateEarnings(){
+  // total all-time
+  let all=0;
+  for(const date in tasks){ for(const r of tasks[date]) all += Number(r.price||0); }
+  earnAllEl.textContent = all.toLocaleString() + ' ₽';
 
-  statsChart = new Chart(statsCtx, { type:'doughnut', data:{ labels:['Дом','Онлайн','Другое'], datasets:[{ data:[0,0,0], backgroundColor:['#4a6cfa','#9a4aff','#34c759'] }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{boxWidth:8}}} } });
+  // month earnings for view month
+  const y = view.getFullYear(); const m = String(view.getMonth()+1).padStart(2,'0');
+  let monthSum=0; for(const date in tasks){ if(date.slice(0,7)===`${y}-${m}`){ for(const r of tasks[date]) monthSum += Number(r.price||0); } }
+  earnMonthEl.textContent = monthSum.toLocaleString() + ' ₽';
+
+  // day earnings for selectedDate
+  let daySum = 0; for(const r of (tasks[selectedDate]||[])) daySum += Number(r.price||0);
+  earnDayEl.textContent = daySum.toLocaleString() + ' ₽';
 }
 
-function updateIncomeChart(){
-  if(!incomeChart) initCharts();
+function persist(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>'\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// modal
+document.getElementById('openAdd')?.addEventListener('click', ()=>{ modalBg.style.display='flex'; });
+// but user may click FAB not present in this version; allow plus via toggle double-click - keep simple: show modal when long-press on selected day? We'll show modal when user clicks day and then clicks saveRecord - also allow opening modal by double-clicking selected day
+
+// Save record button
+saveRecord.addEventListener('click', ()=>{
+  const client = clientName.value.trim(); const car = carModel.value.trim(); const time = timeInput.value.trim(); const price = Number(priceInput.value.trim()) || 0;
+  if(!client){ alert('Введите имя клиента'); return; }
+  if(!tasks[selectedDate]) tasks[selectedDate]=[];
+  tasks[selectedDate].push({ client, car, time, price, createdAt:new Date().toISOString() });
+  persist(); clientName.value=''; carModel.value=''; timeInput.value=''; priceInput.value=''; modalBg.style.display='none'; renderCal(); renderTasks(); updateEarnings();
+});
+
+// allow clicking anywhere on a selected day to open modal (double click)
+daysGrid.addEventListener('dblclick', (e)=>{
+  const d = e.target.closest('.day'); if(!d) return; selectedDate = d.dataset.date; modalBg.style.display='flex';
+});
+
+// prev/next
+prevMonth.addEventListener('click', ()=>{ view.setMonth(view.getMonth()-1); renderCal(); updateEarnings(); });
+nextMonth.addEventListener('click', ()=>{ view.setMonth(view.getMonth()+1); renderCal(); updateEarnings(); });
+
+// Chart: simple last-30-days sum
+function initChart(){
+  incomeChart = new Chart(incomeChartCtx, {
+    type: 'line',
+    data: { labels: [], datasets: [{ label:'Доход', data: [], fill:true, backgroundColor:'rgba(74,108,250,0.14)', borderColor:'#4a6cfa', tension:0.35 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ grid:{display:false} }, y:{ grid:{color:'rgba(255,255,255,0.03)'} } } }
+  });
+  updateChart();
+}
+
+function updateChart(){
+  if(!incomeChart) initChart();
   const labels=[]; const data=[];
-  for(let i=29;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const iso = d.toISOString().slice(0,10); labels.push(d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})); let s=0; (tasks[iso]||[]).forEach(r=>{ s += Number(r.price||0); }); data.push(s); }
+  for(let i=29;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const iso = toLocalISO(d); labels.push(d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})); let s=0; if(tasks[iso]) for(const r of tasks[iso]) s += Number(r.price||0); data.push(s); }
   incomeChart.data.labels = labels; incomeChart.data.datasets[0].data = data; incomeChart.update();
 }
 
-function updateStats(){
-  // count address types and modem sales
-  let home=0, online=0, other=0, modemSoldCount=0, totalOrders=0;
-  for(const date in tasks){ for(const r of tasks[date]){ totalOrders++; const t = r.addrType || 'other'; if(t==='home') home++; else if(t==='online') online++; else other++; if(r.modemSold) modemSoldCount++; } }
-  statsChart.data.datasets[0].data = [home, online, other]; statsChart.update();
-  modemCounterEl.textContent = `${modemSoldCount}/${totalOrders}`;
-  const total = home+online+other || 1;
-  addrPercents.textContent = `Дом: ${Math.round(home/total*100)}% • Онлайн: ${Math.round(online/total*100)}% • Другое: ${Math.round(other/total*100)}%`;
-}
+// initial render
+renderCal(); renderTasks(); updateEarnings();
 
-function updateAllCharts(){ updateIncomeChart(); updateStats(); }
-
-// --- Modal handling ---
-let editing = null; // {date, index} if editing
-function openModal(date, index=null){
-  editing = null;
-  clientName.value=''; carModel.value=''; timeInput.value=''; priceInput.value=''; addrType.value='home'; modemSold.checked=false;
-  if(index!==null){ const rec = (tasks[date]||[])[index]; if(rec){ clientName.value = rec.client||''; carModel.value = rec.car||''; timeInput.value = rec.time||''; priceInput.value = rec.price||''; addrType.value = rec.addrType||'other'; modemSold.checked = !!rec.modemSold; editing = {date, index}; } }
-  modalBg.style.display = 'flex';
-}
-function closeModal(){ modalBg.style.display = 'none'; editing = null; }
-
-saveRecordBtn.addEventListener('click', ()=>{
-  const client = clientName.value.trim(); if(!client){ alert('Введите имя'); return; }
-  const car = carModel.value.trim(); const time = timeInput.value.trim(); const price = Number(priceInput.value.trim()) || 0; const at = addrType.value; const ms = modemSold.checked;
-  const rec = { client, car, time, price, addrType:at, modemSold:ms, done:false, createdAt:new Date().toISOString() };
-  const date = selectedDate;
-  if(editing){ tasks[editing.date][editing.index] = rec; }
-  else { if(!tasks[date]) tasks[date]=[]; tasks[date].push(rec); }
-  persist(); renderCalendar(); renderTasks(); updateAllCharts(); scheduleNotificationFor(rec, date); closeModal();
-});
-
-cancelRecordBtn.addEventListener('click', closeModal);
-
-// double-click on day to open modal
-daysGrid.addEventListener('dblclick', e=>{ const d = e.target.closest('.day'); if(!d) return; selectedDate = d.dataset.date; renderCalendar(); renderTasks(); openModal(selectedDate); });
-
-// prev/next
-prevMonth.addEventListener('click', ()=>{ view.setMonth(view.getMonth()-1); renderCalendar(); });
-nextMonth.addEventListener('click', ()=>{ view.setMonth(view.getMonth()+1); renderCalendar(); });
-
-// toggle view
-toggleBtn.addEventListener('click', ()=>{
-  onCalendar = !onCalendar; calView.classList.toggle('active', onCalendar); chartView.classList.toggle('active', !onCalendar); toggleBtn.textContent = onCalendar? '📅' : '📊'; if(!onCalendar) updateAllCharts();
-});
-
-// --- Notifications (limitations explained) ---
-// We'll register a Service Worker (inline via Blob) so the page can receive push events from a server.
-// NOTE: To send push notifications at the right time ("за день до"), you need a server that keeps subscriptions
-// and triggers a push message when needed (APNs/FCM/VAPID). Browsers cannot reliably schedule notifications when the page is closed.
-// Below: register SW, offer subscription flow and a local fallback using setTimeout (works only while page is open).
-
-let swRegistration = null;
-async function registerInlineSW(){
-  if(!('serviceWorker' in navigator)) return;
-  const swCode = `self.addEventListener('push', function(e){
-    let data = {};
-    try{ data = e.data.json(); }catch(err){ data = {title:'Напоминание', body: e.data ? e.data.text() : 'У вас запись'} }
-    const title = data.title || 'Напоминание';
-    const options = { body: data.body || '', tag: data.tag || 'reminder', data: data, renotify:true };
-    self.registration.showNotification(title, options);
-  });
-  self.addEventListener('notificationclick', function(e){ e.notification.close(); if(e.notification.data && e.notification.data.url) clients.openWindow(e.notification.data.url); }, false);`;
-
-  const blob = new Blob([swCode], { type: 'application/javascript' });
-  const swUrl = URL.createObjectURL(blob);
-  try{ swRegistration = await navigator.serviceWorker.register(swUrl); console.log('SW registered'); }catch(err){ console.warn('SW reg failed', err); }
-}
-
-// Convert VAPID key helper (placeholder)
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
-  return outputArray;
-}
-
-async function subscribeForPush(){
-  if(!('serviceWorker' in navigator) || !('PushManager' in window)) { alert('Push неподдерживается в этом браузере'); return; }
-  if(!swRegistration) await registerInlineSW();
-  const permission = await Notification.requestPermission();
-  if(permission !== 'granted'){ alert('Нужно разрешение на уведомления'); return; }
-  // You MUST replace VAPID_PUBLIC_KEY with your public VAPID key on the server
-  const VAPID_PUBLIC_KEY = 'REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY';
-  try{
-    const sub = await swRegistration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
-    // send `sub` to your server to store and send pushes later
-    console.log('Subscribed', sub);
-    // Example: await fetch('/subscribe', {method:'POST', body:JSON.stringify(sub), headers:{'Content-Type':'application/json'}});
-    alert('Подписка оформлена. На сервере запланируйте отправку push за день до записи.');
-  }catch(e){ console.warn(e); alert('Не удалось подписаться'); }
-}
-
-// Local fallback: schedule a notification using setTimeout (only works while page is open)
-const localTimers = [];
-function scheduleNotificationFor(rec, dateISO){
-  // try to schedule for 24 hours before event time (if time provided)
-  let eventTime = dateISO + 'T00:00:00';
-  if(rec.time){ const t = rec.time.trim(); // expects HH:MM
-    if(/^\d{1,2}:\d{2}$/.test(t)) eventTime = dateISO + 'T' + t + ':00';
-  }
-  const eventTs = new Date(eventTime).getTime();
-  const notifyTs = eventTs - 24*60*60*1000; // 24h earlier
-  const delay = notifyTs - Date.now();
-  if(delay > 0 && delay < 30*24*60*60*1000){ // only schedule if within 30 days
-    const id = setTimeout(async ()=>{
-      // show notification via SW if available
-      if(swRegistration){ swRegistration.showNotification('Напоминание о записи', { body: `Завтра: ${rec.client} ${rec.time || ''}`, data:{url: location.href} }); }
-      else if ('Notification' in window && Notification.permission === 'granted'){ new Notification('Напоминание о записи', { body:`Завтра: ${rec.client} ${rec.time || ''}` }); }
-    }, delay);
-    localTimers.push(id);
-  }
-}
-
-// --- Stats & charts init ---
-function init(){ renderCalendar(); renderTasks(); initCharts(); updateAllCharts(); registerInlineSW(); adjustTasksHeight(); }
-function initCharts(){ initCharts = function(){}; // once
-  initCharts();
-}
-
-// avoid re-declaring Chart in initCharts above; implement actual init
-function initCharts(){
-  // incomeChart and statsChart initialised on first updateAllCharts call
-}
-
-function updateAllCharts(){
-  // lazy init of charts
-  if(!incomeChart){ incomeChart = new Chart(incomeCtx, { type:'line', data:{ labels:[], datasets:[{ label:'Доход', data:[], fill:true, backgroundColor:'rgba(74,108,250,0.14)', borderColor:'#4a6cfa', tension:0.35 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } }); }
-  if(!statsChart){ statsChart = new Chart(statsCtx, { type:'doughnut', data:{ labels:['Дом','Онлайн','Другое'], datasets:[{ data:[0,0,0], backgroundColor:['#4a6cfa','#9a4aff','#34c759'] }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } }); }
-  updateIncomeChart(); updateStats();
-}
-
-function updateIncomeChart(){ const labels=[]; const data=[]; for(let i=29;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const iso = d.toISOString().slice(0,10); labels.push(d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})); let s=0; (tasks[iso]||[]).forEach(r=> s+=Number(r.price||0)); data.push(s); } incomeChart.data.labels = labels; incomeChart.data.datasets[0].data = data; incomeChart.update(); }
-
-function updateStats(){ let home=0, online=0, other=0, modem=0, total=0; for(const date in tasks){ for(const r of tasks[date]){ total++; const t = r.addrType || 'other'; if(t==='home') home++; else if(t==='online') online++; else other++; if(r.modemSold) modem++; } } statsChart.data.datasets[0].data = [home, online, other]; statsChart.update(); modemCounterEl.textContent = `${modem}/${total}`; const tot = Math.max(1, home+online+other); addrPercents.textContent = `Дом: ${Math.round(home/tot*100)}% • Онлайн: ${Math.round(online/tot*100)}% • Другое: ${Math.round(other/tot*100)}%`; }
-
-// --- ensure tasksList scroll area size fits screen ---
-function adjustTasksHeight(){ try{ const rect = tasksList.getBoundingClientRect(); const viewport = window.innerHeight; const spaceBelow = 20; const maxH = Math.max(120, viewport - rect.top - spaceBelow); tasksList.style.maxHeight = maxH + 'px'; }catch(e){} }
-window.addEventListener('resize', adjustTasksHeight);
-
-// --- Init & expose ---
-init();
+// expose for debugging
 window._mobileTasks = tasks;
 </script>
 </body>
