@@ -1,283 +1,587 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Mobile Calendar</title>
-<!-- Chart.js for chart rendering -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<title>Записи — Mobile</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-:root {
-  --bg:#0b0d16;
-  --glass:rgba(255,255,255,0.06);
-  --blur:20px;
-  --radius:18px;
-  --text:#fff;
-  --accent:#4a6cfa;
-  --accent2:#9a4aff;
+:root{
+  --primary: #007AFF;
+  --secondary: #5856D6;
+  --success: #34C759;
+  --danger: #FF3B30;
+  --warning: #FF9500;
+  --bg: #070814;
+  --surface: rgba(255,255,255,0.06);
+  --text: #ffffff;
+  --muted: rgba(255,255,255,0.68);
+  --radius: 14px;
+  --glass-blur: 14px;
 }
-body{margin:0;background:var(--bg);font-family:system-ui;color:var(--text);overflow:hidden;height:100vh;}
-.container{display:flex;flex-direction:column;height:100vh;}
 
-/* Header */
-.header{padding:16px;background:var(--glass);backdrop-filter:blur(var(--blur));display:flex;justify-content:center;align-items:center;font-size:20px;font-weight:800;position:relative}
+/* lock page scrolling but allow scroll inside tasks and modal */
+html,body{
+  height:100%;
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden; /* prevent page scrolling */
+  touch-action: pan-y;
+}
 
-/* Unified toggle button */
-.toggle-btn{position:absolute;right:16px;top:14px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;justify-content:center;align-items:center;font-size:22px;box-shadow:0 0 20px rgba(0,0,0,0.4);transition:0.25s;}
-.toggle-btn:active{transform:scale(0.88);} 
+/* Background */
+.bg { position:fixed; inset:0; z-index:-2; background: linear-gradient(180deg,#05060a,#081026); }
+.bg-pattern { position:fixed; inset:0; background-image: radial-gradient(circle at 20% 80%, rgba(74,108,250,0.06) 0 10%, transparent 11%), radial-gradient(circle at 80% 10%, rgba(88,86,214,0.04) 0 8%, transparent 9%); z-index:-1; }
 
-/* Views */
-.view{flex:1;overflow-y:auto;padding:16px;display:none;}
-.view.active{display:block;}
+.app { display:flex; flex-direction:column; height:100vh; padding:12px; gap:12px; }
+.header { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:12px 24px 12px 12px; border-radius:12px; background:linear-gradient(180deg,var(--surface),transparent); backdrop-filter: blur(var(--glass-blur)); border:1px solid rgba(255,255,255,0.04); }
+.totals { display:flex; gap:8px; align-items:center; }
+.stat { background: rgba(255,255,255,0.02); padding:8px 10px; border-radius:12px; min-width:88px; text-align:center; border:1px solid rgba(255,255,255,0.03); }
+.stat .label { font-size:12px; color:var(--muted); }
+.stat .value { font-weight:800; font-size:16px; margin-top:4px; }
+
+/* Single toggle button (replaces two icon buttons) */
+/* moved a bit left so it never touches the very right edge */
+.toggle-wrap { display:flex; align-items:center; gap:8px; margin-right:34px; }
+.toggle-btn { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text); font-size:18px; cursor:pointer; transition: transform .18s, background .18s, color .18s; }
+.toggle-btn.active { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; transform: translateY(-4px); box-shadow:0 12px 36px rgba(0,0,0,0.45); }
+.toggle-btn.flip { transform: rotateY(180deg); transition: transform .35s; }
+
+/* Chart mode tabs (pills) */
+.tab { padding:6px 10px; border-radius:999px; background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); font-weight:800; cursor:pointer; }
+.tab.active { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#07122b; box-shadow:0 12px 30px rgba(0,0,0,0.35); transform:translateY(-2px); }
+
+/* Main - internal areas manage their own scrolling */
+.main { flex:1; display:flex; flex-direction:column; gap:12px; padding-bottom:12px; overflow:hidden; }
+
+/* Cards */
+.card { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:16px; padding:12px; border:1px solid rgba(255,255,255,0.04); backdrop-filter: blur(8px); }
 
 /* Calendar */
-.month-switch{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
-.switch-arrow{width:42px;height:42px;border-radius:var(--radius);background:var(--glass);backdrop-filter:blur(var(--blur));display:flex;justify-content:center;align-items:center;font-size:20px;}
-.month-name{font-size:22px;font-weight:800;}
+.calendar-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.month-name { font-weight:900; font-size:18px; }
+.month-nav { display:flex; gap:8px; align-items:center; }
+.nav-btn { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.04); background:transparent; font-size:16px; }
+.weekdays { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; margin-bottom:8px; }
+.weekdays div { font-size:11px; color:var(--muted); text-align:center }
 
-.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
-.day{aspect-ratio:1;display:flex;justify-content:center;align-items:center;border-radius:14px;background:var(--glass);backdrop-filter:blur(var(--blur));position:relative;font-weight:700;cursor:pointer;}
-.day.has::after{
-  content:"";
-  width:10px;height:10px;
-  border-radius:50%;
-  background:#4affb9;
-  position:absolute;
-  bottom:8px;
-  box-shadow:0 0 6px #4affb9;
-  border:1px solid rgba(255,255,255,0.18);
-}
-.day.today{outline:2px solid var(--accent);} 
-.day.selected{box-shadow:0 8px 20px rgba(74,108,250,0.14);}
+/* Days grid: limited height to avoid page scroll */
+.days { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; max-height: calc(100vh * 0.34); overflow:hidden; }
+.day { aspect-ratio:1/1; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800; position:relative; transition: transform .15s ease; background:transparent; color:var(--text); min-height:42px; }
+.day.other { color: rgba(255,255,255,0.18); opacity:0.8; }
+.day:hover { transform: translateY(-4px); }
+.day.today { background: linear-gradient(135deg,var(--warning), #FFB86B); color:#07122b; box-shadow:0 10px 28px rgba(255,149,0,0.12); }
+.day.selected { outline:2px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
+/* today & selected combination */
+.day.today.selected { background: linear-gradient(135deg,var(--warning), #FFD49A); color:#07122b; box-shadow:0 12px 36px rgba(255,149,0,0.18); outline:2px solid rgba(255,255,255,0.06); }
+/* dot marker */
+.day .dot { width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); position:absolute; bottom:6px; box-shadow:0 6px 12px rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.08); z-index:2; }
 
-/* Tasks */
-.tasks{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
-.task-card{background:var(--glass);backdrop-filter:blur(var(--blur));padding:14px;border-radius:var(--radius);} 
-.client-name{font-size:18px;font-weight:800;}
-.car{font-size:14px;opacity:0.7;margin-top:4px;}
-.time-tag{padding:8px 10px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;font-size:14px;font-weight:700;display:inline-block;margin-top:8px;color:#07122b}
-.price{margin-top:12px;padding:10px;border-radius:12px;font-size:18px;font-weight:900;text-align:center;background:#222;}
+/* Tasks: scroll only this container */
+.tasks-container { margin-top:10px; display:flex; flex-direction:column; gap:12px; }
+#tasksList { overflow:auto; -webkit-overflow-scrolling:touch; /* dynamic max-height set by JS */ padding-right:6px; }
+.task-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015)); border-radius:14px; padding:12px; border:1px solid rgba(255,255,255,0.04); box-shadow: 0 12px 36px rgba(0,0,0,0.45); transition: transform .18s; }
+.task-card:hover { transform: translateY(-6px); }
+.task-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.client { font-weight:900; font-size:16px; }
+.car { color:var(--muted); font-weight:700; margin-top:6px; font-size:13px; }
+.price-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; }
+.price-tag { padding:10px 14px; border-radius:12px; font-weight:900; font-size:16px; color:white; box-shadow: 0 8px 28px rgba(0,0,0,0.5); transition: all .25s; }
+.price-tag.done { background: linear-gradient(135deg, #34C759, #2EBF54); box-shadow:0 8px 28px rgba(52,199,89,0.12); color:#07122b; }
+.price-tag.pending { background: linear-gradient(135deg, #FFB86B, #FF8A3D); color:#07122b; box-shadow:0 8px 28px rgba(255,149,0,0.08); }
+.price-tag.cancelled { background: linear-gradient(135deg, #B0B0B0, #8B8B8A); color:#07122b; opacity:0.95; }
+.actions { display:flex; gap:8px; align-items:center; }
+.action-btn { width:46px; height:46px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; background:transparent; color:var(--text); font-size:16px; }
 
-/* Earnings */
-.earn-box{margin-top:18px;background:var(--glass);backdrop-filter:blur(var(--blur));padding:14px;border-radius:var(--radius);font-size:16px;line-height:1.4;}
-.earn-title{font-weight:800;margin-bottom:6px;font-size:18px;}
+/* Chart fixed size */
+.chart-card { margin-top:12px; border-radius:12px; padding:10px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); height:170px; overflow:hidden; display:flex; flex-direction:column; }
+.chart-inner { flex:1; min-height:0; }
+.chart-canvas { width:100%; height:100% !important; display:block; }
 
-/* Chart view */
-.chart-wrap{width:100%;height:220px;display:flex;justify-content:center;align-items:center;background:var(--glass);backdrop-filter:blur(var(--blur));border-radius:var(--radius);} 
-canvas{max-height:200px !important; width:100% !important}
+/* Add button and modal */
+.fab { position:fixed; right:26px; bottom:96px; width:64px; height:64px; border-radius:18px; background: linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; font-size:30px; color:white; box-shadow:0 18px 48px rgba(0,0,0,0.45); pointer-events:auto; border:none; z-index:55; }
+.modal-wrap { position:fixed; inset:0; display:none; align-items:flex-end; justify-content:center; z-index:60; background: linear-gradient(rgba(0,0,0,0.36), rgba(0,0,0,0.36)); padding:12px; }
+.modal { width:100%; max-width:520px; border-radius:16px; padding:14px; background: linear-gradient(180deg, rgba(10,12,20,0.98), rgba(16,18,30,0.98)); box-shadow: 0 20px 48px rgba(2,6,23,0.8); border:1px solid rgba(255,255,255,0.04); max-height: 70vh; overflow:auto; -webkit-overflow-scrolling: touch; }
+.modal .input { width:100%; padding:12px; border-radius:12px; border:0; background: rgba(255,255,255,0.02); color:var(--text); margin-top:10px; font-weight:800; }
+.modal .row { display:flex; gap:8px; }
+.btn-row { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+.btn { padding:10px 12px; border-radius:12px; font-weight:900; border:0; cursor:pointer; }
+.btn.ghost { background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--text); }
+.btn.primary { background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; box-shadow:0 12px 36px rgba(0,122,255,0.14); }
+.btn.danger { background: linear-gradient(135deg,#FF4A6A,#FF7A8A); color:#fff; }
 
-/* Modal */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:none;justify-content:center;align-items:center;z-index:50}
-.modal{width:88%;background:var(--glass);backdrop-filter:blur(var(--blur));padding:16px;border-radius:var(--radius);} 
-.input{width:100%;Margin-bottom:12px;padding:12px;border-radius:12px;background:#111;border:none;color:white;font-weight:800}
-.btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;text-align:center;font-weight:800;margin-top:8px;cursor:pointer}
+.center { text-align:center; color:var(--muted); padding:14px; font-weight:800; }
 
-/* small helpers */
-.center{ text-align:center;color:rgba(255,255,255,0.6);padding:14px;font-weight:800}
-
+@media (min-width:520px){ .app { max-width:420px; margin:0 auto; } .fab{ right:36px; bottom:96px; } }
 </style>
 </head>
 <body>
-<div class="container">
+  <div class="bg"></div>
+  <div class="bg-pattern"></div>
 
-  <div class="header">График</div>
-  <div class="toggle-btn" id="toggle">📅</div>
+  <div class="app" id="app">
+    <div class="header">
+      <div class="totals">
+        <div class="stat"><div class="label">Всего</div><div id="totalAll" class="value">0 ₽</div></div>
+        <div class="stat"><div class="label">Месяц</div><div id="totalMonth" class="value">0 ₽</div></div>
+        <div class="stat"><div class="label">Сегодня</div><div id="totalToday" class="value">0 ₽</div></div>
+      </div>
 
-  <!-- Calendar View -->
-  <div class="view active" id="calendar-view">
-
-    <div class="month-switch">
-      <div class="switch-arrow" id="prevMonth">❮</div>
-      <div class="month-name" id="monthName">Март 2025</div>
-      <div class="switch-arrow" id="nextMonth">❯</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <div class="toggle-wrap">
+          <!-- Single toggle button (moved left from the edge) -->
+          <button class="toggle-btn active" id="toggleView" aria-label="Переключить вид"><i id="toggleIcon" class="fas fa-calendar-day"></i></button>
+        </div>
+      </div>
     </div>
 
-    <div class="days-grid" id="daysGrid"></div>
+    <div class="main">
+      <!-- Calendar Pane -->
+      <div class="card pane" id="calendarPane">
+        <div class="calendar-head">
+          <div class="month-name" id="monthLabel">Июнь 2025</div>
+          <div class="month-nav">
+            <button class="nav-btn" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+            <button class="nav-btn" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+        <div class="weekdays" id="weekdays"></div>
+        <div class="days" id="daysGrid"></div>
+      </div>
 
-    <div class="earn-box">
-      <div class="earn-title">Доход</div>
-      <div>За всё время: <span id="earnAll">0 ₽</span></div>
-      <div>За месяц: <span id="earnMonth">0 ₽</span></div>
-      <div>За день: <span id="earnDay">0 ₽</span></div>
+      <!-- Chart Pane (hidden by default) -->
+      <div class="card pane" id="chartPane" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="font-weight:900">Доход — выполненные</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button class="tab active" id="chart7Btn">7д</button>
+            <button class="tab" id="chartDailyBtn">30д</button>
+            <button class="tab" id="chartMonthlyBtn">12м</button>
+          </div>
+        </div>
+        <div class="chart-card"><div class="chart-inner"><canvas id="incomeChart" class="chart-canvas"></canvas></div></div>
+      </div>
+
+      <!-- Tasks pane -->
+      <div class="card" id="tasksPane">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-weight:900">Записи</div>
+          <div style="color:var(--muted); font-weight:800; font-size:13px" id="selectedDateLabel">—</div>
+        </div>
+
+        <div class="tasks-container">
+          <div id="tasksList" aria-label="Список записей">
+            <div class="center">Выберите дату в календаре, чтобы просмотреть записи</div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <div class="tasks" id="tasksList"></div>
+    <button class="fab" id="openAdd" title="Добавить">＋</button>
+
+    <div class="bottom-nav"></div>
   </div>
 
-  <!-- Chart View -->
-  <div class="view" id="chart-view">
-    <div class="chart-wrap">
-      <canvas id="incomeChart"></canvas>
+  <!-- Modal -->
+  <div class="modal-wrap" id="modalWrap">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div id="modalTitle" style="font-weight:900">Новая запись</div>
+      </div>
+
+      <input id="mDate" type="date" class="input" style="display:none" />
+      <input id="mClient" class="input" placeholder="Клиент" />
+      <input id="mCar" class="input" placeholder="Авто" />
+      <div class="row">
+        <input id="mTime" class="input" placeholder="12:00" style="flex:1" />
+        <input id="mPrice" class="input" placeholder="₽" style="width:120px" inputmode="numeric" />
+      </div>
+      <input id="mPlace" class="input" placeholder="Место" />
+      <textarea id="mDesc" class="input" placeholder="Описание" rows="3"></textarea>
+
+      <div class="btn-row">
+        <button class="btn ghost" id="cancelBtn">Отмена</button>
+        <button class="btn danger" id="deleteBtn" style="display:none">Удалить</button>
+        <button class="btn primary" id="saveBtn">Сохранить</button>
+      </div>
     </div>
   </div>
-
-</div>
-
-<!-- Modal -->
-<div class="modal-bg" id="modalBg">
-  <div class="modal">
-    <input class="input" id="clientName" placeholder="Имя клиента">
-    <input class="input" id="carModel" placeholder="Машина">
-    <input class="input" id="time" placeholder="Время (12:00)">
-    <input class="input" id="price" placeholder="Цена (4500)" inputmode="numeric">
-    <div class="btn" id="saveRecord">Сохранить</div>
-  </div>
-</div>
 
 <script>
-// Helper: local ISO (YYYY-MM-DD) using local date components (avoids timezone shifts)
-function toLocalISO(d){
-  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0');
-}
+/* Behaviour: dots, single toggle moved left, 7-day chart, tasksList scroll enabled and dynamic height,
+   improved touch handling so only tasks/modal scroll, page itself locked
+   + fixes for timezone/date-shift: use midday and normalize stored keys to local ISO */
+(function(){
+  const $ = s => document.querySelector(s);
+  const fmtMoney = n => (parseInt(n)||0).toLocaleString() + ' ₽';
+  const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  const weekdays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 
-// Data stored as { 'YYYY-MM-DD': [ {client,car,time,price,createdAt} ] }
-const STORAGE_KEY = 'mobile_tasks';
-let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-let onCalendar = true;
-let selectedDate = toLocalISO(new Date());
-let view = new Date(); // current view month
-
-const toggle=document.getElementById("toggle");
-const calendarView=document.getElementById("calendar-view");
-const chartView=document.getElementById("chart-view");
-const daysGrid=document.getElementById("daysGrid");
-const monthName=document.getElementById('monthName');
-const prevMonth=document.getElementById('prevMonth');
-const nextMonth=document.getElementById('nextMonth');
-const tasksList=document.getElementById('tasksList');
-const earnAllEl=document.getElementById('earnAll');
-const earnMonthEl=document.getElementById('earnMonth');
-const earnDayEl=document.getElementById('earnDay');
-const modalBg=document.getElementById('modalBg');
-const clientName=document.getElementById('clientName');
-const carModel=document.getElementById('carModel');
-const timeInput=document.getElementById('time');
-const priceInput=document.getElementById('price');
-const saveRecord=document.getElementById('saveRecord');
-const incomeChartCtx = document.getElementById('incomeChart').getContext('2d');
-let incomeChart=null;
-
-// toggle single button
-toggle.onclick=()=>{
-  onCalendar = !onCalendar;
-  calendarView.classList.toggle("active", onCalendar);
-  chartView.classList.toggle("active", !onCalendar);
-  toggle.textContent = onCalendar ? "📅" : "📊";
-  if(!onCalendar) updateChart();
-};
-
-// render calendar for current view (view is Date)
-function renderCal(){
-  daysGrid.innerHTML='';
-  const y = view.getFullYear();
-  const m = view.getMonth();
-  const first = new Date(y,m,1);
-  const daysInMonth = new Date(y,m+1,0).getDate();
-  monthName.textContent = first.toLocaleString('ru',{month:'long'}) + ' ' + y;
-
-  // optionally pad if you want Mon-first; here we just show days sequentially to fit mobile
-  for(let d=1; d<=daysInMonth; d++){
-    const date = new Date(y,m,d);
-    const iso = toLocalISO(date);
-    const el = document.createElement('div');
-    el.className = 'day';
-    el.dataset.date = iso;
-    el.textContent = d;
-    if(tasks[iso] && tasks[iso].length) el.classList.add('has');
-    if(iso===toLocalISO(new Date())) el.classList.add('today');
-    if(iso===selectedDate) el.classList.add('selected');
-    el.addEventListener('click', ()=>{ selectedDate = iso; renderCal(); renderTasks(); });
-    daysGrid.appendChild(el);
+  // helpers for stable local-date ISO (YYYY-MM-DD) and midday normalization
+  function toLocalISO(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
   }
-}
+  const todayISO = () => { const t=new Date(); t.setHours(12,0,0,0); return toLocalISO(t); };
 
-function renderTasks(){
-  const list = tasks[selectedDate] || [];
-  tasksList.innerHTML = '';
-  if(!list.length){ tasksList.innerHTML = '<div class="center">Нет записей на этот день. Нажмите + чтобы добавить.</div>'; updateEarnings(); return; }
-  list.forEach((r, i)=>{
-    const card = document.createElement('div'); card.className='task-card';
-    card.innerHTML = `
-      <div class="client-name">${escapeHtml(r.client)}</div>
-      <div class="car">${escapeHtml(r.car)}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-        <div class="time-tag">${escapeHtml(r.time)}</div>
-        <div style="font-weight:800">${Number(r.price).toLocaleString()} ₽</div>
-      </div>
-    `;
-    // delete button
-    const del = document.createElement('div'); del.style.marginTop='10px'; del.style.textAlign='right';
-    del.innerHTML = '<button style="padding:8px 10px;border-radius:10px;border:0;background:rgba(255,255,255,0.04);color:#fff;">Удалить</button>';
-    del.querySelector('button').addEventListener('click', ()=>{ if(confirm('Удалить запись?')){ tasks[selectedDate].splice(i,1); if(!tasks[selectedDate].length) delete tasks[selectedDate]; persist(); renderCal(); renderTasks(); updateEarnings(); } });
-    card.appendChild(del);
-    tasksList.appendChild(card);
-  });
-  updateEarnings();
-}
+  // load and normalize any existing stored keys to local ISO (fix older UTC-shifted keys)
+  let raw = localStorage.getItem('mobile_tasks');
+  let tasks = raw ? JSON.parse(raw) : {};
+  function normalizeStoredTasks(){
+    const normalized = {};
+    for(const k in tasks){
+      try{
+        // parse with midday to avoid TZ issues
+        const d = new Date(k + 'T12:00:00');
+        const nk = toLocalISO(d);
+        normalized[nk] = (normalized[nk]||[]).concat(tasks[k]);
+      }catch(e){
+        normalized[k] = (normalized[k]||[]).concat(tasks[k]);
+      }
+    }
+    tasks = normalized;
+    localStorage.setItem('mobile_tasks', JSON.stringify(tasks));
+  }
+  normalizeStoredTasks();
 
-function updateEarnings(){
-  // total all-time
-  let all=0;
-  for(const date in tasks){ for(const r of tasks[date]) all += Number(r.price||0); }
-  earnAllEl.textContent = all.toLocaleString() + ' ₽';
+  let view = new Date(); view.setHours(12,0,0,0);
+  let selectedDate = todayISO();
+  let chartMode = '7d';
+  let incomeChart = null;
+  let showingCalendar = true;
 
-  // month earnings for view month
-  const y = view.getFullYear(); const m = String(view.getMonth()+1).padStart(2,'0');
-  let monthSum=0; for(const date in tasks){ if(date.slice(0,7)===`${y}-${m}`){ for(const r of tasks[date]) monthSum += Number(r.price||0); } }
-  earnMonthEl.textContent = monthSum.toLocaleString() + ' ₽';
+  // Elements
+  const toggleViewBtn = $('#toggleView');
+  const toggleIcon = $('#toggleIcon');
+  const calendarPane = $('#calendarPane');
+  const chartPane = $('#chartPane');
+  const daysGrid = $('#daysGrid');
+  const weekdaysEl = $('#weekdays');
+  const monthLabel = $('#monthLabel');
+  const tasksList = $('#tasksList');
+  const selectedDateLabel = $('#selectedDateLabel');
 
-  // day earnings for selectedDate
-  let daySum = 0; for(const r of (tasks[selectedDate]||[])) daySum += Number(r.price||0);
-  earnDayEl.textContent = daySum.toLocaleString() + ' ₽';
-}
+  const totalAllEl = $('#totalAll');
+  const totalMonthEl = $('#totalMonth');
+  const totalTodayEl = $('#totalToday');
 
-function persist(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
-function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>'\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  const prevMonthBtn = $('#prevMonth');
+  const nextMonthBtn = $('#nextMonth');
+  const openAdd = $('#openAdd');
 
-// modal
-document.getElementById('openAdd')?.addEventListener('click', ()=>{ modalBg.style.display='flex'; });
-// but user may click FAB not present in this version; allow plus via toggle double-click - keep simple: show modal when long-press on selected day? We'll show modal when user clicks day and then clicks saveRecord - also allow opening modal by double-clicking selected day
+  const modalWrap = $('#modalWrap');
+  const cancelBtn = $('#cancelBtn');
+  const saveBtn = $('#saveBtn');
+  const deleteBtn = $('#deleteBtn');
+  const mDate = $('#mDate');
+  const mClient = $('#mClient');
+  const mCar = $('#mCar');
+  const mTime = $('#mTime');
+  const mPrice = $('#mPrice');
+  const mPlace = $('#mPlace');
+  const mDesc = $('#mDesc');
 
-// Save record button
-saveRecord.addEventListener('click', ()=>{
-  const client = clientName.value.trim(); const car = carModel.value.trim(); const time = timeInput.value.trim(); const price = Number(priceInput.value.trim()) || 0;
-  if(!client){ alert('Введите имя клиента'); return; }
-  if(!tasks[selectedDate]) tasks[selectedDate]=[];
-  tasks[selectedDate].push({ client, car, time, price, createdAt:new Date().toISOString() });
-  persist(); clientName.value=''; carModel.value=''; timeInput.value=''; priceInput.value=''; modalBg.style.display='none'; renderCal(); renderTasks(); updateEarnings();
-});
+  const chart7Btn = $('#chart7Btn');
+  const chartDailyBtn = $('#chartDailyBtn');
+  const chartMonthlyBtn = $('#chartMonthlyBtn');
 
-// allow clicking anywhere on a selected day to open modal (double click)
-daysGrid.addEventListener('dblclick', (e)=>{
-  const d = e.target.closest('.day'); if(!d) return; selectedDate = d.dataset.date; modalBg.style.display='flex';
-});
+  function init(){ renderWeekdays(); renderCalendar(); renderTasks(); updateTotals(); initChart(); bind(); adjustTasksHeight(); }
 
-// prev/next
-prevMonth.addEventListener('click', ()=>{ view.setMonth(view.getMonth()-1); renderCal(); updateEarnings(); });
-nextMonth.addEventListener('click', ()=>{ view.setMonth(view.getMonth()+1); renderCal(); updateEarnings(); });
+  function bind(){
+    toggleViewBtn.addEventListener('click', ()=> {
+      showingCalendar = !showingCalendar;
+      if (showingCalendar) {
+        calendarPane.style.display = '';
+        chartPane.style.display = 'none';
+        toggleViewBtn.classList.add('active');
+        toggleIcon.className = 'fas fa-calendar-day';
+      } else {
+        calendarPane.style.display = 'none';
+        chartPane.style.display = '';
+        toggleViewBtn.classList.remove('active');
+        toggleIcon.className = 'fas fa-chart-line';
+        updateChart();
+      }
+      toggleViewBtn.classList.add('flip');
+      setTimeout(()=> toggleViewBtn.classList.remove('flip'), 360);
+      setTimeout(adjustTasksHeight, 120);
+    });
 
-// Chart: simple last-30-days sum
-function initChart(){
-  incomeChart = new Chart(incomeChartCtx, {
-    type: 'line',
-    data: { labels: [], datasets: [{ label:'Доход', data: [], fill:true, backgroundColor:'rgba(74,108,250,0.14)', borderColor:'#4a6cfa', tension:0.35 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ grid:{display:false} }, y:{ grid:{color:'rgba(255,255,255,0.03)'} } } }
-  });
-  updateChart();
-}
+    prevMonthBtn.addEventListener('click', ()=> { changeMonth(-1); adjustTasksHeight(); });
+    nextMonthBtn.addEventListener('click', ()=> { changeMonth(1); adjustTasksHeight(); });
 
-function updateChart(){
-  if(!incomeChart) initChart();
-  const labels=[]; const data=[];
-  for(let i=29;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const iso = toLocalISO(d); labels.push(d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})); let s=0; if(tasks[iso]) for(const r of tasks[iso]) s += Number(r.price||0); data.push(s); }
-  incomeChart.data.labels = labels; incomeChart.data.datasets[0].data = data; incomeChart.update();
-}
+    openAdd.addEventListener('click', ()=> openModalFor(selectedDate));
+    cancelBtn.addEventListener('click', closeModalWrap);
+    saveBtn.addEventListener('click', saveFromModal);
+    deleteBtn.addEventListener('click', deleteFromModal);
 
-// initial render
-renderCal(); renderTasks(); updateEarnings();
+    chart7Btn.addEventListener('click', ()=> { chartMode='7d'; setActiveChartTab(chart7Btn); updateChart(); });
+    chartDailyBtn.addEventListener('click', ()=> { chartMode='daily'; setActiveChartTab(chartDailyBtn); updateChart(); });
+    chartMonthlyBtn.addEventListener('click', ()=> { chartMode='monthly'; setActiveChartTab(chartMonthlyBtn); updateChart(); });
 
-// expose for debugging
-window._mobileTasks = tasks;
+    tasksList.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-act]'); if (!btn) return;
+      const act = btn.dataset.act; const idx = Number(btn.dataset.i);
+      if (act === 'toggle'){ tasks[selectedDate][idx].done = !tasks[selectedDate][idx].done; persist(); renderTasks(); updateTotals(); updateChart(); }
+      if (act === 'edit'){ openModalFor(selectedDate, idx); adjustTasksHeight(); }
+      if (act === 'del'){ if (confirm('Удалить запись?')){ tasks[selectedDate].splice(idx,1); if (!tasks[selectedDate].length) delete tasks[selectedDate]; persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); adjustTasksHeight(); } }
+    });
+
+    addSwipe(daysGrid, dir=> { changeMonth(dir); adjustTasksHeight(); });
+
+    // allow touchmove inside tasksList and modal, prevent elsewhere
+    document.addEventListener('touchmove', function(e){
+      if (e.target.closest('#tasksList') || e.target.closest('.modal') || e.target.closest('.chart-card')) {
+        return; // allow
+      }
+      e.preventDefault();
+    }, { passive:false });
+
+    window.addEventListener('resize', adjustTasksHeight);
+    window.addEventListener('orientationchange', ()=> setTimeout(adjustTasksHeight, 120));
+  }
+
+  function setActiveChartTab(btn){ [chart7Btn, chartDailyBtn, chartMonthlyBtn].forEach(x=> x.classList.remove('active')); if (btn) btn.classList.add('active'); }
+
+  function renderWeekdays(){ weekdaysEl.innerHTML = weekdays.map(d=>`<div>${d}</div>`).join(''); }
+
+  function renderCalendar(){
+    const y = view.getFullYear(), m = view.getMonth();
+    // first day set to midday to avoid TZ shifts
+    const first = new Date(y, m, 1, 12);
+    monthLabel.textContent = monthNames[m] + ' ' + y;
+    daysGrid.innerHTML = '';
+    const last = new Date(y,m+1,0,12);
+    const pad = (first.getDay() === 0) ? 6 : first.getDay()-1;
+    for (let i=0;i<pad;i++){ const el = document.createElement('div'); el.className='day other'; daysGrid.appendChild(el); }
+
+    const today = todayISO();
+    for (let d=1; d<=last.getDate(); d++){
+      const dateObj = new Date(y,m,d,12); // midday
+      const ds = toLocalISO(dateObj);
+      const el = document.createElement('div'); el.className='day';
+      if (ds===today) el.classList.add('today');
+      if (ds===selectedDate) el.classList.add('selected');
+
+      const num = document.createElement('div'); num.style.zIndex='1'; num.textContent = d; el.appendChild(num);
+
+      if ((tasks[ds]||[]).length) {
+        const dot = document.createElement('div'); dot.className='dot'; el.appendChild(dot);
+      }
+
+      el.dataset.date = ds;
+      el.addEventListener('click', ()=> {
+        selectedDate = ds; renderCalendar(); renderTasks(); updateSelectedDateLabel();
+      });
+      daysGrid.appendChild(el);
+    }
+    updateSelectedDateLabel();
+  }
+
+  function renderTasks(){
+    const list = tasks[selectedDate] || [];
+    $('#selectedDateLabel').textContent = formatSelectedDate(selectedDate);
+    if (!list.length) { tasksList.innerHTML = `<div class='center'>Нет записей на ${formatSelectedDate(selectedDate)}</div>`; adjustTasksHeight(); return; }
+    tasksList.innerHTML='';
+    list.forEach((t, idx)=>{
+      const card = document.createElement('div'); card.className='task-card';
+      card.innerHTML = `
+        <div class="task-top">
+          <div>
+            <div class="client">${escapeHtml(t.client||'Без имени')}</div>
+            <div class="car">${escapeHtml(t.car||'—')}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <div style="font-weight:900" class="time-pill">${escapeHtml(t.time||'—')}</div>
+            <div style="color:var(--muted); font-size:12px; margin-top:8px">${escapeHtml(t.place||'—')}</div>
+          </div>
+        </div>
+        <div class="price-row">
+          <div class="price-tag ${t.done ? 'done' : 'pending'}">${fmtMoney(t.price)}</div>
+          <div class="actions">
+            <button class="action-btn" data-act="toggle" data-i="${idx}" title="${t.done ? 'Отметить как не выполнено' : 'Отметить выполнено'}"><i class="fas ${t.done ? 'fa-check' : 'fa-circle'}"></i></button>
+            <button class="action-btn" data-act="edit" data-i="${idx}" title="Редактировать"><i class="fas fa-edit"></i></button>
+            <button class="action-btn" data-act="del" data-i="${idx}" title="Удалить"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>`;
+      tasksList.appendChild(card);
+    });
+    adjustTasksHeight();
+  }
+
+  function openModalFor(date, editIndex=null){
+    modalWrap.style.display='flex';
+    mDate.value = date || selectedDate;
+    mClient.value=''; mCar.value=''; mTime.value=''; mPrice.value=''; mPlace.value=''; mDesc.value='';
+    modalWrap.dataset.edit='';
+    if (editIndex!==null){
+      const t = (tasks[date]||[])[editIndex];
+      if (t){ mClient.value=t.client||''; mCar.value=t.car||''; mTime.value=t.time||''; mPrice.value=t.price||''; mPlace.value=t.place||''; mDesc.value=t.desc||''; deleteBtn.style.display=''; modalWrap.dataset.edit=String(editIndex); }
+    } else deleteBtn.style.display='none';
+  }
+  function closeModalWrap(){ modalWrap.style.display='none'; modalWrap.dataset.edit=''; }
+  function saveFromModal(){
+    const date = mDate.value || selectedDate;
+    if (!tasks[date]) tasks[date]=[];
+    const obj = { client:mClient.value.trim(), car:mCar.value.trim(), time:mTime.value.trim(), price:mPrice.value.trim(), place:mPlace.value.trim(), desc:mDesc.value.trim(), done:false, createdAt:new Date().toISOString() };
+    const edit = modalWrap.dataset.edit;
+    if (edit !== '') tasks[date][Number(edit)] = obj; else tasks[date].push(obj);
+    persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap(); adjustTasksHeight();
+  }
+  function deleteFromModal(){
+    const date = mDate.value || selectedDate;
+    const edit = modalWrap.dataset.edit;
+    if (edit==='') return;
+    if (!confirm('Удалить запись?')) return;
+    tasks[date].splice(Number(edit),1);
+    if (!tasks[date].length) delete tasks[date];
+    persist(); renderCalendar(); renderTasks(); updateTotals(); updateChart(); closeModalWrap(); adjustTasksHeight();
+  }
+
+  function updateTotals(){
+    let all=0, month=0, todaySum=0;
+    const today = todayISO();
+    const mPref = `${view.getFullYear()}-${String(view.getMonth()+1).padStart(2,'0')}`;
+    for (const date in tasks){
+      for (const t of tasks[date]){
+        const p = Number(t.price||0);
+        if (t.done) all+=p;
+        if (date.slice(0,7)===mPref && t.done) month+=p;
+        if (date===today && t.done) todaySum+=p;
+      }
+    }
+    totalAllEl.textContent = fmtMoney(all);
+    totalMonthEl.textContent = fmtMoney(month);
+    totalTodayEl.textContent = fmtMoney(todaySum);
+  }
+
+  function changeMonth(delta){ view.setMonth(view.getMonth()+delta); view.setHours(12,0,0,0); renderCalendar(); updateTotals(); if (!showingCalendar) updateChart(); }
+  function persist(){ localStorage.setItem('mobile_tasks', JSON.stringify(tasks)); }
+  function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function formatSelectedDate(d){ if(!d) return '—'; const dt=new Date(d + 'T12:00:00'); const today=new Date(); if (d===todayISO()) return 'Сегодня'; return dt.toLocaleDateString('ru-RU', { weekday:'long', day:'numeric', month:'long' }); }
+  function updateSelectedDateLabel(){ $('#selectedDateLabel').textContent = formatSelectedDate(selectedDate); }
+
+  // Chart
+  function initChart(){
+    const ctx = document.getElementById('incomeChart').getContext('2d');
+    incomeChart = new Chart(ctx, {
+      type:'line',
+      data:{ labels:[], datasets:[{ label:'Доход', data:[], fill:true, tension:0.36, pointRadius:3 }] },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{display:false}, tooltip:{mode:'index', intersect:false}},
+        scales:{ x:{ ticks:{ color:'#cfd8ff' }, grid:{ display:false } }, y:{ ticks:{ color:'#cfd8ff' }, grid:{ color:'rgba(255,255,255,0.03)' } } },
+        layout:{ padding:6 }
+      }
+    });
+    updateChart();
+  }
+
+  function updateChart(){
+    if (!incomeChart) return;
+    if (chartMode === '7d'){
+      const labels=[]; const data=[];
+      for (let i=6;i>=0;i--){
+        const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()-i); const ds = toLocalISO(d);
+        labels.push(d.toLocaleDateString('ru-RU', { day:'numeric', month:'short' }));
+        let s=0; (tasks[ds]||[]).forEach(t => { if (t.done) s += Number(t.price||0); });
+        data.push(s);
+      }
+      incomeChart.data.labels = labels;
+      incomeChart.data.datasets[0].data = data;
+      incomeChart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#007AFF';
+      incomeChart.data.datasets[0].backgroundColor = createGradient(incomeChart.ctx, incomeChart.canvas.height, false);
+    } else if (chartMode==='daily') {
+      const labels=[]; const data=[];
+      for (let i=29;i>=0;i--){
+        const d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()-i); const ds=toLocalISO(d);
+        labels.push(d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'}));
+        let s=0; (tasks[ds]||[]).forEach(t=>{ if (t.done) s+=Number(t.price||0); });
+        data.push(s);
+      }
+      incomeChart.data.labels = labels;
+      incomeChart.data.datasets[0].data = data;
+      incomeChart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#007AFF';
+      incomeChart.data.datasets[0].backgroundColor = createGradient(incomeChart.ctx, incomeChart.canvas.height, false);
+    } else {
+      const labels=[]; const data=[];
+      const now=new Date(); now.setHours(12,0,0,0);
+      for (let i=11;i>=0;i--){
+        const d=new Date(now.getFullYear(), now.getMonth()-i, 1, 12); const key=toLocalISO(d);
+        labels.push(d.toLocaleDateString('ru-RU',{month:'short',year:'numeric'}));
+        let s=0;
+        for (const date in tasks){
+          if (date.slice(0,7)===key) (tasks[date]||[]).forEach(t => { if (t.done) s += Number(t.price||0); });
+        }
+        data.push(s);
+      }
+      incomeChart.data.labels = labels;
+      incomeChart.data.datasets[0].data = data;
+      incomeChart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--secondary') || '#5856D6';
+      incomeChart.data.datasets[0].backgroundColor = createGradient(incomeChart.ctx, incomeChart.canvas.height, true);
+    }
+    incomeChart.update();
+  }
+
+  function createGradient(ctx, height, inverted){
+    const g = ctx.createLinearGradient(0,0,0,height || 160);
+    if (!inverted){
+      g.addColorStop(0, 'rgba(0,122,255,0.32)');
+      g.addColorStop(1, 'rgba(52,199,89,0.04)');
+    } else {
+      g.addColorStop(0, 'rgba(88,86,214,0.28)');
+      g.addColorStop(1, 'rgba(88,86,214,0.04)');
+    }
+    return g;
+  }
+
+  // adjust tasksList max-height dynamically so it scrolls but page doesn't move
+  function adjustTasksHeight(){
+    try{
+      const header = document.querySelector('.header');
+      const tasksPane = document.getElementById('tasksPane');
+      if (!header || !tasksPane) return;
+      const viewport = window.innerHeight;
+      const tasksPaneTop = tasksPane.getBoundingClientRect().top;
+      const bottomGap = 120; // px (FAB + margins)
+      const maxH = Math.max(120, viewport - tasksPaneTop - bottomGap);
+      tasksList.style.maxHeight = maxH + 'px';
+    }catch(e){ /* ignore */ }
+  }
+
+  // utilities
+  function addSwipe(el, cb){
+    let startX = null;
+    el.addEventListener('touchstart', (e)=> { startX = e.touches[0].clientX; }, {passive:true});
+    el.addEventListener('touchend', (e)=> { if (startX === null) return; const dx = e.changedTouches[0].clientX - startX; if (Math.abs(dx) > 40) cb(dx < 0 ? 1 : -1); startX = null; });
+  }
+
+  // initial state
+  (function switchToInitial(){
+    calendarPane.style.display=''; chartPane.style.display='none';
+    showingCalendar = true;
+    toggleViewBtn.classList.add('active');
+    toggleIcon.className = 'fas fa-calendar-day';
+    setActiveChartTab(chart7Btn);
+  })();
+
+  // expose helpers
+  window.mobileApp = { renderCalendar, renderTasks, updateChart, tasks, persist };
+
+  // start
+  init();
+})();
 </script>
 </body>
 </html>
